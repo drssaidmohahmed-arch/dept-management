@@ -1,0 +1,79 @@
+# ============================================================
+# Next.js + Prisma - Git Ignore
+# ============================================================
+
+# ─── Dependencies ────────────────────────────────────────────
+node_modules/
+.pnp
+.pnp.js
+
+# ─── Next.js Build ──────────────────────────────────────────
+.next/
+out/
+build/
+dist/
+*.tsbuildinfo
+next-env.d.ts
+
+# ─── Production ─────────────────────────────────────────────
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+bun-debug.log*
+dev.log
+server.log
+
+# ─── Environment Variables ─────────────────────────────────
+.env
+.env*.local
+.env.production
+.env.staging
+
+# ─── Database ───────────────────────────────────────────────
+db/*.db
+db/*.db-journal
+db/*.db-wal
+prisma/migrations/
+
+# ─── Vercel ──────────────────────────────────────────────────
+.vercel
+
+# ─── TypeScript ─────────────────────────────────────────────
+*.tsbuildinfo
+next-env.d.ts
+
+# ─── IDE ────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# ─── Coverage ───────────────────────────────────────────────
+coverage/
+.nyc_output/
+
+# ─── Cache ──────────────────────────────────────────────────
+.cache/
+.eslintcache
+.parcel-cache
+
+# ─── Deploy Package (generated) ─────────────────────────────
+deploy-package/
+*.tar.gz
+
+# ─── OS ────────────────────────────────────────────────────
+Thumbs.db
+Desktop.ini
+
+# ─── Skills (external) ─────────────────────────────────────
+skills/
+.zscripts/
+download/
+
+# ─── Misc ───────────────────────────────────────────────────
+*.tgz
+.npm
+.eslintcache
