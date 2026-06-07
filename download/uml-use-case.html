@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>مخطط حالات الاستخدام</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #F8FAFC;
+    font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+    color: #243447;
+    width: 1200px;
+    height: 900px;
+    position: relative;
+    overflow: hidden;
+  }
+  .title {
+    text-align: center;
+    font-size: 26px;
+    font-weight: 700;
+    color: #243447;
+    padding: 18px 0 10px;
+    letter-spacing: 0.5px;
+  }
+  .title span {
+    color: #4C6EF5;
+  }
+
+  /* System boundary */
+  .system-boundary {
+    position: absolute;
+    left: 50%;
+    top: 60px;
+    transform: translateX(-50%);
+    width: 680px;
+    height: 780px;
+    border: 2.5px solid #4C6EF5;
+    border-radius: 16px;
+    background: rgba(76,110,245,0.03);
+  }
+  .system-boundary-label {
+    position: absolute;
+    top: -14px;
+    right: 24px;
+    background: #F8FAFC;
+    padding: 2px 16px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #4C6EF5;
+  }
+
+  /* Actors */
+  .actor {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 120px;
+  }
+  .actor-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 6px;
+    box-shadow: 0 2px 8px rgba(76,110,245,0.25);
+  }
+  .actor-label {
+    font-size: 15px;
+    font-weight: 700;
+    text-align: center;
+    color: #243447;
+  }
+  /* HOD */
+  .actor-hod { right: 80px; top: 100px; }
+  .actor-hod .actor-icon { background: #4C6EF5; }
+  /* Professor */
+  .actor-prof { right: 80px; top: 340px; }
+  .actor-prof .actor-icon { background: #7C5CFC; }
+  /* Employee */
+  .actor-emp { right: 80px; top: 560px; }
+  .actor-emp .actor-icon { background: #3B82F6; }
+  /* Student */
+  .actor-stu { left: 80px; top: 280px; }
+  .actor-stu .actor-icon { background: #10B981; }
+
+  /* Use case ellipses */
+  .usecase {
+    position: absolute;
+    width: 170px;
+    height: 56px;
+    border: 2px solid #4C6EF5;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    padding: 0 12px;
+    color: #243447;
+    z-index: 2;
+    transition: box-shadow 0.2s;
+  }
+  .usecase:hover {
+    box-shadow: 0 0 0 3px rgba(76,110,245,0.15);
+  }
+
+  /* HOD use cases */
+  .uc-hod-create { left: 340px; top: 110px; }
+  .uc-hod-delete { left: 560px; top: 110px; }
+  .uc-hod-courses { left: 340px; top: 200px; }
+  .uc-hod-stats { left: 560px; top: 200px; }
+
+  /* Professor use cases */
+  .uc-prof-view { left: 340px; top: 330px; }
+  .uc-prof-schedule { left: 560px; top: 330px; }
+
+  /* Employee use cases */
+  .uc-emp-view { left: 340px; top: 550px; }
+  .uc-emp-tasks { left: 560px; top: 550px; }
+
+  /* Student use cases */
+  .uc-stu-view { left: 340px; top: 400px; }
+  .uc-stu-courses { left: 560px; top: 400px; }
+  .uc-stu-request { left: 340px; top: 490px; }
+  .uc-stu-track { left: 560px; top: 490px; }
+
+  /* Login */
+  .uc-login { left: 440px; top: 660px; }
+  .uc-login { border-color: #E74C3C; color: #E74C3C; background: rgba(231,76,60,0.05); }
+
+  /* SVG Lines */
+  .lines-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1200px;
+    height: 900px;
+    z-index: 1;
+    pointer-events: none;
+  }
+  .lines-svg line, .lines-svg path {
+    stroke: #4C6EF5;
+    stroke-width: 1.5;
+    fill: none;
+  }
+  .lines-svg line.login-line {
+    stroke: #E74C3C;
+    stroke-dasharray: 6,3;
+  }
+
+  /* Legend */
+  .legend {
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 20px;
+    font-size: 12px;
+    color: #6B7B8D;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+</style>
+</head>
+<body>
+
+<div class="title">مخطط حالات الاستخدام <span>(Use Case Diagram)</span></div>
+
+<!-- SVG connector lines -->
+<svg class="lines-svg">
+  <!-- HOD connections -->
+  <line x1="870" y1="128" x2="770" y2="128" />
+  <line x1="870" y1="128" x2="770" y2="138" />
+  <line x1="870" y1="128" x2="770" y2="218" />
+  <line x1="870" y1="128" x2="770" y2="228" />
+
+  <!-- Professor connections -->
+  <line x1="870" y1="368" x2="770" y2="358" />
+  <line x1="870" y1="368" x2="770" y2="358" />
+
+  <!-- Employee connections -->
+  <line x1="870" y1="588" x2="770" y2="578" />
+
+  <!-- Student connections -->
+  <line x1="140" y1="308" x2="340" y2="308" />
+  <line x1="140" y1="308" x2="340" y2="428" />
+  <line x1="140" y1="308" x2="340" y2="518" />
+  <line x1="140" y1="308" x2="560" y2="518" />
+
+  <!-- Login lines (dashed) -->
+  <line class="login-line" x1="870" y1="128" x2="525" y2="688" />
+  <line class="login-line" x1="870" y1="368" x2="525" y2="688" />
+  <line class="login-line" x1="870" y1="588" x2="525" y2="688" />
+  <line class="login-line" x1="140" y1="308" x2="525" y2="688" />
+</svg>
+
+<!-- System Boundary -->
+<div class="system-boundary">
+  <div class="system-boundary-label">نظام إدارة القسم الأكاديمي</div>
+</div>
+
+<!-- HOD Use Cases -->
+<div class="usecase uc-hod-create">إنشاء إعلان</div>
+<div class="usecase uc-hod-delete">حذف إعلان</div>
+<div class="usecase uc-hod-courses">إدارة المقررات</div>
+<div class="usecase uc-hod-stats">عرض الإحصائيات</div>
+
+<!-- Professor Use Cases -->
+<div class="usecase uc-prof-view">عرض الإعلانات</div>
+<div class="usecase uc-prof-schedule">عرض الجدول الأسبوعي</div>
+
+<!-- Employee Use Cases -->
+<div class="usecase uc-emp-view">عرض الإعلانات</div>
+<div class="usecase uc-emp-tasks">إدارة المهام</div>
+
+<!-- Student Use Cases -->
+<div class="usecase uc-stu-view">عرض الإعلانات</div>
+<div class="usecase uc-stu-courses">تصفح المواد</div>
+<div class="usecase uc-stu-request">تقديم طلب</div>
+<div class="usecase uc-stu-track">تتبع الطلبات</div>
+
+<!-- Login (shared) -->
+<div class="usecase uc-login">تسجيل الدخول</div>
+
+<!-- Actors -->
+<div class="actor actor-hod">
+  <div class="actor-icon">ر</div>
+  <div class="actor-label">رئيس القسم</div>
+</div>
+<div class="actor actor-prof">
+  <div class="actor-icon">أ</div>
+  <div class="actor-label">الأستاذ</div>
+</div>
+<div class="actor actor-emp">
+  <div class="actor-icon">م</div>
+  <div class="actor-label">الموظف</div>
+</div>
+<div class="actor actor-stu">
+  <div class="actor-icon">ط</div>
+  <div class="actor-label">الطالب</div>
+</div>
+
+<!-- Legend -->
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#4C6EF5"></div> اتصال مباشر</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#E74C3C"></div> تسجيل الدخول (مشترك)</div>
+</div>
+
+</body>
+</html>
