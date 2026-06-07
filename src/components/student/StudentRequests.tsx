@@ -105,8 +105,8 @@ export default function StudentRequests() {
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
             <Button className="flex items-center gap-2 bg-orange-600 hover:bg-orange-700">
-              <Plus className="w-4 h-4" />
               تقديم طلب جديد
+              <Plus className="w-4 h-4" />
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-md" dir="rtl">
@@ -147,10 +147,10 @@ export default function StudentRequests() {
               <Button
                 onClick={handleSubmitRequest}
                 disabled={!requestType || !description.trim()}
-                className="bg-orange-600 hover:bg-orange-700"
+                className="flex items-center gap-2 bg-orange-600 hover:bg-orange-700"
               >
-                <Send className="w-4 h-4 ml-1" />
                 إرسال الطلب
+                <Send className="w-4 h-4" />
               </Button>
             </DialogFooter>
           </DialogContent>

@@ -125,27 +125,83 @@
    Arabic RTL Comprehensive Styles
    ============================================ */
 
-/* Base RTL font */
+/* Base RTL font and direction */
 html[dir="rtl"] {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  direction: rtl;
 }
 
-/* ─── 1. Text Alignment in shadcn/ui ─── */
+/* ─── 1. Global Text Alignment ─── */
+html[dir="rtl"] body,
+html[dir="rtl"] h1,
+html[dir="rtl"] h2,
+html[dir="rtl"] h3,
+html[dir="rtl"] h4,
+html[dir="rtl"] h5,
+html[dir="rtl"] h6,
+html[dir="rtl"] p,
+html[dir="rtl"] label,
+html[dir="rtl"] span,
+html[dir="rtl"] li,
+html[dir="rtl"] a,
+html[dir="rtl"] div {
+  text-align: right;
+}
+
+/* Center alignment overrides */
+html[dir="rtl"] .text-center,
+html[dir="rtl"] [class*="text-center"],
+html[dir="rtl"] [style*="text-align: center"],
+html[dir="rtl"] [style*="text-align:center"] {
+  text-align: center !important;
+}
+
+/* ─── 2. Form Inputs RTL ─── */
+html[dir="rtl"] input:not([type="email"]):not([type="url"]):not([dir="ltr"]),
+html[dir="rtl"] textarea,
+html[dir="rtl"] select {
+  direction: rtl;
+  text-align: right;
+}
+
+/* LTR exceptions for inputs */
+html[dir="rtl"] input[type="email"],
+html[dir="rtl"] input[type="url"],
+html[dir="rtl"] input[dir="ltr"],
+html[dir="rtl"] .font-mono,
+html[dir="rtl"] code {
+  direction: ltr;
+  text-align: left;
+}
+
+/* ─── 3. Text Alignment in shadcn/ui ─── */
 html[dir="rtl"] [data-radix-accordion-trigger],
 html[dir="rtl"] [data-radix-dialog-description],
 html[dir="rtl"] [data-radix-alert-dialog-description],
 html[dir="rtl"] [data-radix-drawer-content],
-html[dir="rtl"] [data-radix-sidebar-menu-button] {
+html[dir="rtl"] [data-radix-sidebar-menu-button],
+html[dir="rtl"] [data-radix-alert-dialog-title],
+html[dir="rtl"] [data-radix-dialog-title],
+html[dir="rtl"] [data-radix-dialog-header] {
   text-align: right;
+  direction: rtl;
 }
 
-/* ─── 2. Table Alignment ─── */
+/* ─── 4. Table Alignment ─── */
 html[dir="rtl"] table th,
 html[dir="rtl"] table td {
   text-align: right;
 }
 
-/* ─── 3. Radix Component Direction ─── */
+/* Table center exceptions */
+html[dir="rtl"] td.text-center,
+html[dir="rtl"] th.text-center,
+html[dir="rtl"] td [class*="text-center"],
+html[dir="rtl"] th [class*="text-center"] {
+  text-align: center !important;
+}
+
+/* ─── 5. Radix Component Direction ─── */
 html[dir="rtl"] [data-radix-popper-content-wrapper],
 html[dir="rtl"] [data-radix-select-content],
 html[dir="rtl"] [data-radix-dropdown-menu-content],
@@ -153,27 +209,30 @@ html[dir="rtl"] [data-radix-navigation-menu-viewport],
 html[dir="rtl"] [data-radix-context-menu-content],
 html[dir="rtl"] [data-radix-menubar-content],
 html[dir="rtl"] [data-radix-popover-content],
-html[dir="rtl"] [data-radix-dialog-content] {
+html[dir="rtl"] [data-radix-dialog-content],
+html[dir="rtl"] [data-radix-alert-dialog-content] {
   direction: rtl;
   text-align: right;
 }
 
-/* ─── 4. Alert Dialog Buttons ─── */
-html[dir="rtl"] [data-radix-alert-dialog-footer] {
+/* ─── 6. Alert Dialog Buttons ─── */
+html[dir="rtl"] [data-radix-alert-dialog-footer],
+html[dir="rtl"] [data-radix-dialog-footer] {
   justify-content: flex-start;
+  direction: rtl;
 }
 
-/* ─── 5. Sonner Toast RTL ─── */
+/* ─── 7. Sonner Toast RTL ─── */
 html[dir="rtl"] [data-sonner-toaster] {
   direction: rtl;
 }
 
-/* ─── 6. Calendar RTL ─── */
+/* ─── 8. Calendar RTL ─── */
 html[dir="rtl"] [data-radix-calendar] {
   direction: rtl;
 }
 
-/* ─── 7. Space-X Auto-Reverse for RTL ─── */
+/* ─── 9. Space-X Auto-Reverse for RTL ─── */
 html[dir="rtl"] .space-x-1 > :not([hidden]) ~ :not([hidden]) {
   --tw-space-x-reverse: 1;
 }
@@ -193,7 +252,7 @@ html[dir="rtl"] .space-x-8 > :not([hidden]) ~ :not([hidden]) {
   --tw-space-x-reverse: 1;
 }
 
-/* ─── 8. Checkbox in dropdown menus ─── */
+/* ─── 10. Checkbox in dropdown menus ─── */
 html[dir="rtl"] [data-radix-dropdown-menu-item] > [data-check],
 html[dir="rtl"] [data-radix-menubar-item] > [data-check],
 html[dir="rtl"] [data-radix-context-menu-item] > [data-check] {
@@ -201,13 +260,124 @@ html[dir="rtl"] [data-radix-context-menu-item] > [data-check] {
   margin-right: 0.5rem;
 }
 
-/* ─── 9. Sidebar RTL ─── */
+/* ─── 11. Sidebar RTL ─── */
 html[dir="rtl"] [data-radix-sidebar] {
   direction: rtl;
 }
 
-/* ─── 10. Tooltip RTL ─── */
+/* ─── 12. Tooltip RTL ─── */
 html[dir="rtl"] [data-radix-tooltip-content] {
+  direction: rtl;
+  text-align: right;
+}
+
+/* ─── 13. Card RTL ─── */
+html[dir="rtl"] [class*="CardHeader"],
+html[dir="rtl"] [class*="CardTitle"],
+html[dir="rtl"] [class*="CardDescription"],
+html[dir="rtl"] [class*="CardContent"] {
+  text-align: right;
+  direction: rtl;
+}
+
+/* ─── 14. Badge RTL ─── */
+html[dir="rtl"] [class*="Badge"],
+html[dir="rtl"] [class*="badge"] {
+  direction: rtl;
+  text-align: right;
+}
+
+/* ─── 15. Button RTL ─── */
+html[dir="rtl"] button,
+html[dir="rtl"] [role="button"] {
+  direction: rtl;
+}
+
+/* ─── 16. Tabs RTL ─── */
+html[dir="rtl"] [data-radix-tabs-list],
+html[dir="rtl"] [role="tablist"] {
+  direction: rtl;
+}
+
+/* ─── 17. Select/Dropdown RTL ─── */
+html[dir="rtl"] [data-radix-select-trigger],
+html[dir="rtl"] [data-radix-select-item],
+html[dir="rtl"] [data-radix-select-content] {
+  direction: rtl;
+  text-align: right;
+}
+
+/* ─── 18. Progress bar RTL ─── */
+html[dir="rtl"] [role="progressbar"] > div,
+html[dir="rtl"] [data-radix-progress-indicator] {
+  transform-origin: right center;
+}
+
+/* ─── 19. Accordion RTL ─── */
+html[dir="rtl"] [data-radix-accordion-content] {
+  direction: rtl;
+  text-align: right;
+}
+
+/* ─── 20. Override shadcn/ui hardcoded text-left ─── */
+/* These rules override Tailwind's text-left/justify-end in shadcn components */
+html[dir="rtl"] [data-slot="dialog-header"],
+html[dir="rtl"] [data-slot="alert-dialog-header"] {
+  text-align: right !important;
+  direction: rtl;
+}
+
+html[dir="rtl"] [data-slot="dialog-footer"],
+html[dir="rtl"] [data-slot="alert-dialog-footer"] {
+  justify-content: flex-start !important;
+  direction: rtl;
+}
+
+html[dir="rtl"] [data-slot="table-head"] {
+  text-align: right !important;
+}
+
+html[dir="rtl"] [data-slot="table-cell"] {
+  text-align: right !important;
+}
+
+html[dir="rtl"] [data-slot="accordion-trigger"] {
+  text-align: right !important;
+  direction: rtl;
+}
+
+html[dir="rtl"] [data-slot="dialog-title"],
+html[dir="rtl"] [data-slot="alert-dialog-title"] {
+  text-align: right !important;
+  direction: rtl;
+}
+
+html[dir="rtl"] [data-slot="dialog-description"],
+html[dir="rtl"] [data-slot="alert-dialog-description"] {
+  text-align: right !important;
+  direction: rtl;
+}
+
+/* ─── 21. Fix Dialog close button position for RTL ─── */
+html[dir="rtl"] [data-slot="dialog-close"] {
+  right: auto;
+  left: 1rem;
+}
+
+/* ─── 22. Fix sidebar menu button text ─── */
+html[dir="rtl"] [data-slot="sidebar-menu-button"] {
+  text-align: right !important;
+}
+
+/* ─── 23. Navigation menu RTL ─── */
+html[dir="rtl"] [data-slot="navigation-menu-item"],
+html[dir="rtl"] [data-slot="navigation-menu-link"],
+html[dir="rtl"] [data-slot="navigation-menu-trigger"] {
+  text-align: right;
+}
+
+/* ─── 24. Drawer RTL ─── */
+html[dir="rtl"] [data-vaul-drawer-content] {
   direction: rtl;
   text-align: right;
 }

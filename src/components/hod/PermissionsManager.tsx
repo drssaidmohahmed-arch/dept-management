@@ -289,8 +289,8 @@ export default function PermissionsManager() {
               <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
                 <DialogTrigger asChild>
                   <Button className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700">
-                    <UserPlus className="w-4 h-4" />
                     إضافة عضو
+                    <UserPlus className="w-4 h-4" />
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-lg" dir="rtl">
@@ -603,7 +603,7 @@ export default function PermissionsManager() {
                           <div className="flex items-center gap-2">
                             {/* Templates */}
                             <div className="hidden sm:flex items-center gap-1">
-                              <span className="text-xs text-muted-foreground ml-1">قوالب:</span>
+                              <span className="text-xs text-muted-foreground ms-1">قوالب:</span>
                               {Object.entries(PERMISSION_TEMPLATES).map(([key, tpl]) => {
                                 const isCurrentTemplate =
                                   member.permissions.length === tpl.permissions.length &&

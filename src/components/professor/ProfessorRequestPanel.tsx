@@ -136,8 +136,8 @@ function NewRequestDialog({ onClose }: { onClose: () => void }) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button className="flex items-center gap-2 bg-sky-600 hover:bg-sky-700">
-          <Plus className="w-4 h-4" />
           تقديم طلب جديد
+          <Plus className="w-4 h-4" />
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" dir="rtl">
@@ -288,13 +288,13 @@ function NewRequestDialog({ onClose }: { onClose: () => void }) {
             >
               {isSubmitting ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
                   جارٍ الإرسال...
+                  <Loader2 className="w-4 h-4 animate-spin" />
                 </>
               ) : (
                 <>
-                  <Send className="w-4 h-4" />
                   إرسال الطلب
+                  <Send className="w-4 h-4" />
                 </>
               )}
             </Button>

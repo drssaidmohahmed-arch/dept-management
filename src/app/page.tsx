@@ -32,6 +32,7 @@ import {
   GraduationCap,
   UserCog,
   BookOpen,
+  ArrowLeft,
   ArrowRight,
   Bell,
   Plus,
@@ -150,7 +151,7 @@ function LandingPage({ onSelectRole }: { onSelectRole: (role: Role) => void }) {
                     </p>
                     <div className="mt-4 flex items-center gap-1 text-sm font-medium text-primary">
                       <span>الدخول</span>
-                      <ArrowRight className="w-4 h-4" />
+                      <ArrowLeft className="w-4 h-4" />
                     </div>
                   </CardContent>
                 </Card>
@@ -325,8 +326,8 @@ export default function Home() {
             onClick={() => setCurrentRole("landing")}
             className="flex items-center gap-2"
           >
-            <ArrowRight className="w-4 h-4" />
             العودة للرئيسية
+            <ArrowRight className="w-4 h-4" />
           </Button>
         </div>
       </header>

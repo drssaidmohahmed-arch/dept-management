@@ -143,8 +143,8 @@ export default function HODDashboard() {
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild>
                 <Button className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700">
-                  <Plus className="w-4 h-4" />
                   إضافة إعلان
+                  <Plus className="w-4 h-4" />
                 </Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-md" dir="rtl">
@@ -344,8 +344,8 @@ export default function HODDashboard() {
               <CardTitle className="flex items-center justify-between">
                 إدارة المقررات الدراسية
                 <Button size="sm" className="flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700">
-                  <Plus className="w-4 h-4" />
                   إضافة مقرر
+                  <Plus className="w-4 h-4" />
                 </Button>
               </CardTitle>
             </CardHeader>
