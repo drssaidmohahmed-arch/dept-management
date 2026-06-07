@@ -1,415 +1,348 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Separator } from '@/components/ui/separator'
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Crown,
   GraduationCap,
-  Briefcase,
+  UserCog,
   BookOpen,
   ArrowRight,
   Bell,
-  Users,
-  BarChart3,
+  Plus,
+  Trash2,
   Calendar,
-  Building2,
+  FileText,
   ClipboardList,
-  Megaphone,
-  AlertTriangle,
-  Info,
-  Clock,
-  CheckCircle2,
-} from 'lucide-react'
-import { useStore, PRIORITY_LABELS, PRIORITY_COLORS, TARGET_ROLE_LABELS, type Announcement, type Priority, type TargetRole, generateId, addAnnouncement } from '@/lib/store'
-import HODDashboard from '@/components/hod/HODDashboard'
-import ProfessorDashboard from '@/components/professor/ProfessorDashboard'
-import EmployeeDashboard from '@/components/employee/EmployeeDashboard'
-import AcademicCourses from '@/components/student/AcademicCourses'
-import StudentRequests from '@/components/student/StudentRequests'
+} from "lucide-react";
+import HODDashboard from "@/components/hod/HODDashboard";
+import ProfessorDashboard from "@/components/professor/ProfessorDashboard";
+import EmployeeDashboard from "@/components/employee/EmployeeDashboard";
+import AcademicCourses from "@/components/student/AcademicCourses";
+import StudentRequests from "@/components/student/StudentRequests";
+import {
+  useAnnouncements,
+  useStore,
+  PRIORITY_LABELS,
+  PRIORITY_COLORS,
+  TARGET_ROLE_LABELS,
+} from "@/lib/store";
 
-type ViewType = 'landing' | 'hod' | 'professor' | 'employee' | 'student'
+type Role = "landing" | "hod" | "professor" | "employee" | "student";
 
-// ============================================================
-// Portal Card Data
-// ============================================================
-const portalCards = [
-  {
-    id: 'hod' as ViewType,
-    title: 'رئيس القسم',
-    description: 'إدارة القسم، إعلانات، إحصائيات، ومتابعة الأعضاء',
-    icon: Crown,
-    color: 'from-emerald-500 to-emerald-700',
-    hoverColor: 'hover:from-emerald-600 hover:to-emerald-800',
-    textColor: 'text-emerald-700',
-    bgLight: 'bg-emerald-50',
-    borderColor: 'border-emerald-200',
-    iconBg: 'bg-emerald-100',
-  },
-  {
-    id: 'professor' as ViewType,
-    title: 'عضو هيئة التدريس',
-    description: 'عرض الإعلانات والمتابعات الأكاديمية',
-    icon: GraduationCap,
-    color: 'from-blue-500 to-blue-700',
-    hoverColor: 'hover:from-blue-600 hover:to-blue-800',
-    textColor: 'text-blue-700',
-    bgLight: 'bg-blue-50',
-    borderColor: 'border-blue-200',
-    iconBg: 'bg-blue-100',
-  },
-  {
-    id: 'employee' as ViewType,
-    title: 'الموظف الإداري',
-    description: 'عرض الإعلانات والمهام الإدارية',
-    icon: Briefcase,
-    color: 'from-cyan-500 to-cyan-700',
-    hoverColor: 'hover:from-cyan-600 hover:to-cyan-800',
-    textColor: 'text-cyan-700',
-    bgLight: 'bg-cyan-50',
-    borderColor: 'border-cyan-200',
-    iconBg: 'bg-cyan-100',
-  },
-  {
-    id: 'student' as ViewType,
-    title: 'الطالب',
-    description: 'الإعلانات والمقررات الدراسية والطلبات',
-    icon: BookOpen,
-    color: 'from-orange-500 to-orange-700',
-    hoverColor: 'hover:from-orange-600 hover:to-orange-800',
-    textColor: 'text-orange-700',
-    bgLight: 'bg-orange-50',
-    borderColor: 'border-orange-200',
-    iconBg: 'bg-orange-100',
-  },
-]
+// ============ Landing Page ============
 
-// ============================================================
-// Landing Page
-// ============================================================
-function LandingPage({ onSelect }: { onSelect: (view: ViewType) => void }) {
+function LandingPage({ onSelectRole }: { onSelectRole: (role: Role) => void }) {
+  const roles = [
+    {
+      id: "hod" as Role,
+      title: "رئيس القسم",
+      description: "لوحة التحكم الرئيسية لإدارة القسم والإعلانات والإحصائيات",
+      icon: Crown,
+      color: "from-emerald-500 to-emerald-700",
+      bgLight: "bg-emerald-50",
+      textColor: "text-emerald-700",
+      borderColor: "border-emerald-200",
+    },
+    {
+      id: "professor" as Role,
+      title: "عضو هيئة التدريس",
+      description: "عرض الإعلانات والجدول الأسبوعي والمعلومات الأكاديمية",
+      icon: GraduationCap,
+      color: "from-sky-500 to-sky-700",
+      bgLight: "bg-sky-50",
+      textColor: "text-sky-700",
+      borderColor: "border-sky-200",
+    },
+    {
+      id: "employee" as Role,
+      title: "الموظف الإداري",
+      description: "إدارة المهام الإدارية وعرض الإعلانات الداخلية",
+      icon: UserCog,
+      color: "from-cyan-500 to-cyan-700",
+      bgLight: "bg-cyan-50",
+      textColor: "text-cyan-700",
+      borderColor: "border-cyan-200",
+    },
+    {
+      id: "student" as Role,
+      title: "الطالب",
+      description: "الإعلانات والمواد الأكاديمية وتقديم الطلبات",
+      icon: BookOpen,
+      color: "from-orange-500 to-orange-700",
+      bgLight: "bg-orange-50",
+      textColor: "text-orange-700",
+      borderColor: "border-orange-200",
+    },
+  ];
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}
-      <header className="bg-gradient-to-l from-slate-800 to-slate-900 text-white">
-        <div className="max-w-6xl mx-auto px-4 py-8 sm:py-12">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center">
-              <Building2 className="w-8 h-8 sm:w-10 sm:h-10 text-emerald-400" />
+      <header className="bg-gradient-to-l from-slate-800 to-slate-900 text-white py-8 px-4">
+        <div className="max-w-6xl mx-auto text-center">
+          <div className="flex items-center justify-center gap-3 mb-3">
+            <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center">
+              <GraduationCap className="w-7 h-7" />
             </div>
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-bold">نظام إدارة القسم الأكاديمي</h1>
-              <p className="text-slate-300 text-sm sm:text-base mt-1">منصة متكاملة لإدارة وتنظيم شؤون القسم الأكاديمي</p>
-            </div>
+            <h1 className="text-3xl md:text-4xl font-bold">
+              نظام إدارة القسم الأكاديمي
+            </h1>
           </div>
+          <p className="text-slate-300 text-lg">
+            اختر نوع الحساب للدخول إلى لوحة التحكم الخاصة بك
+          </p>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="flex-1 max-w-6xl mx-auto px-4 py-8 sm:py-12 w-full">
-        <h2 className="text-xl sm:text-2xl font-bold text-center mb-2">اختر نوع الحساب للدخول</h2>
-        <p className="text-muted-foreground text-center mb-8 sm:mb-10 text-sm sm:text-base">اضغط على البطاقة المناسبة للوصول إلى لوحة التحكم</p>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-          {portalCards.map((card) => {
-            const Icon = card.icon
-            return (
-              <Card
-                key={card.id}
-                className={`group cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-2 border-2 ${card.borderColor} overflow-hidden`}
-                onClick={() => onSelect(card.id)}
-              >
-                <CardHeader className="pb-3">
-                  <div className={`w-14 h-14 rounded-xl ${card.iconBg} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300`}>
-                    <Icon className={`w-7 h-7 ${card.textColor}`} />
-                  </div>
-                  <CardTitle className={`text-lg font-bold ${card.textColor}`}>{card.title}</CardTitle>
-                  <CardDescription className="text-sm leading-relaxed">{card.description}</CardDescription>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <div className={`w-full py-2.5 rounded-lg bg-gradient-to-l ${card.color} ${card.hoverColor} text-white text-center text-sm font-medium transition-all duration-300 group-hover:shadow-lg`}>
-                    الدخول إلى لوحة التحكم
-                  </div>
-                </CardContent>
-              </Card>
-            )
-          })}
-        </div>
-
-        {/* System Info Card */}
-        <div className="mt-10 sm:mt-12">
-          <Card className="border-2 border-slate-200">
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Info className="w-5 h-5 text-slate-600" />
-                معلومات النظام
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-emerald-500" />
-                  <span className="text-muted-foreground">الإصدار:</span>
-                  <span className="font-medium">1.0.0</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-blue-500" />
-                  <span className="text-muted-foreground">الإطار:</span>
-                  <span className="font-medium">Next.js 16</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-cyan-500" />
-                  <span className="text-muted-foreground">اللغة:</span>
-                  <span className="font-medium">TypeScript</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-orange-500" />
-                  <span className="text-muted-foreground">الحالة:</span>
-                  <span className="font-medium text-emerald-600">نشط ✓</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+      {/* Cards Grid */}
+      <main className="flex-1 flex items-center justify-center p-6 md:p-12">
+        <div className="max-w-5xl w-full">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {roles.map((role) => {
+              const Icon = role.icon;
+              return (
+                <Card
+                  key={role.id}
+                  className="role-card cursor-pointer border-2 hover:border-transparent overflow-hidden"
+                  onClick={() => onSelectRole(role.id)}
+                >
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={`w-12 h-12 rounded-xl flex items-center justify-center ${role.bgLight} ${role.textColor}`}
+                      >
+                        <Icon className="w-6 h-6" />
+                      </div>
+                      <CardTitle className={`text-xl ${role.textColor}`}>
+                        {role.title}
+                      </CardTitle>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground text-sm leading-relaxed">
+                      {role.description}
+                    </p>
+                    <div className="mt-4 flex items-center gap-1 text-sm font-medium text-primary">
+                      <span>الدخول</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
         </div>
       </main>
 
       {/* Footer */}
-      <footer className="bg-slate-50 border-t mt-auto">
-        <div className="max-w-6xl mx-auto px-4 py-4 text-center text-sm text-muted-foreground">
-          <p>© ٢٠٢٥ نظام إدارة القسم الأكاديمي - جميع الحقوق محفوظة</p>
-        </div>
+      <footer className="bg-slate-50 border-t py-4 px-4 mt-auto">
+        <p className="text-center text-sm text-muted-foreground">
+          © ٢٠٢٥ نظام إدارة القسم الأكاديمي - جميع الحقوق محفوظة
+        </p>
       </footer>
     </div>
-  )
+  );
 }
 
-// ============================================================
-// Dashboard Header with Back Button
-// ============================================================
-function DashboardHeader({ title, role, onBack }: { title: string; role: ViewType; onBack: () => void }) {
-  const card = portalCards.find(c => c.id === role)
-  const Icon = card?.icon || Building2
+// ============ Student Dashboard (inline) ============
+
+function StudentDashboard() {
+  const announcements = useAnnouncements();
+  const studentAnnouncements = announcements.filter(
+    (a) => a.targetRole === "all" || a.targetRole === "students"
+  );
+  const urgentAnnouncements = studentAnnouncements.filter(
+    (a) => a.priority === "urgent"
+  );
 
   return (
-    <div className="bg-gradient-to-l from-slate-800 to-slate-900 text-white">
-      <div className="max-w-6xl mx-auto px-4 py-6">
-        <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-white hover:bg-white/10"
-            onClick={onBack}
-          >
-            <ArrowRight className="w-5 h-5" />
-          </Button>
-          <div className={`w-12 h-12 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center`}>
-            <Icon className="w-6 h-6 text-emerald-400" />
-          </div>
-          <div>
-            <h1 className="text-xl sm:text-2xl font-bold">{title}</h1>
-            <p className="text-slate-300 text-sm">لوحة التحكم - نظام إدارة القسم الأكاديمي</p>
+    <div className="space-y-6">
+      {/* Urgent Announcements */}
+      {urgentAnnouncements.length > 0 && (
+        <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+          <h3 className="text-red-800 font-bold text-lg mb-3 flex items-center gap-2">
+            <Bell className="w-5 h-5" />
+            إعلانات عاجلة
+          </h3>
+          <div className="space-y-3">
+            {urgentAnnouncements.map((ann) => (
+              <div
+                key={ann.id}
+                className="bg-white rounded-lg p-3 border border-red-100"
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <h4 className="font-semibold text-red-900">{ann.title}</h4>
+                  <Badge variant="destructive" className="shrink-0">
+                    عاجل
+                  </Badge>
+                </div>
+                <p className="text-red-700 text-sm mt-1">{ann.content}</p>
+                <p className="text-red-400 text-xs mt-2">
+                  {new Date(ann.createdAt).toLocaleDateString("ar-SA")}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
-      </div>
-    </div>
-  )
-}
-
-// ============================================================
-// Student Dashboard (inline)
-// ============================================================
-function StudentDashboard() {
-  const { announcements: allAnnouncements, requests, stats } = useStore()
-  const studentAnnouncements = allAnnouncements.filter(
-    a => a.targetRole === 'all' || a.targetRole === 'students'
-  )
-
-  return (
-    <div className="max-w-6xl mx-auto px-4 py-6">
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <Card className="border-orange-200">
-          <CardContent className="p-4 flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center">
-              <Bell className="w-6 h-6 text-orange-700" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-orange-700">{stats.studentAnnouncements}</p>
-              <p className="text-sm text-muted-foreground">الإعلانات</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="border-blue-200">
-          <CardContent className="p-4 flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
-              <BookOpen className="w-6 h-6 text-blue-700" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-blue-700">{stats.totalCourses}</p>
-              <p className="text-sm text-muted-foreground">المقررات</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="border-amber-200">
-          <CardContent className="p-4 flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center">
-              <ClipboardList className="w-6 h-6 text-amber-700" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-amber-700">{stats.totalRequests}</p>
-              <p className="text-sm text-muted-foreground">الطلبات</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="border-emerald-200">
-          <CardContent className="p-4 flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center">
-              <CheckCircle2 className="w-6 h-6 text-emerald-700" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-emerald-700">{stats.totalHours}</p>
-              <p className="text-sm text-muted-foreground">الساعات الدراسية</p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      )}
 
       {/* Tabs */}
       <Tabs defaultValue="announcements" className="w-full">
-        <TabsList className="w-full flex mb-4">
-          <TabsTrigger value="announcements" className="flex-1">
-            <Bell className="w-4 h-4 ml-2" />
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="announcements" className="flex items-center gap-1">
+            <Bell className="w-4 h-4" />
             الإعلانات
             {studentAnnouncements.length > 0 && (
-              <Badge variant="destructive" className="mr-2 min-w-[24px] text-center text-xs">
+              <Badge variant="secondary" className="mr-1 text-xs">
                 {studentAnnouncements.length}
               </Badge>
             )}
           </TabsTrigger>
-          <TabsTrigger value="courses" className="flex-1">
-            <BookOpen className="w-4 h-4 ml-2" />
-            المقررات الدراسية
+          <TabsTrigger value="courses" className="flex items-center gap-1">
+            <BookOpen className="w-4 h-4" />
+            المواد الأكاديمية
           </TabsTrigger>
-          <TabsTrigger value="requests" className="flex-1">
-            <ClipboardList className="w-4 h-4 ml-2" />
-            طلباتي
-            {stats.pendingRequests > 0 && (
-              <Badge variant="destructive" className="mr-2 min-w-[24px] text-center text-xs">
-                {stats.pendingRequests}
-              </Badge>
-            )}
+          <TabsTrigger value="requests" className="flex items-center gap-1">
+            <ClipboardList className="w-4 h-4" />
+            الطلبات
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="announcements">
-          <div className="space-y-4">
-            {studentAnnouncements.length === 0 ? (
-              <Card>
-                <CardContent className="p-8 text-center text-muted-foreground">
-                  <Bell className="w-12 h-12 mx-auto mb-3 opacity-30" />
-                  <p>لا توجد إعلانات حالياً</p>
-                </CardContent>
-              </Card>
-            ) : (
-              studentAnnouncements.map((announcement) => (
-                <AnnouncementCard key={announcement.id} announcement={announcement} />
-              ))
-            )}
-          </div>
+        <TabsContent value="announcements" className="mt-4">
+          {studentAnnouncements.length === 0 ? (
+            <div className="text-center py-12 text-muted-foreground">
+              <Bell className="w-12 h-12 mx-auto mb-3 opacity-30" />
+              <p>لا توجد إعلانات حالياً</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {studentAnnouncements.map((ann) => (
+                <Card key={ann.id}>
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="font-semibold">{ann.title}</h3>
+                          <Badge
+                            className={`text-xs ${PRIORITY_COLORS[ann.priority]}`}
+                          >
+                            {PRIORITY_LABELS[ann.priority]}
+                          </Badge>
+                        </div>
+                        <p className="text-muted-foreground text-sm leading-relaxed">
+                          {ann.content}
+                        </p>
+                        <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <Calendar className="w-3 h-3" />
+                            {new Date(ann.createdAt).toLocaleDateString("ar-SA")}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <FileText className="w-3 h-3" />
+                            {TARGET_ROLE_LABELS[ann.targetRole]}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
         </TabsContent>
 
-        <TabsContent value="courses">
+        <TabsContent value="courses" className="mt-4">
           <AcademicCourses />
         </TabsContent>
 
-        <TabsContent value="requests">
+        <TabsContent value="requests" className="mt-4">
           <StudentRequests />
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }
 
-// ============================================================
-// Shared Announcement Card
-// ============================================================
-function AnnouncementCard({ announcement }: { announcement: Announcement }) {
-  return (
-    <Card className="border-r-4 border-r-slate-300 hover:shadow-md transition-shadow">
-      <CardContent className="p-4 sm:p-5">
-        <div className="flex flex-col sm:flex-row sm:items-start gap-3">
-          <div className="flex-1">
-            <div className="flex flex-wrap items-center gap-2 mb-2">
-              <h3 className="font-bold text-base">{announcement.title}</h3>
-              <Badge className={`${PRIORITY_COLORS[announcement.priority]} text-xs border`}>
-                {PRIORITY_LABELS[announcement.priority]}
-              </Badge>
-              <Badge variant="outline" className="text-xs">
-                {TARGET_ROLE_LABELS[announcement.targetRole]}
-              </Badge>
-            </div>
-            <p className="text-sm text-muted-foreground leading-relaxed mb-2">{announcement.content}</p>
-            <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-              <span className="flex items-center gap-1">
-                <Users className="w-3.5 h-3.5" />
-                {announcement.authorName}
-              </span>
-              <Separator orientation="vertical" className="h-3.5" />
-              <span className="flex items-center gap-1">
-                <Calendar className="w-3.5 h-3.5" />
-                {announcement.date}
-              </span>
-            </div>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  )
-}
+// ============ Main Page ============
 
-// ============================================================
-// Main Page Component
-// ============================================================
 export default function Home() {
-  const [currentView, setCurrentView] = useState<ViewType>('landing')
+  const [currentRole, setCurrentRole] = useState<Role>("landing");
 
-  const goBack = () => setCurrentView('landing')
+  const roleTitles: Record<string, string> = {
+    hod: "لوحة تحكم رئيس القسم",
+    professor: "لوحة تحكم عضو هيئة التدريس",
+    employee: "لوحة تحكم الموظف الإداري",
+    student: "لوحة تحكم الطالب",
+  };
+
+  if (currentRole === "landing") {
+    return <LandingPage onSelectRole={setCurrentRole} />;
+  }
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      {currentView === 'landing' ? (
-        <LandingPage onSelect={setCurrentView} />
-      ) : (
-        <>
-          <DashboardHeader
-            title={
-              currentView === 'hod'
-                ? 'لوحة تحكم رئيس القسم'
-                : currentView === 'professor'
-                ? 'لوحة تحكم عضو هيئة التدريس'
-                : currentView === 'employee'
-                ? 'لوحة تحكم الموظف الإداري'
-                : 'لوحة تحكم الطالب'
-            }
-            role={currentView}
-            onBack={goBack}
-          />
-          <main className="flex-1">
-            {currentView === 'hod' && <HODDashboard />}
-            {currentView === 'professor' && <ProfessorDashboard />}
-            {currentView === 'employee' && <EmployeeDashboard />}
-            {currentView === 'student' && <StudentDashboard />}
-          </main>
-          <footer className="bg-slate-50 border-t mt-auto">
-            <div className="max-w-6xl mx-auto px-4 py-4 text-center text-sm text-muted-foreground">
-              <p>© ٢٠٢٥ نظام إدارة القسم الأكاديمي - جميع الحقوق محفوظة</p>
+    <div className="min-h-screen flex flex-col bg-slate-50">
+      {/* Header */}
+      <header className="bg-white border-b sticky top-0 z-10">
+        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 bg-slate-800 rounded-lg flex items-center justify-center">
+              <GraduationCap className="w-5 h-5 text-white" />
             </div>
-          </footer>
-        </>
-      )}
+            <h1 className="text-lg font-bold text-slate-800">
+              {roleTitles[currentRole]}
+            </h1>
+          </div>
+          <Button
+            variant="outline"
+            onClick={() => setCurrentRole("landing")}
+            className="flex items-center gap-2"
+          >
+            <ArrowRight className="w-4 h-4" />
+            العودة للرئيسية
+          </Button>
+        </div>
+      </header>
+
+      {/* Dashboard Content */}
+      <main className="flex-1 max-w-6xl mx-auto w-full p-4 md:p-6">
+        {currentRole === "hod" && <HODDashboard />}
+        {currentRole === "professor" && <ProfessorDashboard />}
+        {currentRole === "employee" && <EmployeeDashboard />}
+        {currentRole === "student" && <StudentDashboard />}
+      </main>
+
+      {/* Footer */}
+      <footer className="bg-white border-t py-3 px-4 mt-auto">
+        <p className="text-center text-xs text-muted-foreground">
+          © ٢٠٢٥ نظام إدارة القسم الأكاديمي
+        </p>
+      </footer>
     </div>
-  )
+  );
 }

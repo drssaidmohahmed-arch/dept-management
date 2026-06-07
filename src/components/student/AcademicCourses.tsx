@@ -1,132 +1,317 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import { useState } from "react";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { BookOpen, Clock } from 'lucide-react'
-import { useCourses } from '@/lib/store'
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { BookOpen, Calculator, TrendingUp } from "lucide-react";
 
-const SEMESTER_LABELS: Record<number, string> = {
-  1: 'الفصل الأول',
-  2: 'الفصل الثاني',
-  3: 'الفصل الثالث',
-  4: 'الفصل الرابع',
-  5: 'الفصل الخامس',
-  6: 'الفصل السادس',
-}
+const semesterNames = [
+  "الفصل الأول",
+  "الفصل الثاني",
+  "الفصل الثالث",
+  "الفصل الرابع",
+  "الفصل الخامس",
+  "الفصل السادس",
+];
+
+const allCoursesData: Record<number, { name: string; code: string; hours: number }[]> = {
+  1: [
+    { name: "مقدمة في علوم الحاسب", code: "CS101", hours: 3 },
+    { name: "رياضيات متقدمة", code: "MATH101", hours: 4 },
+    { name: "فيزياء عامة", code: "PHYS101", hours: 3 },
+    { name: "لغة إنجليزية", code: "ENG101", hours: 2 },
+    { name: "مهارات حاسوبية", code: "IT101", hours: 2 },
+    { name: "مبادئ البرمجة", code: "CS102", hours: 3 },
+    { name: "إحصاء واحتمالات", code: "STAT101", hours: 3 },
+    { name: "تفكير نقدي", code: "CRIT101", hours: 2 },
+  ],
+  2: [
+    { name: "هياكل البيانات", code: "CS201", hours: 3 },
+    { name: "قواعد البيانات", code: "CS202", hours: 3 },
+    { name: "رياضيات متقدمة ٢", code: "MATH201", hours: 3 },
+    { name: "أنظمة تشغيل ١", code: "CS203", hours: 3 },
+    { name: "برمجة كائنية", code: "CS204", hours: 3 },
+    { name: "لغة إنجليزية ٢", code: "ENG201", hours: 2 },
+    { name: "شبكات الحاسب ١", code: "CS205", hours: 3 },
+    { name: "منطق رقمي", code: "CS206", hours: 2 },
+  ],
+  3: [
+    { name: "تحليل الخوارزميات", code: "CS301", hours: 3 },
+    { name: "أنظمة تشغيل ٢", code: "CS302", hours: 3 },
+    { name: "هندسة البرمجيات", code: "CS303", hours: 3 },
+    { name: "شبكات الحاسب ٢", code: "CS304", hours: 3 },
+    { name: "ذكاء اصطناعي", code: "CS305", hours: 3 },
+    { name: "تصميم واجهات", code: "CS306", hours: 2 },
+    { name: "إدارة مشاريع", code: "MGT301", hours: 2 },
+    { name: "أخلاقيات الحاسب", code: "CS307", hours: 2 },
+  ],
+  4: [
+    { name: "تعلم آلي", code: "CS401", hours: 3 },
+    { name: "أمن معلومات", code: "CS402", hours: 3 },
+    { name: "تطوير ويب متقدم", code: "CS403", hours: 3 },
+    { name: "حوسبة سحابية", code: "CS404", hours: 3 },
+    { name: "معالجة صور", code: "CS405", hours: 3 },
+    { name: "تطبيقات موبايل", code: "CS406", hours: 2 },
+    { name: "نظم موزعة", code: "CS407", hours: 3 },
+    { name: "ريادة أعمال", code: "MGT401", hours: 2 },
+  ],
+  5: [
+    { name: "بيانات ضخمة", code: "CS501", hours: 3 },
+    { name: "تعلم عميق", code: "CS502", hours: 3 },
+    { name: "اختبار برمجيات", code: "CS503", hours: 2 },
+    { name: "معالجة لغة طبيعية", code: "CS504", hours: 3 },
+    { name: "إنترنت الأشياء", code: "CS505", hours: 2 },
+    { name: "مشروع تخرج ١", code: "CS506", hours: 3 },
+    { name: "بلوك تشين", code: "CS507", hours: 2 },
+    { name: "مساق اختياري", code: "ELEC501", hours: 2 },
+  ],
+  6: [
+    { name: "أبحاث متقدمة", code: "CS601", hours: 3 },
+    { name: "مشروع تخرج ٢", code: "CS602", hours: 4 },
+    { name: "تدريب ميداني", code: "CS603", hours: 3 },
+    { name: "مسار متخصص ١", code: "SPEC601", hours: 3 },
+    { name: "مسار متخصص ٢", code: "SPEC602", hours: 3 },
+    { name: "إدارة تقنية", code: "MGT601", hours: 2 },
+    { name: "موضوع خاص", code: "CS604", hours: 2 },
+    { name: "ندوات بحثية", code: "CS605", hours: 1 },
+  ],
+};
+
+// Grade to GPA mapping
+const gradeToPoints: Record<string, number> = {
+  "أ+": 4.0,
+  "أ": 4.0,
+  "أ-": 3.7,
+  "ب+": 3.3,
+  "ب": 3.0,
+  "ب-": 2.7,
+  "ج+": 2.3,
+  "ج": 2.0,
+  "ج-": 1.7,
+  "د+": 1.3,
+  "د": 1.0,
+  "د-": 0.7,
+  "ر": 0.0,
+};
+
+const gradeColorClass = (grade?: string) => {
+  if (!grade) return "text-muted-foreground";
+  const points = gradeToPoints[grade] ?? 0;
+  if (points >= 3.7) return "text-emerald-600 font-semibold";
+  if (points >= 3.0) return "text-sky-600 font-semibold";
+  if (points >= 2.0) return "text-amber-600 font-semibold";
+  if (points >= 1.0) return "text-orange-600 font-semibold";
+  return "text-red-600 font-semibold";
+};
 
 export default function AcademicCourses() {
-  const courses = useCourses()
-  const [selectedSemester, setSelectedSemester] = useState<number>(1)
+  const [activeSemester, setActiveSemester] = useState(1);
 
-  const filteredCourses = courses.filter(c => c.semester === selectedSemester)
-  const totalHours = filteredCourses.reduce((acc, c) => acc + c.hours, 0)
-  const gradedCourses = filteredCourses.filter(c => c.grade)
+  // Mock grades for semesters 1-3
+  const gradesData: Record<number, Record<string, string>> = {
+    1: {
+      CS101: "أ",
+      MATH101: "أ-",
+      PHYS101: "ب+",
+      ENG101: "أ",
+      IT101: "أ",
+      CS102: "ب",
+      STAT101: "أ+",
+      CRIT101: "أ-",
+    },
+    2: {
+      CS201: "أ-",
+      CS202: "ب+",
+      MATH201: "ب",
+      CS203: "أ",
+      CS204: "أ-",
+      ENG201: "أ",
+      CS205: "ب+",
+      CS206: "أ",
+    },
+    3: {
+      CS301: "ب+",
+      CS302: "أ-",
+      CS303: "أ",
+      CS304: "ب",
+      CS305: "أ",
+      CS306: "أ+",
+      MGT301: "أ-",
+      CS307: "أ",
+    },
+  };
 
-  // Calculate GPA (simplified)
-  const gradePoints: Record<string, number> = {
-    'A+': 4.0, 'A': 4.0, 'A-': 3.7,
-    'B+': 3.3, 'B': 3.0, 'B-': 2.7,
-    'C+': 2.3, 'C': 2.0, 'C-': 1.7,
-    'D+': 1.3, 'D': 1.0, 'D-': 0.7,
-    'F': 0.0,
-  }
+  const semesterCourses = allCoursesData[activeSemester] || [];
+  const semesterGrades = gradesData[activeSemester] || {};
 
-  const totalPoints = gradedCourses.reduce(
-    (acc, c) => acc + (gradePoints[c.grade || ''] || 0) * c.hours,
-    0
-  )
-  const totalGradedHours = gradedCourses.reduce((acc, c) => acc + c.hours, 0)
-  const gpa = totalGradedHours > 0 ? (totalPoints / totalGradedHours).toFixed(2) : '—'
+  // Calculate GPA for current semester
+  const calculateGPA = () => {
+    let totalPoints = 0;
+    let totalHours = 0;
+    semesterCourses.forEach((course) => {
+      const grade = semesterGrades[course.code];
+      if (grade && gradeToPoints[grade] !== undefined) {
+        totalPoints += gradeToPoints[grade] * course.hours;
+        totalHours += course.hours;
+      }
+    });
+    return totalHours > 0 ? totalPoints / totalHours : 0;
+  };
+
+  // Calculate cumulative GPA
+  const calculateCumulativeGPA = () => {
+    let totalPoints = 0;
+    let totalHours = 0;
+    Object.entries(gradesData).forEach(([sem, grades]) => {
+      const courses = allCoursesData[Number(sem)] || [];
+      courses.forEach((course) => {
+        const grade = grades[course.code];
+        if (grade && gradeToPoints[grade] !== undefined) {
+          totalPoints += gradeToPoints[grade] * course.hours;
+          totalHours += course.hours;
+        }
+      });
+    });
+    return totalHours > 0 ? totalPoints / totalHours : 0;
+  };
+
+  const currentGPA = calculateGPA();
+  const cumulativeGPA = calculateCumulativeGPA();
+  const totalHours = semesterCourses.reduce((sum, c) => sum + c.hours, 0);
+  const passedHours = Object.values(gradesData).reduce((sum, grades) => {
+    const sem = Object.keys(gradesData).findIndex((k) => gradesData[Number(k)] === grades) + 1;
+    const courses = allCoursesData[sem] || [];
+    return sum + courses.filter((c) => grades[c.code]).reduce((s, c) => s + c.hours, 0);
+  }, 0);
+
+  const gpaColor = (gpa: number) => {
+    if (gpa >= 3.5) return "text-emerald-600";
+    if (gpa >= 3.0) return "text-sky-600";
+    if (gpa >= 2.5) return "text-amber-600";
+    return "text-red-600";
+  };
 
   return (
-    <Card>
-      <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <CardTitle className="text-lg flex items-center gap-2">
-          <BookOpen className="w-5 h-5 text-blue-600" />
-          المقررات الدراسية
-        </CardTitle>
-        <div className="flex items-center gap-3 flex-wrap">
-          <Select value={String(selectedSemester)} onValueChange={(v) => setSelectedSemester(Number(v))}>
-            <SelectTrigger className="w-48">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {[1, 2, 3, 4, 5, 6].map((sem) => (
-                <SelectItem key={sem} value={String(sem)}>
-                  {SEMESTER_LABELS[sem]}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Badge variant="outline" className="text-sm">
-            <Clock className="w-3.5 h-3.5 ml-1" />
-            {totalHours} ساعة
-          </Badge>
-          <Badge className="bg-emerald-100 text-emerald-800 text-sm border border-emerald-300">
-            المعدل: {gpa}
-          </Badge>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm border-collapse">
-            <thead>
-              <tr className="border-b-2 border-slate-200">
-                <th className="p-3 text-right font-bold bg-slate-50 rounded-tr-lg">#</th>
-                <th className="p-3 text-right font-bold bg-slate-50">رمز المقرر</th>
-                <th className="p-3 text-right font-bold bg-slate-50">اسم المقرر</th>
-                <th className="p-3 text-center font-bold bg-slate-50">الساعات</th>
-                <th className="p-3 text-center font-bold bg-slate-50 rounded-tl-lg">التقدير</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredCourses.map((course, index) => (
-                <tr key={course.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
-                  <td className="p-3 text-muted-foreground">{index + 1}</td>
-                  <td className="p-3 font-mono font-medium text-blue-700">{course.code}</td>
-                  <td className="p-3">{course.name}</td>
-                  <td className="p-3 text-center">{course.hours}</td>
-                  <td className="p-3 text-center">
-                    {course.grade ? (
-                      <Badge
-                        className={`text-xs border ${
-                          gradePoints[course.grade] && gradePoints[course.grade] >= 3.5
-                            ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
-                            : gradePoints[course.grade] && gradePoints[course.grade] >= 2.5
-                            ? 'bg-blue-100 text-blue-800 border-blue-300'
-                            : course.grade
-                            ? 'bg-amber-100 text-amber-800 border-amber-300'
-                            : 'bg-slate-100 text-slate-800 border-slate-300'
-                        }`}
-                      >
-                        {course.grade}
-                      </Badge>
-                    ) : (
-                      <span className="text-muted-foreground">—</span>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+    <div className="space-y-4">
+      {/* GPA Summary */}
+      <div className="grid grid-cols-3 gap-4">
+        <Card>
+          <CardContent className="p-4 text-center">
+            <div className="flex items-center justify-center gap-1 mb-1">
+              <Calculator className="w-4 h-4 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground">المعدل الفصلي</span>
+            </div>
+            <p className={`text-2xl font-bold ${gpaColor(currentGPA)}`}>
+              {currentGPA.toFixed(2)}
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4 text-center">
+            <div className="flex items-center justify-center gap-1 mb-1">
+              <TrendingUp className="w-4 h-4 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground">المعدل التراكمي</span>
+            </div>
+            <p className={`text-2xl font-bold ${gpaColor(cumulativeGPA)}`}>
+              {cumulativeGPA.toFixed(2)}
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4 text-center">
+            <div className="flex items-center justify-center gap-1 mb-1">
+              <BookOpen className="w-4 h-4 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground">الساعات المكتسبة</span>
+            </div>
+            <p className="text-2xl font-bold text-slate-800">{passedHours}</p>
+          </CardContent>
+        </Card>
+      </div>
 
-        {filteredCourses.length === 0 && (
-          <div className="text-center py-8 text-muted-foreground">
-            <BookOpen className="w-10 h-10 mx-auto mb-2 opacity-30" />
-            <p>لا توجد مقررات لهذا الفصل</p>
-          </div>
-        )}
-      </CardContent>
-    </Card>
-  )
+      {/* Semester Tabs */}
+      <Tabs
+        value={String(activeSemester)}
+        onValueChange={(v) => setActiveSemester(Number(v))}
+      >
+        <TabsList className="grid w-full grid-cols-6 h-auto">
+          {semesterNames.map((name, i) => (
+            <TabsTrigger
+              key={i}
+              value={String(i + 1)}
+              className="text-xs px-2 py-1.5"
+            >
+              {name}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+
+        {semesterNames.map((_, i) => (
+          <TabsContent key={i} value={String(i + 1)} className="mt-4">
+            <Card>
+              <CardContent className="p-0">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b bg-slate-50">
+                        <th className="text-right p-3 font-medium">#</th>
+                        <th className="text-right p-3 font-medium">رمز المقرر</th>
+                        <th className="text-right p-3 font-medium">اسم المقرر</th>
+                        <th className="text-right p-3 font-medium text-center">الساعات</th>
+                        <th className="text-right p-3 font-medium text-center">التقدير</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(allCoursesData[i + 1] || []).map((course, j) => {
+                        const grade = gradesData[i + 1]?.[course.code];
+                        return (
+                          <tr
+                            key={course.code}
+                            className="border-b hover:bg-slate-50 transition-colors"
+                          >
+                            <td className="p-3 text-muted-foreground">{j + 1}</td>
+                            <td className="p-3 font-mono text-xs">{course.code}</td>
+                            <td className="p-3">{course.name}</td>
+                            <td className="p-3 text-center">{course.hours}</td>
+                            <td className="p-3 text-center">
+                              {grade ? (
+                                <span className={`text-lg ${gradeColorClass(grade)}`}>
+                                  {grade}
+                                </span>
+                              ) : (
+                                <span className="text-muted-foreground">—</span>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                    <tfoot>
+                      <tr className="border-t bg-slate-50 font-medium">
+                        <td colSpan={3} className="p-3">
+                          إجمالي الساعات
+                        </td>
+                        <td className="p-3 text-center">
+                          {(allCoursesData[i + 1] || []).reduce(
+                            (sum, c) => sum + c.hours,
+                            0
+                          )}
+                        </td>
+                        <td></td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        ))}
+      </Tabs>
+    </div>
+  );
 }

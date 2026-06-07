@@ -1,0 +1,12 @@
+node_modules
+.next
+.git
+.gitignore
+skills
+download
+*.md
+deploy-package
+*.tar.gz
+docker-compose*.yml
+Dockerfile*
+.env*

@@ -1,23 +1,20 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
 export const metadata: Metadata = {
   title: "نظام إدارة القسم الأكاديمي",
-  description: "نظام شامل لإدارة القسم الأكاديمي - يدعم رئيس القسم وأعضاء هيئة التدريس والموظفين والطلاب",
+  description:
+    "نظام شامل لإدارة القسم الأكاديمي يشمل إدارة الإعلانات والمقررات والطلبات الأكاديمية",
+  keywords: [
+    "إدارة أكاديمية",
+    "قسم أكاديمي",
+    "جامعة",
+    "إعلانات",
+    "مقررات دراسية",
+  ],
   icons: {
-    icon: "https://z-cdn.chatglm.cn/z-ai/static/logo.svg",
+    icon: "/logo.svg",
   },
 };
 
@@ -28,9 +25,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ar" dir="rtl" suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
-      >
+      <body className="antialiased bg-background text-foreground min-h-screen">
         {children}
         <Toaster />
       </body>
