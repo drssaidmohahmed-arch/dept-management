@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef, useSyncExternalStore } from "react";
 
 // ============ Types ============
 
@@ -233,12 +233,11 @@ export function getStats() {
  */
 export function useStore(): StoreState {
   const subscribeFn = useCallback(subscribe, []);
-  const getSnapshotFn = useCallback(getSnapshot, []);
 
-  // We use a version counter in getSnapshot to ensure useSyncExternalStore
-  // detects changes. Since we replace the state object on every mutation,
-  // the reference comparison in useSyncExternalStore works correctly.
-  return getSnapshotFn();
+  return useSyncExternalStore(
+    subscribeFn,
+    getSnapshot
+  );
 }
 
 /**
