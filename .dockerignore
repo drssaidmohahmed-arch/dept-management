@@ -1,12 +1,58 @@
-node_modules
-.next
-.git
+# Dependencies
+node_modules/
+.pnp/
+.pnp.js
+
+# Build outputs
+.next/
+out/
+dist/
+build/
+*.tsbuildinfo
+
+# Database
+db/*.db
+db/*.db-journal
+prisma/migrations/
+
+# Environment
+.env
+.env.local
+.env.production
+.env.staging
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+dev.log
+server.log
+
+# Testing
+coverage/
+.nyc_output/
+
+# Git
+.git/
 .gitignore
-skills
-download
-*.md
-deploy-package
-*.tar.gz
-docker-compose*.yml
+
+# Docker
 Dockerfile*
-.env*
+docker-compose*.yml
+.dockerignore
+
+# GitHub
+.github/
+
+# Misc
+README.md
+LICENSE
