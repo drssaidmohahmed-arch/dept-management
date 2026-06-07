@@ -210,3 +210,109 @@ Added `flex-row-reverse` to 10 `flex items-center` containers where an icon/colo
 - Line 606: `<span className="text-xs text-muted-foreground ms-1">` — ms is margin-start (RTL-aware)
 
 No other classes were modified. No `justify-between` containers were touched.
+
+---
+
+Task ID: 11
+Agent: Main Agent
+Task: Create Supabase client utility files for the Next.js project
+
+Work Log:
+- Verified `@supabase/ssr` (v0.10.3) and `@supabase/supabase-js` (v2.107.0) already installed in package.json
+- Created directory: `src/lib/supabase/`
+- Created `src/lib/supabase/client.ts` — browser-side Supabase client using `createBrowserClient` from `@supabase/ssr`
+- Created `src/lib/supabase/server.ts` — server-side Supabase client using `createServerClient` from `@supabase/ssr` with Next.js `cookies()` for cookie handling
+- Created `src/lib/supabase/database.types.ts` — comprehensive TypeScript types for 7 database tables (announcements, members, professor_requests, student_requests, courses, professor_courses, enrolled_students) with Row/Insert/Update types and enum definitions
+- Created `.env.local` with `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` placeholder variables
+- Lint passed (pre-existing errors in store.ts are unrelated to this task)
+
+Stage Summary:
+- 4 files created: client.ts, server.ts, database.types.ts, .env.local
+- Supabase utility layer ready for integration with the academic department management system
+
+---
+
+Task ID: 10
+Agent: Main Agent
+Task: Create comprehensive Supabase PostgreSQL database migration SQL file
+
+Work Log:
+- Created `/home/z/my-project/supabase/` directory
+- Created `/home/z/my-project/supabase/schema.sql` (315 lines) with complete database migration
+- Defined 8 ENUM types: announcement_priority, target_role, member_role, request_status, professor_request_category, professor_request_target, professor_request_status, student_enrollment_status
+- Created 7 tables: announcements, members, professor_requests, student_requests, courses, professor_courses, enrolled_students
+- Added 14 performance indexes across all tables
+- Created updated_at trigger function and applied it to professor_requests table
+- Enabled Row Level Security (RLS) on all 7 tables with public read policies and service_role full access policies (14 policies total)
+- Seeded exact data matching the in-memory store (src/lib/store.ts):
+  - 4 announcements with exact Arabic content, priorities, and target roles
+  - 8 department members with exact permissions arrays, positions, avatars, join dates, and active status
+  - 5 professor requests with exact categories, targets, descriptions, statuses, and timestamps
+  - 13 courses (8 from course catalog + 5 additional courses referenced by professor_courses/enrolled_students)
+  - 8 professor course assignments with exact semester and enrolled counts
+  - 31 enrolled students across 8 courses and 3 semesters with exact grades, marks, attendance, and statuses
+- Used deterministic UUIDs for seed data to ensure reproducible inserts
+
+Stage Summary:
+- Complete production-ready Supabase migration SQL file created at supabase/schema.sql
+- All data exactly matches the in-memory store in src/lib/store.ts
+- RLS enabled with appropriate policies for public read and service_role full access
+- Trigger ensures updated_at is auto-set on professor_requests UPDATE
+
+---
+
+Task ID: 12
+Agent: Main Agent
+Task: Create comprehensive API routes for the Supabase backend
+
+Work Log:
+- Explored project structure: verified Supabase server/client setup and database.types.ts schema
+- Created 7 API route directories under src/app/api/
+- Created `/api/announcements/route.ts` — GET (all, ordered by created_at desc), POST (insert with defaults), DELETE (by id)
+- Created `/api/members/route.ts` — GET (with role/status/search query params, ordered by joined_at desc), POST (insert all fields), PUT (update by id with validation), DELETE (by id with validation)
+- Created `/api/professor-requests/route.ts` — GET (with status/target/category/search query params), POST (insert with pending status), PUT (update with auto updated_at timestamp), DELETE (by id with validation)
+- Created `/api/student-requests/route.ts` — GET (with status/search query params), POST (insert with pending status), DELETE (by id with validation)
+- Created `/api/courses/route.ts` — GET (all, ordered by code)
+- Created `/api/professor-courses/route.ts` — GET (all, ordered by course_code)
+- Created `/api/enrolled-students/route.ts` — GET (with courseCode/semester/search query params, ordered by student_id)
+- All routes use server-side Supabase client from `@/lib/supabase/server`
+- All routes include proper try/catch error handling with NextResponse.json()
+- Lint verified: zero errors from the new API route files (23 pre-existing errors in other files)
+
+Stage Summary:
+- 7 API route files created covering all 7 database tables
+- Full CRUD operations where applicable (announcements, members, professor_requests, student_requests)
+- Read-only GET endpoints for reference tables (courses, professor_courses, enrolled_students)
+- Query parameter filtering supported on all GET endpoints
+- Server-side Supabase client used consistently across all routes
+
+---
+
+Task ID: 13
+Agent: Main Agent
+Task: Create Supabase-backed store (supabase-store.ts) as drop-in replacement for in-memory store
+
+Work Log:
+- Read existing `src/lib/store.ts` (914 lines) to understand all types, constants, hooks, and action functions
+- Verified `src/lib/supabase/client.ts` uses `createBrowserClient` from `@supabase/ssr`
+- Created `/home/z/my-project/src/lib/supabase-store.ts` — complete Supabase-backed store with:
+  - Re-exports of ALL 11 types (Announcement, StudentRequest, Course, PermissionKey, DepartmentMember, ProfessorRequest, ProfessorRequestTarget, ProfessorRequestCategory, ProfessorRequestStatus, EnrolledStudent, ProfessorCourse, StoreState)
+  - Re-exports of ALL 18 constants/label/color maps from original store
+  - Module-level external store infrastructure with `useSyncExternalStore` pattern (avoids React hooks lint issues)
+  - Module-level cache (`tableCache`) for each of the 7 Supabase tables
+  - Module-level listener sets (`tableListeners`) for reactive updates
+  - Realtime subscriptions set up on module load for all 7 tables
+  - Row mapper functions for each entity type (DB snake_case → TypeScript camelCase mapping)
+  - 7 data hooks: `useAnnouncements`, `useStudentRequests`, `useMembers`, `useProfessorRequests`, `useProfessorCourses`, `useEnrolledStudents`, `useCourses`
+  - `useStats` hook backed by async `getStats()` function with multi-table subscriptions
+  - 12 async action functions: `addAnnouncement`, `deleteAnnouncement`, `addStudentRequest`, `deleteStudentRequest`, `addProfessorRequest`, `updateProfessorRequestStatus`, `deleteProfessorRequest`, `addMember`, `deleteMember`, `toggleMemberPermission`, `toggleMemberStatus`, `updateMemberPermissions`
+  - `getAnnouncementsForRole` utility function
+- Lint verified: zero errors from supabase-store.ts (15 pre-existing errors in store.ts only)
+
+Stage Summary:
+- 1 file created: `src/lib/supabase-store.ts` (~420 lines)
+- Exact same public API as `src/lib/store.ts` — drop-in replacement
+- All hooks use `useSyncExternalStore` for consistent reactivity (same pattern as original store)
+- Realtime subscriptions provide live data updates across all components
+- All action functions are async and use Supabase client directly
+- Column name mappings: created_at→createdAt, target_role→targetRole, is_active→isActive, joined_at→joinedAt, course_code→courseCode, student_id→studentId, mid_term_mark→midTermMark, final_mark→finalMark, assignments_mark→assignmentsMark, professor_name→professorName, enrolled_count→enrolledCount, target_student_id→targetStudentId, target_student_name→targetStudentName, updated_at→updatedAt
