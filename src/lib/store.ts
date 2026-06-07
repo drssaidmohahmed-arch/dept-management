@@ -28,10 +28,99 @@ export interface Course {
   semester: number;
 }
 
+// ============ Permission Types ============
+
+export type PermissionKey =
+  | "manage_announcements"
+  | "manage_courses"
+  | "manage_requests"
+  | "view_reports"
+  | "manage_schedules"
+  | "manage_exams"
+  | "export_data"
+  | "manage_users";
+
+export interface DepartmentMember {
+  id: string;
+  name: string;
+  email: string;
+  role: "professor" | "employee";
+  position: string;
+  avatar: string;
+  isActive: boolean;
+  permissions: PermissionKey[];
+  joinedAt: string;
+}
+
+export const PERMISSION_LABELS: Record<PermissionKey, { label: string; description: string; icon: string }> = {
+  manage_announcements: {
+    label: "إدارة الإعلانات",
+    description: "إنشاء وتعديل وحذف الإعلانات",
+    icon: "megaphone",
+  },
+  manage_courses: {
+    label: "إدارة المقررات",
+    description: "إضافة وتعديل وحذف المقررات الدراسية",
+    icon: "book",
+  },
+  manage_requests: {
+    label: "إدارة الطلبات",
+    description: "قبول ورفض ومتابعة طلبات الطلاب",
+    icon: "clipboard",
+  },
+  view_reports: {
+    label: "عرض التقارير",
+    description: "الاطلاع على التقارير والإحصائيات",
+    icon: "chart",
+  },
+  manage_schedules: {
+    label: "إدارة الجداول",
+    description: "تعديل الجداول الأسبوعية والمحاضرات",
+    icon: "calendar",
+  },
+  manage_exams: {
+    label: "إدارة الامتحانات",
+    description: "إعداد وجدولة الامتحانات والدرجات",
+    icon: "exam",
+  },
+  export_data: {
+    label: "تصدير البيانات",
+    description: "تصدير التقارير والسجلات بصيغ مختلفة",
+    icon: "download",
+  },
+  manage_users: {
+    label: "إدارة المستخدمين",
+    description: "إضافة وتعديل بيانات المستخدمين",
+    icon: "users",
+  },
+};
+
+export const ALL_PERMISSIONS: PermissionKey[] = [
+  "manage_announcements",
+  "manage_courses",
+  "manage_requests",
+  "view_reports",
+  "manage_schedules",
+  "manage_exams",
+  "export_data",
+  "manage_users",
+];
+
+export const MEMBER_ROLE_LABELS: Record<string, string> = {
+  professor: "عضو هيئة تدريس",
+  employee: "موظف إداري",
+};
+
+export const MEMBER_ROLE_COLORS: Record<string, string> = {
+  professor: "bg-sky-100 text-sky-800",
+  employee: "bg-cyan-100 text-cyan-800",
+};
+
 export interface StoreState {
   announcements: Announcement[];
   studentRequests: StudentRequest[];
   courses: Course[];
+  members: DepartmentMember[];
 }
 
 // ============ Constants ============
@@ -104,6 +193,97 @@ const initialAnnouncements: Announcement[] = [
   },
 ];
 
+const initialMembers: DepartmentMember[] = [
+  {
+    id: "mem-1",
+    name: "د. أحمد محمد الشريف",
+    email: "ahmed.sharif@univ.edu",
+    role: "professor",
+    position: "أستاذ مشارك",
+    avatar: "أ",
+    isActive: true,
+    permissions: ["manage_announcements", "manage_courses", "manage_schedules", "manage_exams", "view_reports"],
+    joinedAt: "2018-09-01T00:00:00.000Z",
+  },
+  {
+    id: "mem-2",
+    name: "د. فاطمة علي الحسن",
+    email: "fatima.hasan@univ.edu",
+    role: "professor",
+    position: "أستاذ مساعد",
+    avatar: "ف",
+    isActive: true,
+    permissions: ["manage_courses", "manage_exams", "view_reports"],
+    joinedAt: "2020-01-15T00:00:00.000Z",
+  },
+  {
+    id: "mem-3",
+    name: "د. خالد عبدالله العمري",
+    email: "khaled.omari@univ.edu",
+    role: "professor",
+    position: "محاضر",
+    avatar: "خ",
+    isActive: true,
+    permissions: ["manage_courses", "manage_schedules", "view_reports"],
+    joinedAt: "2021-09-01T00:00:00.000Z",
+  },
+  {
+    id: "mem-4",
+    name: "أ. سارة محمود زايد",
+    email: "sara.zayed@univ.edu",
+    role: "employee",
+    position: "مسؤول شؤون الطلاب",
+    avatar: "س",
+    isActive: true,
+    permissions: ["manage_requests", "export_data", "view_reports"],
+    joinedAt: "2019-03-10T00:00:00.000Z",
+  },
+  {
+    id: "mem-5",
+    name: "أ. عمر حسن الدوسري",
+    email: "omar.dosari@univ.edu",
+    role: "employee",
+    position: "مسؤول الشؤون الأكاديمية",
+    avatar: "ع",
+    isActive: true,
+    permissions: ["manage_courses", "manage_schedules", "export_data", "view_reports"],
+    joinedAt: "2017-08-20T00:00:00.000Z",
+  },
+  {
+    id: "mem-6",
+    name: "أ. نورة سعد القحطاني",
+    email: "noura.qahtani@univ.edu",
+    role: "employee",
+    position: "سكرتير القسم",
+    avatar: "ن",
+    isActive: true,
+    permissions: ["manage_announcements", "export_data"],
+    joinedAt: "2022-01-05T00:00:00.000Z",
+  },
+  {
+    id: "mem-7",
+    name: "د. محمد فيصل الغامدي",
+    email: "mohammed.ghamdi@univ.edu",
+    role: "professor",
+    position: "أستاذ",
+    avatar: "م",
+    isActive: false,
+    permissions: ["manage_announcements", "manage_courses", "manage_exams", "manage_users", "view_reports", "export_data"],
+    joinedAt: "2015-01-01T00:00:00.000Z",
+  },
+  {
+    id: "mem-8",
+    name: "أ. هند عبدالرحمن السبيعي",
+    email: "hind.subaie@univ.edu",
+    role: "employee",
+    position: "مسؤول الامتحانات",
+    avatar: "هـ",
+    isActive: true,
+    permissions: ["manage_exams", "manage_schedules", "view_reports"],
+    joinedAt: "2023-06-15T00:00:00.000Z",
+  },
+];
+
 const initialCourses: Course[] = Array.from({ length: 8 }, (_, i) => ({
   id: `s1-c${i + 1}`,
   name: [
@@ -137,6 +317,7 @@ let state: StoreState = {
   announcements: initialAnnouncements,
   studentRequests: [],
   courses: initialCourses,
+  members: initialMembers,
 };
 
 const listeners = new Set<() => void>();
@@ -205,6 +386,66 @@ export function deleteStudentRequest(id: string) {
   emitChange();
 }
 
+// ============ Member Actions ============
+
+export function updateMemberPermissions(memberId: string, permissions: PermissionKey[]) {
+  state = {
+    ...state,
+    members: state.members.map((m) =>
+      m.id === memberId ? { ...m, permissions } : m
+    ),
+  };
+  emitChange();
+}
+
+export function toggleMemberPermission(memberId: string, permission: PermissionKey) {
+  state = {
+    ...state,
+    members: state.members.map((m) => {
+      if (m.id !== memberId) return m;
+      const hasPermission = m.permissions.includes(permission);
+      return {
+        ...m,
+        permissions: hasPermission
+          ? m.permissions.filter((p) => p !== permission)
+          : [...m.permissions, permission],
+      };
+    }),
+  };
+  emitChange();
+}
+
+export function toggleMemberStatus(memberId: string) {
+  state = {
+    ...state,
+    members: state.members.map((m) =>
+      m.id === memberId ? { ...m, isActive: !m.isActive } : m
+    ),
+  };
+  emitChange();
+}
+
+export function addMember(member: Omit<DepartmentMember, "id" | "joinedAt">) {
+  const newMember: DepartmentMember = {
+    ...member,
+    id: `mem-${nextId++}`,
+    joinedAt: new Date().toISOString(),
+  };
+  state = {
+    ...state,
+    members: [newMember, ...state.members],
+  };
+  emitChange();
+}
+
+export function deleteMember(memberId: string) {
+  state = {
+    ...state,
+    members: state.members.filter((m) => m.id !== memberId),
+  };
+  emitChange();
+}
+
 export function getAnnouncementsForRole(
   role: "professors" | "employees" | "students" | "all"
 ) {
@@ -214,13 +455,17 @@ export function getAnnouncementsForRole(
 }
 
 export function getStats() {
+  const activeProfessors = state.members.filter((m) => m.role === "professor" && m.isActive).length;
+  const activeEmployees = state.members.filter((m) => m.role === "employee" && m.isActive).length;
   return {
     totalAnnouncements: state.announcements.length,
-    professors: 12,
-    employees: 8,
+    professors: activeProfessors,
+    employees: activeEmployees,
     students: 156,
     totalRequests: state.studentRequests.length,
     averageGPA: 3.67,
+    totalMembers: state.members.length,
+    activeMembers: state.members.filter((m) => m.isActive).length,
   };
 }
 
@@ -269,6 +514,20 @@ export function useStudentRequests(): StudentRequest[] {
 }
 
 /**
+ * Returns members array - stable reference until data changes.
+ */
+export function useMembers(): DepartmentMember[] {
+  const subscribeFn = useCallback(subscribe, []);
+
+  const members = useSyncExternalStore(
+    subscribeFn,
+    () => state.members
+  );
+
+  return members;
+}
+
+/**
  * Returns courses array - stable reference until data changes.
  */
 export function useCourses(): Course[] {
@@ -288,16 +547,8 @@ export function useCourses(): Course[] {
 export function useStats() {
   const subscribeFn = useCallback(subscribe, []);
 
-  // We store stats in state-like cache for referential stability
-  const statsRef = useRef(getStats());
-
-  useEffect(() => {
-    const unsubscribe = subscribe(() => {
-      statsRef.current = getStats();
-    });
-    statsRef.current = getStats();
-    return unsubscribe;
-  }, [subscribeFn]);
-
-  return statsRef.current;
+  return useSyncExternalStore(
+    subscribeFn,
+    () => getStats()
+  );
 }

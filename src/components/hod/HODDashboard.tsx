@@ -42,7 +42,9 @@ import {
   Calendar,
   Megaphone,
   TrendingUp,
+  Shield,
 } from "lucide-react";
+import PermissionsManager from "@/components/hod/PermissionsManager";
 import {
   useAnnouncements,
   addAnnouncement,
@@ -128,6 +130,10 @@ export default function HODDashboard() {
           <TabsTrigger value="courses" className="flex items-center gap-1">
             <BookOpen className="w-4 h-4" />
             إدارة المقررات
+          </TabsTrigger>
+          <TabsTrigger value="permissions" className="flex items-center gap-1">
+            <Shield className="w-4 h-4" />
+            صلاحيات الأعضاء
           </TabsTrigger>
         </TabsList>
 
@@ -386,6 +392,10 @@ export default function HODDashboard() {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="permissions" className="mt-4">
+          <PermissionsManager />
         </TabsContent>
       </Tabs>
     </div>
