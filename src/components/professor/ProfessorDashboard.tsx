@@ -17,16 +17,22 @@ import {
   Calendar,
   Clock,
   GraduationCap,
+  UserCheck,
 } from "lucide-react";
 import {
   useAnnouncements,
+  useProfessorCourses,
+  useEnrolledStudents,
   PRIORITY_LABELS,
   PRIORITY_COLORS,
   TARGET_ROLE_LABELS,
 } from "@/lib/store";
+import CourseStudentsList from "@/components/professor/CourseStudentsList";
 
 export default function ProfessorDashboard() {
   const announcements = useAnnouncements();
+  const professorCourses = useProfessorCourses();
+  const enrolledStudents = useEnrolledStudents();
 
   const professorAnnouncements = useMemo(
     () => announcements.filter((a) => a.targetRole === "all" || a.targetRole === "professors"),
@@ -38,10 +44,18 @@ export default function ProfessorDashboard() {
     [professorAnnouncements]
   );
 
+  const uniqueStudents = useMemo(() => {
+    return new Set(
+      enrolledStudents
+        .filter((s) => professorCourses.some((c) => c.code === s.courseCode))
+        .map((s) => s.studentId)
+    ).size;
+  }, [enrolledStudents, professorCourses]);
+
   const statCards = [
     { label: "الإعلانات", value: professorAnnouncements.length, icon: Bell, color: "bg-sky-50 text-sky-700" },
-    { label: "المقررات", value: 4, icon: BookOpen, color: "bg-emerald-50 text-emerald-700" },
-    { label: "الطلاب", value: 89, icon: Users, color: "bg-orange-50 text-orange-700" },
+    { label: "المقررات", value: professorCourses.length, icon: BookOpen, color: "bg-emerald-50 text-emerald-700" },
+    { label: "الطلبة", value: uniqueStudents, icon: Users, color: "bg-orange-50 text-orange-700" },
     { label: "العاجلة", value: urgentAnnouncements.length, icon: ClipboardList, color: "bg-red-50 text-red-700" },
   ];
 
@@ -118,6 +132,13 @@ export default function ProfessorDashboard() {
           <TabsTrigger value="schedule" className="flex items-center gap-1">
             <Calendar className="w-4 h-4" />
             الجدول الأسبوعي
+          </TabsTrigger>
+          <TabsTrigger value="students" className="flex items-center gap-1">
+            <UserCheck className="w-4 h-4" />
+            قوائم الطلبة
+            <Badge variant="secondary" className="mr-1 text-xs">
+              {uniqueStudents}
+            </Badge>
           </TabsTrigger>
         </TabsList>
 
@@ -203,6 +224,10 @@ export default function ProfessorDashboard() {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="students" className="mt-4">
+          <CourseStudentsList />
         </TabsContent>
       </Tabs>
     </div>

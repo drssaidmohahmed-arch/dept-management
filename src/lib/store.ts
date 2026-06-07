@@ -116,11 +116,90 @@ export const MEMBER_ROLE_COLORS: Record<string, string> = {
   employee: "bg-cyan-100 text-cyan-800",
 };
 
+// ============ Student Enrollment Types ============
+
+export interface EnrolledStudent {
+  id: string;
+  studentId: string;
+  name: string;
+  courseCode: string;
+  semester: number;
+  grade?: string;
+  midTermMark?: number;
+  finalMark?: number;
+  assignmentsMark?: number;
+  attendance: number; // percentage 0-100
+  status: "active" | "withdrawn" | "incomplete";
+}
+
+export interface ProfessorCourse {
+  code: string;
+  name: string;
+  hours: number;
+  semester: number;
+  professorName: string;
+  enrolledCount: number;
+}
+
+export const SEMESTER_NAMES: Record<number, string> = {
+  1: "الفصل الأول",
+  2: "الفصل الثاني",
+  3: "الفصل الثالث",
+  4: "الفصل الرابع",
+  5: "الفصل الخامس",
+  6: "الفصل السادس",
+};
+
+export const STUDENT_STATUS_LABELS: Record<string, string> = {
+  active: "نشط",
+  withdrawn: "منسحب",
+  incomplete: "غير مكتمل",
+};
+
+export const STUDENT_STATUS_COLORS: Record<string, string> = {
+  active: "bg-emerald-100 text-emerald-800",
+  withdrawn: "bg-red-100 text-red-800",
+  incomplete: "bg-amber-100 text-amber-800",
+};
+
+export const GRADE_TO_POINTS: Record<string, number> = {
+  "أ+": 4.0,
+  "أ": 4.0,
+  "أ-": 3.7,
+  "ب+": 3.3,
+  "ب": 3.0,
+  "ب-": 2.7,
+  "ج+": 2.3,
+  "ج": 2.0,
+  "ج-": 1.7,
+  "د+": 1.3,
+  "د": 1.0,
+  "د-": 0.7,
+  "ر": 0.0,
+};
+
+export const GRADE_COLORS: Record<string, string> = {
+  "أ+": "text-emerald-600 font-bold",
+  "أ": "text-emerald-600 font-bold",
+  "أ-": "text-emerald-500 font-semibold",
+  "ب+": "text-sky-600 font-semibold",
+  "ب": "text-sky-500 font-semibold",
+  "ب-": "text-sky-400",
+  "ج+": "text-amber-600",
+  "ج": "text-amber-500",
+  "ج-": "text-amber-400",
+  "د+": "text-orange-600",
+  "د": "text-orange-500",
+  "ر": "text-red-600 font-bold",
+};
+
 export interface StoreState {
   announcements: Announcement[];
   studentRequests: StudentRequest[];
   courses: Course[];
   members: DepartmentMember[];
+  enrolledStudents: EnrolledStudent[];
+  professorCourses: ProfessorCourse[];
 }
 
 // ============ Constants ============
@@ -191,6 +270,67 @@ const initialAnnouncements: Announcement[] = [
     targetRole: "employees",
     createdAt: "2025-01-12T11:00:00.000Z",
   },
+];
+
+const initialEnrolledStudents: EnrolledStudent[] = [
+  // === Semester 1 ===
+  // CS101 - مقدمة في علوم الحاسب
+  { id: "en-1", studentId: "ST-2024-001", name: "عبدالرحمن محمد السالم", courseCode: "CS101", semester: 1, grade: "أ", midTermMark: 28, finalMark: 42, assignmentsMark: 28, attendance: 95, status: "active" },
+  { id: "en-2", studentId: "ST-2024-002", name: "نورة عبدالله الحربي", courseCode: "CS101", semester: 1, grade: "أ-", midTermMark: 26, finalMark: 38, assignmentsMark: 27, attendance: 92, status: "active" },
+  { id: "en-3", studentId: "ST-2024-003", name: "فهد سعد العتيبي", courseCode: "CS101", semester: 1, grade: "ب+", midTermMark: 22, finalMark: 35, assignmentsMark: 25, attendance: 85, status: "active" },
+  { id: "en-4", studentId: "ST-2024-004", name: "ريم خالد الشمري", courseCode: "CS101", semester: 1, grade: "ب", midTermMark: 20, finalMark: 33, assignmentsMark: 24, attendance: 78, status: "active" },
+  { id: "en-5", studentId: "ST-2024-005", name: "سلطان فيصل المطيري", courseCode: "CS101", semester: 1, grade: "أ+", midTermMark: 30, finalMark: 45, assignmentsMark: 30, attendance: 98, status: "active" },
+  { id: "en-6", studentId: "ST-2024-006", name: "لمى أحمد الزهراني", courseCode: "CS101", semester: 1, grade: undefined, midTermMark: 18, finalMark: 25, assignmentsMark: 20, attendance: 60, status: "incomplete" },
+  // CS102 - مبادئ البرمجة
+  { id: "en-7", studentId: "ST-2024-001", name: "عبدالرحمن محمد السالم", courseCode: "CS102", semester: 1, grade: "ب", midTermMark: 21, finalMark: 32, assignmentsMark: 23, attendance: 88, status: "active" },
+  { id: "en-8", studentId: "ST-2024-002", name: "نورة عبدالله الحربي", courseCode: "CS102", semester: 1, grade: "أ", midTermMark: 28, finalMark: 40, assignmentsMark: 28, attendance: 96, status: "active" },
+  { id: "en-9", studentId: "ST-2024-007", name: "ماجد ناصر الدوسري", courseCode: "CS102", semester: 1, grade: "ب+", midTermMark: 23, finalMark: 34, assignmentsMark: 25, attendance: 82, status: "active" },
+  { id: "en-10", studentId: "ST-2024-003", name: "فهد سعد العتيبي", courseCode: "CS102", semester: 1, grade: "أ-", midTermMark: 27, finalMark: 37, assignmentsMark: 26, attendance: 90, status: "active" },
+  { id: "en-11", studentId: "ST-2024-008", name: "هند عادل القحطاني", courseCode: "CS102", semester: 1, grade: "ج+", midTermMark: 18, finalMark: 28, assignmentsMark: 22, attendance: 70, status: "active" },
+  // MATH101 - رياضيات متقدمة
+  { id: "en-12", studentId: "ST-2024-004", name: "ريم خالد الشمري", courseCode: "MATH101", semester: 1, grade: "ب-", midTermMark: 20, finalMark: 30, assignmentsMark: 22, attendance: 80, status: "active" },
+  { id: "en-13", studentId: "ST-2024-005", name: "سلطان فيصل المطيري", courseCode: "MATH101", semester: 1, grade: "أ", midTermMark: 29, finalMark: 42, assignmentsMark: 29, attendance: 97, status: "active" },
+  { id: "en-14", studentId: "ST-2024-009", name: "بدر همام السبيعي", courseCode: "MATH101", semester: 1, grade: "ر", midTermMark: 12, finalMark: 15, assignmentsMark: 10, attendance: 45, status: "active" },
+  { id: "en-15", studentId: "ST-2024-001", name: "عبدالرحمن محمد السالم", courseCode: "MATH101", semester: 1, grade: "ب+", midTermMark: 23, finalMark: 35, assignmentsMark: 25, attendance: 86, status: "active" },
+  { id: "en-16", studentId: "ST-2024-007", name: "ماجد ناصر الدوسري", courseCode: "MATH101", semester: 1, grade: "ج", midTermMark: 17, finalMark: 26, assignmentsMark: 20, attendance: 68, status: "active" },
+
+  // === Semester 2 ===
+  // CS201 - هياكل البيانات
+  { id: "en-17", studentId: "ST-2024-001", name: "عبدالرحمن محمد السالم", courseCode: "CS201", semester: 2, grade: "أ-", midTermMark: 27, finalMark: 38, assignmentsMark: 27, attendance: 93, status: "active" },
+  { id: "en-18", studentId: "ST-2024-002", name: "نورة عبدالله الحربي", courseCode: "CS201", semester: 2, grade: "ب+", midTermMark: 23, finalMark: 34, assignmentsMark: 25, attendance: 87, status: "active" },
+  { id: "en-19", studentId: "ST-2024-003", name: "فهد سعد العتيبي", courseCode: "CS201", semester: 2, grade: "أ", midTermMark: 29, finalMark: 42, assignmentsMark: 29, attendance: 96, status: "active" },
+  { id: "en-20", studentId: "ST-2024-010", name: "أسماء طارق البقمي", courseCode: "CS201", semester: 2, grade: "ب", midTermMark: 21, finalMark: 32, assignmentsMark: 23, attendance: 80, status: "active" },
+  // CS202 - قواعد البيانات
+  { id: "en-21", studentId: "ST-2024-004", name: "ريم خالد الشمري", courseCode: "CS202", semester: 2, grade: "أ+", midTermMark: 30, finalMark: 45, assignmentsMark: 30, attendance: 99, status: "active" },
+  { id: "en-22", studentId: "ST-2024-005", name: "سلطان فيصل المطيري", courseCode: "CS202", semester: 2, grade: "ب+", midTermMark: 24, finalMark: 35, assignmentsMark: 26, attendance: 84, status: "active" },
+  { id: "en-23", studentId: "ST-2024-001", name: "عبدالرحمن محمد السالم", courseCode: "CS202", semester: 2, grade: "أ", midTermMark: 28, finalMark: 41, assignmentsMark: 28, attendance: 94, status: "active" },
+  // CS205 - شبكات الحاسب ١
+  { id: "en-24", studentId: "ST-2024-007", name: "ماجد ناصر الدوسري", courseCode: "CS205", semester: 2, grade: "ب", midTermMark: 20, finalMark: 32, assignmentsMark: 24, attendance: 79, status: "active" },
+  { id: "en-25", studentId: "ST-2024-010", name: "أسماء طارق البقمي", courseCode: "CS205", semester: 2, grade: "أ-", midTermMark: 26, finalMark: 38, assignmentsMark: 27, attendance: 91, status: "active" },
+
+  // === Semester 3 ===
+  // CS301 - تحليل الخوارزميات
+  { id: "en-26", studentId: "ST-2024-001", name: "عبدالرحمن محمد السالم", courseCode: "CS301", semester: 3, grade: "أ", midTermMark: 28, finalMark: 43, assignmentsMark: 29, attendance: 97, status: "active" },
+  { id: "en-27", studentId: "ST-2024-002", name: "نورة عبدالله الحربي", courseCode: "CS301", semester: 3, grade: "ب+", midTermMark: 23, finalMark: 34, assignmentsMark: 25, attendance: 86, status: "active" },
+  { id: "en-28", studentId: "ST-2024-003", name: "فهد سعد العتيبي", courseCode: "CS301", semester: 3, grade: "أ-", midTermMark: 26, finalMark: 38, assignmentsMark: 27, attendance: 92, status: "active" },
+  // CS305 - ذكاء اصطناعي
+  { id: "en-29", studentId: "ST-2024-004", name: "ريم خالد الشمري", courseCode: "CS305", semester: 3, grade: "أ+", midTermMark: 30, finalMark: 45, assignmentsMark: 30, attendance: 100, status: "active" },
+  { id: "en-30", studentId: "ST-2024-005", name: "سلطان فيصل المطيري", courseCode: "CS305", semester: 3, grade: "ب", midTermMark: 21, finalMark: 33, assignmentsMark: 23, attendance: 81, status: "active" },
+  { id: "en-31", studentId: "ST-2024-007", name: "ماجد ناصر الدوسري", courseCode: "CS305", semester: 3, grade: undefined, midTermMark: 10, assignmentsMark: 15, attendance: 35, status: "withdrawn" },
+];
+
+const initialProfessorCourses: ProfessorCourse[] = [
+  // Semester 1
+  { code: "CS101", name: "مقدمة في علوم الحاسب", hours: 3, semester: 1, professorName: "د. أحمد محمد الشريف", enrolledCount: 6 },
+  { code: "CS102", name: "مبادئ البرمجة", hours: 3, semester: 1, professorName: "د. أحمد محمد الشريف", enrolledCount: 5 },
+  { code: "MATH101", name: "رياضيات متقدمة", hours: 4, semester: 1, professorName: "د. فاطمة علي الحسن", enrolledCount: 5 },
+  // Semester 2
+  { code: "CS201", name: "هياكل البيانات", hours: 3, semester: 2, professorName: "د. أحمد محمد الشريف", enrolledCount: 4 },
+  { code: "CS202", name: "قواعد البيانات", hours: 3, semester: 2, professorName: "د. فاطمة علي الحسن", enrolledCount: 3 },
+  { code: "CS205", name: "شبكات الحاسب ١", hours: 3, semester: 2, professorName: "د. خالد عبدالله العمري", enrolledCount: 2 },
+  // Semester 3
+  { code: "CS301", name: "تحليل الخوارزميات", hours: 3, semester: 3, professorName: "د. أحمد محمد الشريف", enrolledCount: 3 },
+  { code: "CS305", name: "ذكاء اصطناعي", hours: 3, semester: 3, professorName: "د. فاطمة علي الحسن", enrolledCount: 3 },
 ];
 
 const initialMembers: DepartmentMember[] = [
@@ -318,6 +458,8 @@ let state: StoreState = {
   studentRequests: [],
   courses: initialCourses,
   members: initialMembers,
+  enrolledStudents: initialEnrolledStudents,
+  professorCourses: initialProfessorCourses,
 };
 
 const listeners = new Set<() => void>();
@@ -525,6 +667,34 @@ export function useMembers(): DepartmentMember[] {
   );
 
   return members;
+}
+
+/**
+ * Returns enrolled students array - stable reference until data changes.
+ */
+export function useEnrolledStudents(): EnrolledStudent[] {
+  const subscribeFn = useCallback(subscribe, []);
+
+  const students = useSyncExternalStore(
+    subscribeFn,
+    () => state.enrolledStudents
+  );
+
+  return students;
+}
+
+/**
+ * Returns professor courses array - stable reference until data changes.
+ */
+export function useProfessorCourses(): ProfessorCourse[] {
+  const subscribeFn = useCallback(subscribe, []);
+
+  const courses = useSyncExternalStore(
+    subscribeFn,
+    () => state.professorCourses
+  );
+
+  return courses;
 }
 
 /**
