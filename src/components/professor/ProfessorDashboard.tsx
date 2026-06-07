@@ -18,21 +18,27 @@ import {
   Clock,
   GraduationCap,
   UserCheck,
+  Send,
 } from "lucide-react";
 import {
   useAnnouncements,
   useProfessorCourses,
   useEnrolledStudents,
+  useProfessorRequests,
   PRIORITY_LABELS,
   PRIORITY_COLORS,
   TARGET_ROLE_LABELS,
 } from "@/lib/store";
 import CourseStudentsList from "@/components/professor/CourseStudentsList";
+import ProfessorRequestPanel from "@/components/professor/ProfessorRequestPanel";
 
 export default function ProfessorDashboard() {
   const announcements = useAnnouncements();
   const professorCourses = useProfessorCourses();
   const enrolledStudents = useEnrolledStudents();
+
+  const requests = useProfessorRequests();
+  const pendingRequests = useMemo(() => requests.filter((r) => r.status === "pending").length, [requests]);
 
   const professorAnnouncements = useMemo(
     () => announcements.filter((a) => a.targetRole === "all" || a.targetRole === "professors"),
@@ -57,6 +63,7 @@ export default function ProfessorDashboard() {
     { label: "المقررات", value: professorCourses.length, icon: BookOpen, color: "bg-emerald-50 text-emerald-700" },
     { label: "الطلبة", value: uniqueStudents, icon: Users, color: "bg-orange-50 text-orange-700" },
     { label: "العاجلة", value: urgentAnnouncements.length, icon: ClipboardList, color: "bg-red-50 text-red-700" },
+    { label: "طلباتي", value: requests.length, icon: Send, color: "bg-indigo-50 text-indigo-700" },
   ];
 
   const schedule = [
@@ -139,6 +146,15 @@ export default function ProfessorDashboard() {
             <Badge variant="secondary" className="mr-1 text-xs">
               {uniqueStudents}
             </Badge>
+          </TabsTrigger>
+          <TabsTrigger value="requests" className="flex items-center gap-1">
+            <Send className="w-4 h-4" />
+            تقديم طلب
+            {pendingRequests > 0 && (
+              <Badge variant="secondary" className="mr-1 text-xs bg-yellow-100 text-yellow-800">
+                {pendingRequests}
+              </Badge>
+            )}
           </TabsTrigger>
         </TabsList>
 
@@ -228,6 +244,10 @@ export default function ProfessorDashboard() {
 
         <TabsContent value="students" className="mt-4">
           <CourseStudentsList />
+        </TabsContent>
+
+        <TabsContent value="requests" className="mt-4">
+          <ProfessorRequestPanel />
         </TabsContent>
       </Tabs>
     </div>

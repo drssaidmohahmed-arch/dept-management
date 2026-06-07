@@ -116,6 +116,75 @@ export const MEMBER_ROLE_COLORS: Record<string, string> = {
   employee: "bg-cyan-100 text-cyan-800",
 };
 
+// ============ Professor Request Types ============
+
+export type ProfessorRequestTarget = "department" | "student";
+export type ProfessorRequestCategory =
+  | "academic"
+  | "administrative"
+  | "technical"
+  | "schedule_change"
+  | "grade_review"
+  | "other";
+export type ProfessorRequestStatus = "pending" | "approved" | "rejected" | "in_progress";
+
+export interface ProfessorRequest {
+  id: string;
+  category: ProfessorRequestCategory;
+  target: ProfessorRequestTarget;
+  targetStudentId?: string;
+  targetStudentName?: string;
+  subject: string;
+  description: string;
+  priority: "urgent" | "important" | "normal";
+  status: ProfessorRequestStatus;
+  response?: string;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export const PROF_REQ_CATEGORY_LABELS: Record<ProfessorRequestCategory, string> = {
+  academic: "أكاديمي",
+  administrative: "إداري",
+  technical: "تقني",
+  schedule_change: "تعديل جدول",
+  grade_review: "مراجعة درجات",
+  other: "أخرى",
+};
+
+export const PROF_REQ_CATEGORY_COLORS: Record<ProfessorRequestCategory, string> = {
+  academic: "bg-sky-100 text-sky-800",
+  administrative: "bg-cyan-100 text-cyan-800",
+  technical: "bg-violet-100 text-violet-800",
+  schedule_change: "bg-amber-100 text-amber-800",
+  grade_review: "bg-emerald-100 text-emerald-800",
+  other: "bg-slate-100 text-slate-800",
+};
+
+export const PROF_REQ_TARGET_LABELS: Record<ProfessorRequestTarget, string> = {
+  department: "موجه للقسم",
+  student: "موجه لطالب",
+};
+
+export const PROF_REQ_TARGET_COLORS: Record<ProfessorRequestTarget, string> = {
+  department: "bg-indigo-100 text-indigo-800",
+  student: "bg-orange-100 text-orange-800",
+};
+
+export const PROF_REQ_STATUS_LABELS: Record<ProfessorRequestStatus, string> = {
+  pending: "قيد الانتظار",
+  approved: "مقبول",
+  rejected: "مرفوض",
+  in_progress: "قيد المعالجة",
+};
+
+export const PROF_REQ_STATUS_COLORS: Record<ProfessorRequestStatus, string> = {
+  pending: "bg-yellow-100 text-yellow-800 border-yellow-200",
+  approved: "bg-green-100 text-green-800 border-green-200",
+  rejected: "bg-red-100 text-red-800 border-red-200",
+  in_progress: "bg-blue-100 text-blue-800 border-blue-200",
+};
+
 // ============ Student Enrollment Types ============
 
 export interface EnrolledStudent {
@@ -200,6 +269,7 @@ export interface StoreState {
   members: DepartmentMember[];
   enrolledStudents: EnrolledStudent[];
   professorCourses: ProfessorCourse[];
+  professorRequests: ProfessorRequest[];
 }
 
 // ============ Constants ============
@@ -453,6 +523,68 @@ const initialCourses: Course[] = Array.from({ length: 8 }, (_, i) => ({
 
 // ============ Store Implementation ============
 
+const initialProfessorRequests: ProfessorRequest[] = [
+  {
+    id: "pr-1",
+    category: "academic",
+    target: "department",
+    subject: "طلب تحديث المنهج الدراسي",
+    description: "أطلب تحديث منهج مقرر هياكل البيانات (CS201) لتشمل مواضيع الأشجار AVL والرسوم البيانية الموجهة بشكل أعمق، مع إضافة مشاريع تطبيقية للطلاب.",
+    priority: "important",
+    status: "in_progress",
+    createdAt: "2025-01-12T09:00:00.000Z",
+    updatedAt: "2025-01-14T11:30:00.000Z",
+  },
+  {
+    id: "pr-2",
+    category: "schedule_change",
+    target: "department",
+    subject: "طلب تغيير وقت محاضرة",
+    description: "أطلب تغيير وقت محاضرة مقدمة في علوم الحاسب (CS101) من يوم الأحد الساعة 8 إلى يوم الثلاثاء الساعة 10 لتعارض مع اجتماع المجلس الأكاديمي.",
+    priority: "normal",
+    status: "pending",
+    createdAt: "2025-01-15T08:00:00.000Z",
+  },
+  {
+    id: "pr-3",
+    category: "grade_review",
+    target: "student",
+    targetStudentId: "ST-2024-006",
+    targetStudentName: "لمى أحمد الزهراني",
+    subject: "طلب مراجعة درجات الطالبة",
+    description: "أطلب مراجعة درجات الطالبة لمى أحمد الزهراني في مقرر CS101 حيث يبدو أن هناك خطأ في احتساب درجة أعمال السنة. مجموع أعمال السنة المسجلة 20 بينما المفترض 25.",
+    priority: "important",
+    status: "pending",
+    createdAt: "2025-01-14T14:00:00.000Z",
+  },
+  {
+    id: "pr-4",
+    category: "technical",
+    target: "department",
+    subject: "طلب صيانة أجهزة المعمل",
+    description: "الأجهزة في معمل البرمجة (معمل 5) تحتاج صيانة عاجلة. 4 أجهزة من أصل 20 متعطلة وأجهزة أخرى بطيئة جداً مما يؤثر على سير العملي.",
+    priority: "urgent",
+    status: "approved",
+    response: "تمت الموافقة على الطلب وإرسال فريق الصيانة.",
+    createdAt: "2025-01-10T10:00:00.000Z",
+    updatedAt: "2025-01-11T15:00:00.000Z",
+  },
+  {
+    id: "pr-5",
+    category: "administrative",
+    target: "student",
+    targetStudentId: "ST-2024-003",
+    targetStudentName: "فهد سعد العتيبي",
+    subject: "تنبيه بخصوص الغياب المتكرر",
+    description: "أرسل تنبيه للطالب فهد سعد العتيبي بشأن غيابه المتكرر عن محاضرات هياكل البيانات (CS201) حيث بلغت نسبة غيابه 25% وأقترب من الحد الأقصى المسموح.",
+    priority: "normal",
+    status: "approved",
+    response: "تم إبلاغ الطالب وإرسال إنذار رسمي.",
+    createdAt: "2025-01-08T12:00:00.000Z",
+    updatedAt: "2025-01-09T09:00:00.000Z",
+  },
+];
+
 let state: StoreState = {
   announcements: initialAnnouncements,
   studentRequests: [],
@@ -460,6 +592,7 @@ let state: StoreState = {
   members: initialMembers,
   enrolledStudents: initialEnrolledStudents,
   professorCourses: initialProfessorCourses,
+  professorRequests: initialProfessorRequests,
 };
 
 const listeners = new Set<() => void>();
@@ -524,6 +657,48 @@ export function deleteStudentRequest(id: string) {
   state = {
     ...state,
     studentRequests: state.studentRequests.filter((r) => r.id !== id),
+  };
+  emitChange();
+}
+
+// ============ Professor Request Actions ============
+
+export function addProfessorRequest(
+  request: Omit<ProfessorRequest, "id" | "createdAt" | "status">
+) {
+  const newRequest: ProfessorRequest = {
+    ...request,
+    id: `pr-${nextId++}`,
+    status: "pending",
+    createdAt: new Date().toISOString(),
+  };
+  state = {
+    ...state,
+    professorRequests: [newRequest, ...state.professorRequests],
+  };
+  emitChange();
+}
+
+export function updateProfessorRequestStatus(
+  requestId: string,
+  status: ProfessorRequestStatus,
+  response?: string
+) {
+  state = {
+    ...state,
+    professorRequests: state.professorRequests.map((r) =>
+      r.id === requestId
+        ? { ...r, status, response, updatedAt: new Date().toISOString() }
+        : r
+    ),
+  };
+  emitChange();
+}
+
+export function deleteProfessorRequest(id: string) {
+  state = {
+    ...state,
+    professorRequests: state.professorRequests.filter((r) => r.id !== id),
   };
   emitChange();
 }
@@ -709,6 +884,20 @@ export function useCourses(): Course[] {
   );
 
   return courses;
+}
+
+/**
+ * Returns professor requests array - stable reference until data changes.
+ */
+export function useProfessorRequests(): ProfessorRequest[] {
+  const subscribeFn = useCallback(subscribe, []);
+
+  const requests = useSyncExternalStore(
+    subscribeFn,
+    () => state.professorRequests
+  );
+
+  return requests;
 }
 
 /**
