@@ -47,11 +47,11 @@ import AcademicCourses from "@/components/student/AcademicCourses";
 import StudentRequests from "@/components/student/StudentRequests";
 import {
   useAnnouncements,
-  useStore,
   PRIORITY_LABELS,
   PRIORITY_COLORS,
   TARGET_ROLE_LABELS,
 } from "@/lib/store";
+import { useMemo } from "react";
 
 type Role = "landing" | "hod" | "professor" | "employee" | "student";
 
@@ -174,11 +174,13 @@ function LandingPage({ onSelectRole }: { onSelectRole: (role: Role) => void }) {
 
 function StudentDashboard() {
   const announcements = useAnnouncements();
-  const studentAnnouncements = announcements.filter(
-    (a) => a.targetRole === "all" || a.targetRole === "students"
+  const studentAnnouncements = useMemo(
+    () => announcements.filter((a) => a.targetRole === "all" || a.targetRole === "students"),
+    [announcements]
   );
-  const urgentAnnouncements = studentAnnouncements.filter(
-    (a) => a.priority === "urgent"
+  const urgentAnnouncements = useMemo(
+    () => studentAnnouncements.filter((a) => a.priority === "urgent"),
+    [studentAnnouncements]
   );
 
   return (

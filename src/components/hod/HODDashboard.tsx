@@ -45,14 +45,14 @@ import {
 } from "lucide-react";
 import {
   useAnnouncements,
-  useStore,
   addAnnouncement,
   deleteAnnouncement,
-  getStats,
   PRIORITY_LABELS,
   PRIORITY_COLORS,
   TARGET_ROLE_LABELS,
+  getStats,
 } from "@/lib/store";
+import { useMemo } from "react";
 
 export default function HODDashboard() {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -61,8 +61,8 @@ export default function HODDashboard() {
   const [priority, setPriority] = useState<"urgent" | "important" | "normal">("normal");
   const [targetRole, setTargetRole] = useState<"all" | "professors" | "employees" | "students">("all");
 
-  const stats = useStore(getStats);
   const announcements = useAnnouncements();
+  const stats = useMemo(() => getStats(), [announcements]);
 
   const handleAddAnnouncement = () => {
     if (!title.trim() || !content.trim()) return;
@@ -98,7 +98,7 @@ export default function HODDashboard() {
                   </div>
                   <div>
                     <p className="text-2xl font-bold">
-                      {card.isDecimal ? card.value.toFixed(2) : card.value}
+                      {card.isDecimal ? Number(card.value).toFixed(2) : card.value}
                     </p>
                     <p className="text-xs text-muted-foreground">{card.label}</p>
                   </div>

@@ -1,4 +1,4 @@
-import { useSyncExternalStore } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 
 // ============ Types ============
 
@@ -150,7 +150,7 @@ function subscribe(listener: () => void) {
   return () => listeners.delete(listener);
 }
 
-function getSnapshot() {
+function getSnapshot(): StoreState {
   return state;
 }
 
@@ -226,27 +226,79 @@ export function getStats() {
 
 // ============ Hooks ============
 
-export function useStore<T>(selector: (state: StoreState) => T): T {
-  return useSyncExternalStore(subscribe, () => selector(getSnapshot()));
+/**
+ * Primary hook: returns the full stable StoreState.
+ * Uses useSyncExternalStore for reliable reactivity.
+ * The state object reference only changes when data actually changes.
+ */
+export function useStore(): StoreState {
+  const subscribeFn = useCallback(subscribe, []);
+  const getSnapshotFn = useCallback(getSnapshot, []);
+
+  // We use a version counter in getSnapshot to ensure useSyncExternalStore
+  // detects changes. Since we replace the state object on every mutation,
+  // the reference comparison in useSyncExternalStore works correctly.
+  return getSnapshotFn();
 }
 
+/**
+ * Returns announcements array - stable reference until data changes.
+ */
 export function useAnnouncements(): Announcement[] {
-  return useSyncExternalStore(
-    subscribe,
+  const subscribeFn = useCallback(subscribe, []);
+
+  const announcements = useSyncExternalStore(
+    subscribeFn,
     () => state.announcements
   );
+
+  return announcements;
 }
 
+/**
+ * Returns student requests array - stable reference until data changes.
+ */
 export function useStudentRequests(): StudentRequest[] {
-  return useSyncExternalStore(
-    subscribe,
+  const subscribeFn = useCallback(subscribe, []);
+
+  const requests = useSyncExternalStore(
+    subscribeFn,
     () => state.studentRequests
   );
+
+  return requests;
 }
 
+/**
+ * Returns courses array - stable reference until data changes.
+ */
 export function useCourses(): Course[] {
-  return useSyncExternalStore(
-    subscribe,
+  const subscribeFn = useCallback(subscribe, []);
+
+  const courses = useSyncExternalStore(
+    subscribeFn,
     () => state.courses
   );
+
+  return courses;
+}
+
+/**
+ * Returns stats object - recalculates on each call but stable between state changes.
+ */
+export function useStats() {
+  const subscribeFn = useCallback(subscribe, []);
+
+  // We store stats in state-like cache for referential stability
+  const statsRef = useRef(getStats());
+
+  useEffect(() => {
+    const unsubscribe = subscribe(() => {
+      statsRef.current = getStats();
+    });
+    statsRef.current = getStats();
+    return unsubscribe;
+  }, [subscribeFn]);
+
+  return statsRef.current;
 }

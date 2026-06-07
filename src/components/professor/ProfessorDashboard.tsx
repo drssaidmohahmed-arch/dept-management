@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from "react";
 import {
   Card,
   CardContent,
@@ -18,20 +19,23 @@ import {
   GraduationCap,
 } from "lucide-react";
 import {
-  useStore,
-  getAnnouncementsForRole,
+  useAnnouncements,
   PRIORITY_LABELS,
   PRIORITY_COLORS,
   TARGET_ROLE_LABELS,
-  type Announcement,
 } from "@/lib/store";
 
 export default function ProfessorDashboard() {
-  const professorAnnouncements = useStore(
-    (s) => s.announcements.filter((a) => a.targetRole === "all" || a.targetRole === "professors")
+  const announcements = useAnnouncements();
+
+  const professorAnnouncements = useMemo(
+    () => announcements.filter((a) => a.targetRole === "all" || a.targetRole === "professors"),
+    [announcements]
   );
-  const urgentAnnouncements = professorAnnouncements.filter(
-    (a) => a.priority === "urgent"
+
+  const urgentAnnouncements = useMemo(
+    () => professorAnnouncements.filter((a) => a.priority === "urgent"),
+    [professorAnnouncements]
   );
 
   const statCards = [

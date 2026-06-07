@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from "react";
 import {
   Card,
   CardContent,
@@ -19,15 +20,18 @@ import {
   Calendar,
 } from "lucide-react";
 import {
-  useStore,
+  useAnnouncements,
   PRIORITY_LABELS,
   PRIORITY_COLORS,
   TARGET_ROLE_LABELS,
 } from "@/lib/store";
 
 export default function EmployeeDashboard() {
-  const employeeAnnouncements = useStore(
-    (s) => s.announcements.filter((a) => a.targetRole === "all" || a.targetRole === "employees")
+  const announcements = useAnnouncements();
+
+  const employeeAnnouncements = useMemo(
+    () => announcements.filter((a) => a.targetRole === "all" || a.targetRole === "employees"),
+    [announcements]
   );
 
   const statCards = [
