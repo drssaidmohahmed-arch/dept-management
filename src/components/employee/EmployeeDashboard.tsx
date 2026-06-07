@@ -24,7 +24,7 @@ import {
   PRIORITY_LABELS,
   PRIORITY_COLORS,
   TARGET_ROLE_LABELS,
-} from "@/lib/store";
+} from "@/lib/supabase-store";
 
 export default function EmployeeDashboard() {
   const announcements = useAnnouncements();

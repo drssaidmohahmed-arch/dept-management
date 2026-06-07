@@ -52,7 +52,7 @@ import {
   STUDENT_STATUS_COLORS,
   GRADE_TO_POINTS,
   GRADE_COLORS,
-} from "@/lib/store";
+} from "@/lib/supabase-store";
 
 // Current logged-in professor (mock)
 const CURRENT_PROFESSOR = "د. أحمد محمد الشريف";

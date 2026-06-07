@@ -52,9 +52,8 @@ import {
   PRIORITY_LABELS,
   PRIORITY_COLORS,
   TARGET_ROLE_LABELS,
-  getStats,
-} from "@/lib/store";
-import { useMemo } from "react";
+  useStats,
+} from "@/lib/supabase-store";
 
 export default function HODDashboard() {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -64,7 +63,7 @@ export default function HODDashboard() {
   const [targetRole, setTargetRole] = useState<"all" | "professors" | "employees" | "students">("all");
 
   const announcements = useAnnouncements();
-  const stats = useMemo(() => getStats(), [announcements]);
+  const stats = useStats();
 
   const handleAddAnnouncement = () => {
     if (!title.trim() || !content.trim()) return;

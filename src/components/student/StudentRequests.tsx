@@ -42,7 +42,7 @@ import {
   deleteStudentRequest,
   REQUEST_STATUS_LABELS,
   REQUEST_STATUS_COLORS,
-} from "@/lib/store";
+} from "@/lib/supabase-store";
 
 const REQUEST_TYPES = [
   { value: "transcript", label: "كشف درجات" },

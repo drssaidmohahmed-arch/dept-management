@@ -28,7 +28,7 @@ import {
   PRIORITY_LABELS,
   PRIORITY_COLORS,
   TARGET_ROLE_LABELS,
-} from "@/lib/store";
+} from "@/lib/supabase-store";
 import CourseStudentsList from "@/components/professor/CourseStudentsList";
 import ProfessorRequestPanel from "@/components/professor/ProfessorRequestPanel";
 

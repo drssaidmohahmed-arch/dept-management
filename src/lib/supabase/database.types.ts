@@ -164,6 +164,8 @@ export interface Database {
         Row: {
           id: string
           course_code: string
+          name: string
+          hours: number
           professor_name: string
           semester: number
           enrolled_count: number
@@ -171,6 +173,8 @@ export interface Database {
         Insert: {
           id?: string
           course_code: string
+          name?: string
+          hours?: number
           professor_name: string
           semester: number
           enrolled_count?: number
@@ -178,6 +182,8 @@ export interface Database {
         Update: {
           id?: string
           course_code?: string
+          name?: string
+          hours?: number
           professor_name?: string
           semester?: number
           enrolled_count?: number

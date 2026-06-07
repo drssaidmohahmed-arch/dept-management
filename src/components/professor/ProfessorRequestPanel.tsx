@@ -71,7 +71,7 @@ import {
   PRIORITY_COLORS,
   type ProfessorRequestCategory,
   type ProfessorRequestTarget,
-} from "@/lib/store";
+} from "@/lib/supabase-store";
 
 // ============ New Request Dialog ============
 

@@ -85,7 +85,7 @@ import {
   MEMBER_ROLE_COLORS,
   type PermissionKey,
   type DepartmentMember,
-} from "@/lib/store";
+} from "@/lib/supabase-store";
 
 // Permission icon mapping
 const permissionIcons: Record<string, React.ElementType> = {

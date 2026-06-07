@@ -2,6 +2,7 @@
 
 import { useSyncExternalStore, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 // ============ Re-export ALL types, constants, labels, colors from the original store ============
 
@@ -58,7 +59,18 @@ import type {
 
 // ============ Supabase Client ============
 
-const supabase = createClient();
+let _supabase: SupabaseClient<any, string, any> | null = null;
+
+function getSupabase() {
+  if (!_supabase) {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (url && key && url.startsWith('http')) {
+      _supabase = createClient();
+    }
+  }
+  return _supabase;
+}
 
 // ============ External Store Infrastructure ============
 
@@ -117,7 +129,9 @@ function getTableSnapshot<T>(tableName: string): T[] {
 }
 
 async function fetchTableData(tableName: string) {
-  const { data, error } = await supabase.from(tableName).select('*');
+  const sb = getSupabase();
+  if (!sb) return;
+  const { data, error } = await sb.from(tableName).select('*');
 
   if (!error && data) {
     tableCache[tableName] = data;
@@ -126,7 +140,9 @@ async function fetchTableData(tableName: string) {
 }
 
 function setupRealtimeSubscription(tableName: string) {
-  supabase
+  const sb = getSupabase();
+  if (!sb) return;
+  sb
     .channel(`${tableName}-realtime`)
     .on(
       'postgres_changes',
@@ -209,12 +225,12 @@ function mapProfessorRequestRow(row: Record<string, unknown>): ProfessorRequest 
 
 function mapProfessorCourseRow(row: Record<string, unknown>): ProfessorCourse {
   return {
-    code: row.code as string,
-    name: row.name as string,
-    hours: row.hours as number,
+    code: (row.course_code as string) || '',
+    name: (row.name as string) || '',
+    hours: (row.hours as number) || 0,
     semester: row.semester as number,
-    professorName: row.professor_name as string,
-    enrolledCount: row.enrolled_count as number,
+    professorName: (row.professor_name as string) || '',
+    enrolledCount: (row.enrolled_count as number) || 0,
   };
 }
 
@@ -222,7 +238,7 @@ function mapEnrolledStudentRow(row: Record<string, unknown>): EnrolledStudent {
   return {
     id: row.id as string,
     studentId: row.student_id as string,
-    name: row.name as string,
+    name: (row.student_name as string) || '',
     courseCode: row.course_code as string,
     semester: row.semester as number,
     grade: row.grade as string | undefined,
@@ -348,10 +364,23 @@ export function useCourses(): Course[] {
 // ============ Stats ============
 
 export async function getStats() {
+  const sb = getSupabase();
+  if (!sb) {
+    return {
+      totalAnnouncements: 0,
+      professors: 0,
+      employees: 0,
+      students: 156,
+      totalRequests: 0,
+      averageGPA: 3.67,
+      totalMembers: 0,
+      activeMembers: 0,
+    };
+  }
   const [announcementsRes, membersRes, requestsRes] = await Promise.all([
-    supabase.from('announcements').select('id', { count: 'exact', head: true }),
-    supabase.from('members').select('*'),
-    supabase.from('student_requests').select('id', { count: 'exact', head: true }),
+    sb.from('announcements').select('id', { count: 'exact', head: true }),
+    sb.from('members').select('*'),
+    sb.from('student_requests').select('id', { count: 'exact', head: true }),
   ]);
 
   const members = membersRes.data || [];
@@ -428,7 +457,9 @@ async function fetchStats() {
 export async function addAnnouncement(
   announcement: Omit<Announcement, 'id' | 'createdAt'>
 ) {
-  const { error } = await supabase.from('announcements').insert({
+  const sb = getSupabase();
+  if (!sb) return;
+  const { error } = await sb.from('announcements').insert({
     title: announcement.title,
     content: announcement.content,
     priority: announcement.priority,
@@ -438,7 +469,9 @@ export async function addAnnouncement(
 }
 
 export async function deleteAnnouncement(id: string) {
-  const { error } = await supabase.from('announcements').delete().eq('id', id);
+  const sb = getSupabase();
+  if (!sb) return;
+  const { error } = await sb.from('announcements').delete().eq('id', id);
   if (error) console.error('Error deleting announcement:', error);
 }
 
@@ -447,7 +480,9 @@ export async function deleteAnnouncement(id: string) {
 export async function addStudentRequest(
   request: Omit<StudentRequest, 'id' | 'createdAt' | 'status'>
 ) {
-  const { error } = await supabase.from('student_requests').insert({
+  const sb = getSupabase();
+  if (!sb) return;
+  const { error } = await sb.from('student_requests').insert({
     type: request.type,
     description: request.description,
     status: 'pending',
@@ -456,7 +491,9 @@ export async function addStudentRequest(
 }
 
 export async function deleteStudentRequest(id: string) {
-  const { error } = await supabase
+  const sb = getSupabase();
+  if (!sb) return;
+  const { error } = await sb
     .from('student_requests')
     .delete()
     .eq('id', id);
@@ -468,7 +505,9 @@ export async function deleteStudentRequest(id: string) {
 export async function addProfessorRequest(
   request: Omit<ProfessorRequest, 'id' | 'createdAt' | 'status'>
 ) {
-  const { error } = await supabase.from('professor_requests').insert({
+  const sb = getSupabase();
+  if (!sb) return;
+  const { error } = await sb.from('professor_requests').insert({
     category: request.category,
     target: request.target,
     target_student_id: request.targetStudentId ?? null,
@@ -487,6 +526,8 @@ export async function updateProfessorRequestStatus(
   status: ProfessorRequestStatus,
   response?: string
 ) {
+  const sb = getSupabase();
+  if (!sb) return;
   const updatePayload: Record<string, unknown> = {
     status,
     updated_at: new Date().toISOString(),
@@ -495,7 +536,7 @@ export async function updateProfessorRequestStatus(
     updatePayload.response = response;
   }
 
-  const { error } = await supabase
+  const { error } = await sb
     .from('professor_requests')
     .update(updatePayload)
     .eq('id', requestId);
@@ -503,7 +544,9 @@ export async function updateProfessorRequestStatus(
 }
 
 export async function deleteProfessorRequest(id: string) {
-  const { error } = await supabase
+  const sb = getSupabase();
+  if (!sb) return;
+  const { error } = await sb
     .from('professor_requests')
     .delete()
     .eq('id', id);
@@ -515,7 +558,9 @@ export async function deleteProfessorRequest(id: string) {
 export async function addMember(
   member: Omit<DepartmentMember, 'id' | 'joinedAt'>
 ) {
-  const { error } = await supabase.from('members').insert({
+  const sb = getSupabase();
+  if (!sb) return;
+  const { error } = await sb.from('members').insert({
     name: member.name,
     email: member.email,
     role: member.role,
@@ -528,7 +573,9 @@ export async function addMember(
 }
 
 export async function deleteMember(memberId: string) {
-  const { error } = await supabase.from('members').delete().eq('id', memberId);
+  const sb = getSupabase();
+  if (!sb) return;
+  const { error } = await sb.from('members').delete().eq('id', memberId);
   if (error) console.error('Error deleting member:', error);
 }
 
@@ -536,8 +583,11 @@ export async function toggleMemberPermission(
   memberId: string,
   permission: PermissionKey
 ) {
+  const sb = getSupabase();
+  if (!sb) return;
+
   // First fetch current member permissions
-  const { data: member, error: fetchError } = await supabase
+  const { data: member, error: fetchError } = await sb
     .from('members')
     .select('permissions')
     .eq('id', memberId)
@@ -555,7 +605,7 @@ export async function toggleMemberPermission(
     ? currentPermissions.filter((p) => p !== permission)
     : [...currentPermissions, permission];
 
-  const { error } = await supabase
+  const { error } = await sb
     .from('members')
     .update({ permissions: updatedPermissions })
     .eq('id', memberId);
@@ -564,8 +614,11 @@ export async function toggleMemberPermission(
 }
 
 export async function toggleMemberStatus(memberId: string) {
+  const sb = getSupabase();
+  if (!sb) return;
+
   // First fetch current member status
-  const { data: member, error: fetchError } = await supabase
+  const { data: member, error: fetchError } = await sb
     .from('members')
     .select('is_active')
     .eq('id', memberId)
@@ -576,7 +629,7 @@ export async function toggleMemberStatus(memberId: string) {
     return;
   }
 
-  const { error } = await supabase
+  const { error } = await sb
     .from('members')
     .update({ is_active: !member?.is_active })
     .eq('id', memberId);
@@ -588,7 +641,9 @@ export async function updateMemberPermissions(
   memberId: string,
   permissions: PermissionKey[]
 ) {
-  const { error } = await supabase
+  const sb = getSupabase();
+  if (!sb) return;
+  const { error } = await sb
     .from('members')
     .update({ permissions })
     .eq('id', memberId);

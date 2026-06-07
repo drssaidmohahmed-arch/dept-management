@@ -51,7 +51,7 @@ import {
   PRIORITY_LABELS,
   PRIORITY_COLORS,
   TARGET_ROLE_LABELS,
-} from "@/lib/store";
+} from "@/lib/supabase-store";
 import { useMemo } from "react";
 
 type Role = "landing" | "hod" | "professor" | "employee" | "student";
