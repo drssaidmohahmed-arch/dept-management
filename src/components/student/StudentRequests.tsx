@@ -104,7 +104,7 @@ export default function StudentRequests() {
         <h3 className="text-lg font-bold text-slate-800">الطلبات المقدمة</h3>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="flex items-center gap-2 bg-orange-600 hover:bg-orange-700">
+            <Button className="flex items-center gap-2 flex-row-reverse bg-orange-600 hover:bg-orange-700">
               <Plus className="w-4 h-4" />
               تقديم طلب جديد
             </Button>
@@ -144,7 +144,7 @@ export default function StudentRequests() {
               <Button
                 onClick={handleSubmitRequest}
                 disabled={!requestType || !description.trim()}
-                className="flex items-center gap-2 bg-orange-600 hover:bg-orange-700"
+                className="flex items-center gap-2 flex-row-reverse bg-orange-600 hover:bg-orange-700"
               >
                 <Send className="w-4 h-4" />
                 إرسال الطلب
@@ -171,7 +171,7 @@ export default function StudentRequests() {
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-wrap items-center gap-2 mb-1">
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex items-center gap-1.5 flex-row-reverse">
                         <FileText className="w-4 h-4 text-muted-foreground" />
                         <h3 className="font-semibold text-slate-800">
                           {request.type}
@@ -186,7 +186,7 @@ export default function StudentRequests() {
                     <p className="text-muted-foreground text-sm leading-relaxed">
                       {request.description}
                     </p>
-                    <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
+                    <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground flex-row-reverse">
                       <Calendar className="w-3 h-3" />
                       {new Date(request.createdAt).toLocaleDateString("ar-SA", {
                         year: "numeric",

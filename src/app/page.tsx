@@ -134,7 +134,7 @@ function LandingPage({ onSelectRole }: { onSelectRole: (role: Role) => void }) {
                   onClick={() => onSelectRole(role.id)}
                 >
                   <CardHeader className="pb-3">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 flex-row-reverse">
                       <div
                         className={`w-12 h-12 rounded-xl flex items-center justify-center ${role.bgLight} ${role.textColor}`}
                       >
@@ -151,7 +151,7 @@ function LandingPage({ onSelectRole }: { onSelectRole: (role: Role) => void }) {
                     </p>
                     <div className="mt-4 flex items-center gap-1 text-sm font-medium text-primary">
                       <span>الدخول</span>
-                      <ArrowRight className="w-4 h-4" />
+                      <ArrowLeft className="w-4 h-4" />
                     </div>
                   </CardContent>
                 </Card>
@@ -189,7 +189,7 @@ function StudentDashboard() {
       {/* Urgent Announcements */}
       {urgentAnnouncements.length > 0 && (
         <div className="bg-red-50 border border-red-200 rounded-xl p-4">
-          <h3 className="text-red-800 font-bold text-lg mb-3 flex items-center gap-2">
+          <h3 className="text-red-800 font-bold text-lg mb-3 flex items-center gap-2 flex-row-reverse">
             <Bell className="w-5 h-5" />
             إعلانات عاجلة
           </h3>
@@ -218,7 +218,7 @@ function StudentDashboard() {
       {/* Tabs */}
       <Tabs defaultValue="announcements" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="announcements" className="flex items-center gap-1">
+          <TabsTrigger value="announcements" className="flex items-center gap-1 flex-row-reverse">
             <Bell className="w-4 h-4" />
             الإعلانات
             {studentAnnouncements.length > 0 && (
@@ -227,11 +227,11 @@ function StudentDashboard() {
               </Badge>
             )}
           </TabsTrigger>
-          <TabsTrigger value="courses" className="flex items-center gap-1">
+          <TabsTrigger value="courses" className="flex items-center gap-1 flex-row-reverse">
             <BookOpen className="w-4 h-4" />
             المواد الأكاديمية
           </TabsTrigger>
-          <TabsTrigger value="requests" className="flex items-center gap-1">
+          <TabsTrigger value="requests" className="flex items-center gap-1 flex-row-reverse">
             <ClipboardList className="w-4 h-4" />
             الطلبات
           </TabsTrigger>
@@ -262,11 +262,11 @@ function StudentDashboard() {
                           {ann.content}
                         </p>
                         <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
-                          <span className="flex items-center gap-1">
+                          <span className="flex items-center gap-1 flex-row-reverse">
                             <Calendar className="w-3 h-3" />
                             {new Date(ann.createdAt).toLocaleDateString("ar-SA")}
                           </span>
-                          <span className="flex items-center gap-1">
+                          <span className="flex items-center gap-1 flex-row-reverse">
                             <FileText className="w-3 h-3" />
                             {TARGET_ROLE_LABELS[ann.targetRole]}
                           </span>
@@ -326,7 +326,7 @@ export default function Home() {
             onClick={() => setCurrentRole("landing")}
             className="flex items-center gap-2"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowRight className="w-4 h-4" />
             العودة للرئيسية
           </Button>
         </div>

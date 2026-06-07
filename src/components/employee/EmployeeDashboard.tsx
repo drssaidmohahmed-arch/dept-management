@@ -76,7 +76,7 @@ export default function EmployeeDashboard() {
           return (
             <Card key={card.label}>
               <CardContent className="p-4">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 flex-row-reverse">
                   <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${card.color}`}>
                     <Icon className="w-5 h-5" />
                   </div>
@@ -94,7 +94,7 @@ export default function EmployeeDashboard() {
       {/* Tabs */}
       <Tabs defaultValue="announcements" className="w-full">
         <TabsList>
-          <TabsTrigger value="announcements" className="flex items-center gap-1">
+          <TabsTrigger value="announcements" className="flex items-center gap-1 flex-row-reverse">
             <Bell className="w-4 h-4" />
             الإعلانات
             {employeeAnnouncements.length > 0 && (
@@ -103,7 +103,7 @@ export default function EmployeeDashboard() {
               </Badge>
             )}
           </TabsTrigger>
-          <TabsTrigger value="tasks" className="flex items-center gap-1">
+          <TabsTrigger value="tasks" className="flex items-center gap-1 flex-row-reverse">
             <ClipboardCheck className="w-4 h-4" />
             المهام
             <Badge variant="secondary" className="ms-1 text-xs">
@@ -135,7 +135,7 @@ export default function EmployeeDashboard() {
                     <p className="text-muted-foreground text-sm leading-relaxed">
                       {ann.content}
                     </p>
-                    <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
+                    <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground flex-row-reverse">
                       <Calendar className="w-3 h-3" />
                       {new Date(ann.createdAt).toLocaleDateString("ar-SA", {
                         year: "numeric",
@@ -160,7 +160,7 @@ export default function EmployeeDashboard() {
                 {tasks.map((task) => (
                   <div
                     key={task.id}
-                    className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${
+                    className={`flex items-center gap-3 p-3 rounded-lg border transition-colors flex-row-reverse ${
                       task.status === "completed"
                         ? "bg-emerald-50/50 border-emerald-100"
                         : "bg-white border-slate-200 hover:border-slate-300"
@@ -178,7 +178,7 @@ export default function EmployeeDashboard() {
                         {task.title}
                       </p>
                       <div className="flex items-center gap-2 mt-1">
-                        <span className="text-xs text-muted-foreground flex items-center gap-1">
+                        <span className="text-xs text-muted-foreground flex items-center gap-1 flex-row-reverse">
                           <Calendar className="w-3 h-3" />
                           {new Date(task.dueDate).toLocaleDateString("ar-SA")}
                         </span>

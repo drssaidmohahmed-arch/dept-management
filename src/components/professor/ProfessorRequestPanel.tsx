@@ -135,14 +135,14 @@ function NewRequestDialog({ onClose }: { onClose: () => void }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="flex items-center gap-2 bg-sky-600 hover:bg-sky-700">
+        <Button className="flex items-center gap-2 bg-sky-600 hover:bg-sky-700 flex-row-reverse">
           <Plus className="w-4 h-4" />
           تقديم طلب جديد
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" dir="rtl">
         <DialogHeader>
-          <DialogTitle className="text-xl flex items-center gap-2">
+          <DialogTitle className="text-xl flex items-center gap-2 flex-row-reverse">
             <Send className="w-5 h-5 text-sky-600" />
             تقديم طلب جديد
           </DialogTitle>
@@ -166,7 +166,7 @@ function NewRequestDialog({ onClose }: { onClose: () => void }) {
                 }`}
                 onClick={() => setTarget("department")}
               >
-                <CardContent className="p-4 flex items-center gap-3">
+                <CardContent className="p-4 flex items-center gap-3 flex-row-reverse">
                   <div className="w-10 h-10 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center shrink-0">
                     <Building2 className="w-5 h-5" />
                   </div>
@@ -186,7 +186,7 @@ function NewRequestDialog({ onClose }: { onClose: () => void }) {
                 }`}
                 onClick={() => setTarget("student")}
               >
-                <CardContent className="p-4 flex items-center gap-3">
+                <CardContent className="p-4 flex items-center gap-3 flex-row-reverse">
                   <div className="w-10 h-10 rounded-lg bg-orange-100 text-orange-700 flex items-center justify-center shrink-0">
                     <GraduationCap className="w-5 h-5" />
                   </div>
@@ -284,7 +284,7 @@ function NewRequestDialog({ onClose }: { onClose: () => void }) {
             <Button
               onClick={handleSubmit}
               disabled={!isValid || isSubmitting || (target === "student" && !targetStudentId)}
-              className="flex-1 bg-sky-600 hover:bg-sky-700"
+              className="flex-1 bg-sky-600 hover:bg-sky-700 flex-row-reverse"
             >
               {isSubmitting ? (
                 <>
@@ -399,7 +399,7 @@ function RequestCard({
           {/* Response (if exists) */}
           {request.response && (
             <div className="mt-3 p-3 bg-emerald-50 border border-emerald-200 rounded-lg">
-              <div className="flex items-center gap-1.5 mb-1">
+              <div className="flex items-center gap-1.5 mb-1 flex-row-reverse">
                 <MessageSquare className="w-4 h-4 text-emerald-700" />
                 <span className="text-sm font-semibold text-emerald-800">الرد:</span>
               </div>
@@ -409,7 +409,7 @@ function RequestCard({
 
           {/* Footer */}
           <div className="flex items-center justify-between mt-3 pt-3 border-t">
-            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+            <div className="flex items-center gap-1 text-xs text-muted-foreground flex-row-reverse">
               <Calendar className="w-3 h-3" />
               {new Date(request.createdAt).toLocaleDateString("ar-SA", {
                 year: "numeric",
@@ -420,7 +420,7 @@ function RequestCard({
               })}
             </div>
             {request.updatedAt && (
-              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+              <div className="flex items-center gap-1 text-xs text-muted-foreground flex-row-reverse">
                 <Clock className="w-3 h-3" />
                 آخر تحديث:{" "}
                 {new Date(request.updatedAt).toLocaleDateString("ar-SA", {
@@ -482,7 +482,7 @@ function StatsCards({ requests }: { requests: ReturnType<typeof useProfessorRequ
         return (
           <Card key={stat.label}>
             <CardContent className="p-3">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-row-reverse">
                 <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${stat.color}`}>
                   <Icon className="w-4 h-4" />
                 </div>
@@ -558,7 +558,7 @@ export default function ProfessorRequestPanel() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-bold flex items-center gap-2">
+          <h2 className="text-lg font-bold flex items-center gap-2 flex-row-reverse">
             <Send className="w-5 h-5 text-sky-600" />
             إدارة الطلبات
           </h2>
@@ -633,7 +633,7 @@ export default function ProfessorRequestPanel() {
               variant="outline"
               size="sm"
               onClick={() => setSortBy(sortBy === "newest" ? "oldest" : "newest")}
-              className="flex items-center gap-1 shrink-0"
+              className="flex items-center gap-1 shrink-0 flex-row-reverse"
             >
               <ArrowUpDown className="w-3.5 h-3.5" />
               {sortBy === "newest" ? "الأحدث أولاً" : "الأقدم أولاً"}

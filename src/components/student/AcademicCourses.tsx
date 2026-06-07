@@ -203,7 +203,7 @@ export default function AcademicCourses() {
       <div className="grid grid-cols-3 gap-4">
         <Card>
           <CardContent className="p-4 text-center">
-            <div className="flex items-center justify-center gap-1 mb-1">
+            <div className="flex items-center justify-center gap-1 mb-1 flex-row-reverse">
               <Calculator className="w-4 h-4 text-muted-foreground" />
               <span className="text-xs text-muted-foreground">المعدل الفصلي</span>
             </div>
@@ -214,7 +214,7 @@ export default function AcademicCourses() {
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
-            <div className="flex items-center justify-center gap-1 mb-1">
+            <div className="flex items-center justify-center gap-1 mb-1 flex-row-reverse">
               <TrendingUp className="w-4 h-4 text-muted-foreground" />
               <span className="text-xs text-muted-foreground">المعدل التراكمي</span>
             </div>
@@ -225,7 +225,7 @@ export default function AcademicCourses() {
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
-            <div className="flex items-center justify-center gap-1 mb-1">
+            <div className="flex items-center justify-center gap-1 mb-1 flex-row-reverse">
               <BookOpen className="w-4 h-4 text-muted-foreground" />
               <span className="text-xs text-muted-foreground">الساعات المكتسبة</span>
             </div>

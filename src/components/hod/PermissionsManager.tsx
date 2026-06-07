@@ -228,7 +228,7 @@ export default function PermissionsManager() {
             return (
               <Card key={stat.label}>
                 <CardContent className="p-4">
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 flex-row-reverse">
                     <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${stat.color}`}>
                       <Icon className="w-5 h-5" />
                     </div>
@@ -260,7 +260,7 @@ export default function PermissionsManager() {
 
               {/* Filters */}
               <div className="flex items-center gap-2">
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1.5 flex-row-reverse">
                   <Filter className="w-4 h-4 text-muted-foreground" />
                   <Select value={filterRole} onValueChange={(v) => setFilterRole(v as typeof filterRole)}>
                     <SelectTrigger className="w-[140px]">
@@ -288,7 +288,7 @@ export default function PermissionsManager() {
               {/* Add Button */}
               <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700">
+                  <Button className="flex items-center gap-2 flex-row-reverse bg-emerald-600 hover:bg-emerald-700">
                     <UserPlus className="w-4 h-4" />
                     إضافة عضو
                   </Button>
@@ -387,7 +387,7 @@ export default function PermissionsManager() {
                                     : [...prev, perm]
                                 )
                               }
-                              className={`flex items-center gap-2 p-2.5 rounded-lg border text-sm text-right transition-all ${
+                              className={`flex items-center gap-2 flex-row-reverse p-2.5 rounded-lg border text-sm text-right transition-all ${
                                 isSelected
                                   ? permissionColors[perm] + " border-current"
                                   : "bg-white border-slate-200 text-slate-500 hover:border-slate-300"
@@ -448,7 +448,7 @@ export default function PermissionsManager() {
                 >
                   {/* Member Row */}
                   <div className="p-4">
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-4 flex-row-reverse">
                       {/* Avatar */}
                       <div className={`w-11 h-11 rounded-full flex items-center justify-center font-bold text-lg ${getAvatarColor(member)}`}>
                         {member.avatar}
@@ -471,11 +471,11 @@ export default function PermissionsManager() {
                           )}
                         </div>
                         <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                          <span className="flex items-center gap-1">
+                          <span className="flex items-center gap-1 flex-row-reverse">
                             <Mail className="w-3 h-3" />
                             {member.email}
                           </span>
-                          <span className="flex items-center gap-1">
+                          <span className="flex items-center gap-1 flex-row-reverse">
                             <Clock className="w-3 h-3" />
                             عضو منذ {new Date(member.joinedAt).toLocaleDateString("ar-SA", { year: "numeric" })}
                           </span>
@@ -593,7 +593,7 @@ export default function PermissionsManager() {
                       <div className="space-y-4">
                         {/* Header + Quick Actions */}
                         <div className="flex items-center justify-between">
-                          <h4 className="font-semibold text-slate-700 flex items-center gap-2">
+                          <h4 className="font-semibold text-slate-700 flex items-center gap-2 flex-row-reverse">
                             <Shield className="w-4 h-4" />
                             إدارة الصلاحيات
                             <Badge variant="secondary" className="text-xs">
@@ -644,7 +644,7 @@ export default function PermissionsManager() {
                               <button
                                 key={perm}
                                 onClick={() => toggleMemberPermission(member.id, perm)}
-                                className={`flex items-start gap-3 p-3 rounded-lg border text-right transition-all ${
+                                className={`flex items-start gap-3 flex-row-reverse p-3 rounded-lg border text-right transition-all ${
                                   hasPermission
                                     ? permissionColors[perm] + " border-current shadow-sm"
                                     : "bg-white border-slate-200 text-slate-400 hover:border-slate-300"
@@ -656,7 +656,7 @@ export default function PermissionsManager() {
                                   <PermIcon className="w-4 h-4" />
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                  <div className="flex items-center gap-1.5 mb-0.5">
+                                  <div className="flex items-center gap-1.5 flex-row-reverse mb-0.5">
                                     <span className={`text-sm font-medium ${hasPermission ? "" : "text-slate-500"}`}>
                                       {info.label}
                                     </span>

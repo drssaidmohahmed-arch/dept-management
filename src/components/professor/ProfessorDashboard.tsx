@@ -109,7 +109,7 @@ export default function ProfessorDashboard() {
           return (
             <Card key={card.label}>
               <CardContent className="p-4">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 flex-row-reverse">
                   <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${card.color}`}>
                     <Icon className="w-5 h-5" />
                   </div>
@@ -181,7 +181,7 @@ export default function ProfessorDashboard() {
                     <p className="text-muted-foreground text-sm leading-relaxed">
                       {ann.content}
                     </p>
-                    <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
+                    <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground flex-row-reverse">
                       <Calendar className="w-3 h-3" />
                       {new Date(ann.createdAt).toLocaleDateString("ar-SA", {
                         year: "numeric",
@@ -218,7 +218,7 @@ export default function ProfessorDashboard() {
                       <tr key={i} className="border-b hover:bg-slate-50 transition-colors">
                         <td className="p-3 font-medium">{item.day}</td>
                         <td className="p-3">
-                          <span className="flex items-center gap-1 text-xs">
+                          <span className="flex items-center gap-1 text-xs flex-row-reverse">
                             <Clock className="w-3 h-3" />
                             {item.time}
                           </span>

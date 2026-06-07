@@ -203,7 +203,7 @@ export default function CourseStudentsList() {
             return (
               <Card key={stat.label}>
                 <CardContent className="p-4">
-                  <div className="flex items-center gap-3">
+                  <div className="flex flex-row-reverse items-center gap-3">
                     <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${stat.color}`}>
                       <Icon className="w-5 h-5" />
                     </div>
@@ -222,7 +222,7 @@ export default function CourseStudentsList() {
         {(semesterStats.withdrawn > 0 || semesterStats.incomplete > 0) && (
           <div className="flex gap-3">
             {semesterStats.withdrawn > 0 && (
-              <div className="flex-1 flex items-center gap-2 bg-red-50 border border-red-200 rounded-lg px-4 py-3">
+              <div className="flex-1 flex flex-row-reverse items-center gap-2 bg-red-50 border border-red-200 rounded-lg px-4 py-3">
                 <UserX className="w-5 h-5 text-red-600 shrink-0" />
                 <p className="text-sm text-red-800">
                   <strong>{semesterStats.withdrawn}</strong> طالب منسحب في هذا الفصل
@@ -230,7 +230,7 @@ export default function CourseStudentsList() {
               </div>
             )}
             {semesterStats.incomplete > 0 && (
-              <div className="flex-1 flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
+              <div className="flex-1 flex flex-row-reverse items-center gap-2 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
                 <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0" />
                 <p className="text-sm text-amber-800">
                   <strong>{semesterStats.incomplete}</strong> طالب حالة غير مكتملة
@@ -320,7 +320,7 @@ export default function CourseStudentsList() {
                     className="p-4 cursor-pointer"
                     onClick={() => setExpandedCourse(isExpanded ? null : course.code)}
                   >
-                    <div className="flex items-center gap-4">
+                    <div className="flex flex-row-reverse items-center gap-4">
                       {/* Course Icon */}
                       <div className="w-11 h-11 rounded-lg bg-sky-50 text-sky-700 flex items-center justify-center shrink-0">
                         <BookOpen className="w-5 h-5" />
@@ -334,15 +334,15 @@ export default function CourseStudentsList() {
                           <Badge variant="secondary" className="text-xs">{course.hours} ساعة</Badge>
                         </div>
                         <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                          <span className="flex items-center gap-1">
+                          <span className="flex flex-row-reverse items-center gap-1">
                             <Users className="w-3 h-3" />
                             {stats.count} طالب
                           </span>
-                          <span className={`flex items-center gap-1 ${attendanceColor(stats.avgAttendance)}`}>
+                          <span className={`flex flex-row-reverse items-center gap-1 ${attendanceColor(stats.avgAttendance)}`}>
                             <Clock className="w-3 h-3" />
                             حضور {stats.avgAttendance}%
                           </span>
-                          <span className={`flex items-center gap-1 ${stats.avgGPA >= 3.0 ? "text-sky-600" : "text-amber-600"}`}>
+                          <span className={`flex flex-row-reverse items-center gap-1 ${stats.avgGPA >= 3.0 ? "text-sky-600" : "text-amber-600"}`}>
                             <TrendingUp className="w-3 h-3" />
                             معدل {stats.avgGPA.toFixed(2)}
                           </span>

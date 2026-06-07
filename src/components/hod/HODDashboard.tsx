@@ -94,7 +94,7 @@ export default function HODDashboard() {
           return (
             <Card key={card.label} className="overflow-hidden">
               <CardContent className="p-4">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 flex-row-reverse">
                   <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${card.color}`}>
                     <Icon className="w-5 h-5" />
                   </div>
@@ -114,7 +114,7 @@ export default function HODDashboard() {
       {/* Tabs */}
       <Tabs defaultValue="announcements" className="w-full">
         <TabsList>
-          <TabsTrigger value="announcements" className="flex items-center gap-1">
+          <TabsTrigger value="announcements" className="flex items-center gap-1 flex-row-reverse">
             <Bell className="w-4 h-4" />
             الإعلانات
             {announcements.length > 0 && (
@@ -123,15 +123,15 @@ export default function HODDashboard() {
               </Badge>
             )}
           </TabsTrigger>
-          <TabsTrigger value="statistics" className="flex items-center gap-1">
+          <TabsTrigger value="statistics" className="flex items-center gap-1 flex-row-reverse">
             <BarChart3 className="w-4 h-4" />
             الإحصائيات
           </TabsTrigger>
-          <TabsTrigger value="courses" className="flex items-center gap-1">
+          <TabsTrigger value="courses" className="flex items-center gap-1 flex-row-reverse">
             <BookOpen className="w-4 h-4" />
             إدارة المقررات
           </TabsTrigger>
-          <TabsTrigger value="permissions" className="flex items-center gap-1">
+          <TabsTrigger value="permissions" className="flex items-center gap-1 flex-row-reverse">
             <Shield className="w-4 h-4" />
             صلاحيات الأعضاء
           </TabsTrigger>
@@ -142,7 +142,7 @@ export default function HODDashboard() {
             <h2 className="text-lg font-bold text-slate-800">إدارة الإعلانات</h2>
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild>
-                <Button className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700">
+                <Button className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 flex-row-reverse">
                   <Plus className="w-4 h-4" />
                   إضافة إعلان
                 </Button>
@@ -242,7 +242,7 @@ export default function HODDashboard() {
                         <p className="text-muted-foreground text-sm leading-relaxed">
                           {ann.content}
                         </p>
-                        <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
+                        <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground flex-row-reverse">
                           <Calendar className="w-3 h-3" />
                           {new Date(ann.createdAt).toLocaleDateString("ar-SA", {
                             year: "numeric",
@@ -343,7 +343,7 @@ export default function HODDashboard() {
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
                 إدارة المقررات الدراسية
-                <Button size="sm" className="flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700">
+                <Button size="sm" className="flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 flex-row-reverse">
                   <Plus className="w-4 h-4" />
                   إضافة مقرر
                 </Button>
