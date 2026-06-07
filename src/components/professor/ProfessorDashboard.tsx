@@ -131,7 +131,7 @@ export default function ProfessorDashboard() {
             <Bell className="w-4 h-4" />
             الإعلانات
             {professorAnnouncements.length > 0 && (
-              <Badge variant="secondary" className="mr-1 text-xs">
+              <Badge variant="secondary" className="ms-1 text-xs">
                 {professorAnnouncements.length}
               </Badge>
             )}
@@ -143,7 +143,7 @@ export default function ProfessorDashboard() {
           <TabsTrigger value="students" className="flex items-center gap-1">
             <UserCheck className="w-4 h-4" />
             قوائم الطلبة
-            <Badge variant="secondary" className="mr-1 text-xs">
+            <Badge variant="secondary" className="ms-1 text-xs">
               {uniqueStudents}
             </Badge>
           </TabsTrigger>
@@ -151,7 +151,7 @@ export default function ProfessorDashboard() {
             <Send className="w-4 h-4" />
             تقديم طلب
             {pendingRequests > 0 && (
-              <Badge variant="secondary" className="mr-1 text-xs bg-yellow-100 text-yellow-800">
+              <Badge variant="secondary" className="ms-1 text-xs bg-yellow-100 text-yellow-800">
                 {pendingRequests}
               </Badge>
             )}

@@ -151,7 +151,7 @@ function LandingPage({ onSelectRole }: { onSelectRole: (role: Role) => void }) {
                     </p>
                     <div className="mt-4 flex items-center gap-1 text-sm font-medium text-primary">
                       <span>الدخول</span>
-                      <ArrowLeft className="w-4 h-4" />
+                      <ArrowRight className="w-4 h-4" />
                     </div>
                   </CardContent>
                 </Card>
@@ -222,7 +222,7 @@ function StudentDashboard() {
             <Bell className="w-4 h-4" />
             الإعلانات
             {studentAnnouncements.length > 0 && (
-              <Badge variant="secondary" className="mr-1 text-xs">
+              <Badge variant="secondary" className="ms-1 text-xs">
                 {studentAnnouncements.length}
               </Badge>
             )}
@@ -326,8 +326,8 @@ export default function Home() {
             onClick={() => setCurrentRole("landing")}
             className="flex items-center gap-2"
           >
+            <ArrowLeft className="w-4 h-4" />
             العودة للرئيسية
-            <ArrowRight className="w-4 h-4" />
           </Button>
         </div>
       </header>

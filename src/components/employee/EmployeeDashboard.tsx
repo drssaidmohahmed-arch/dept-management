@@ -98,7 +98,7 @@ export default function EmployeeDashboard() {
             <Bell className="w-4 h-4" />
             الإعلانات
             {employeeAnnouncements.length > 0 && (
-              <Badge variant="secondary" className="mr-1 text-xs">
+              <Badge variant="secondary" className="ms-1 text-xs">
                 {employeeAnnouncements.length}
               </Badge>
             )}
@@ -106,7 +106,7 @@ export default function EmployeeDashboard() {
           <TabsTrigger value="tasks" className="flex items-center gap-1">
             <ClipboardCheck className="w-4 h-4" />
             المهام
-            <Badge variant="secondary" className="mr-1 text-xs">
+            <Badge variant="secondary" className="ms-1 text-xs">
               {tasks.length}
             </Badge>
           </TabsTrigger>

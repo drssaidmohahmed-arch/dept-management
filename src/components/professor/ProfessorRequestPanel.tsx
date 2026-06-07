@@ -136,8 +136,8 @@ function NewRequestDialog({ onClose }: { onClose: () => void }) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button className="flex items-center gap-2 bg-sky-600 hover:bg-sky-700">
-          تقديم طلب جديد
           <Plus className="w-4 h-4" />
+          تقديم طلب جديد
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" dir="rtl">
@@ -288,13 +288,13 @@ function NewRequestDialog({ onClose }: { onClose: () => void }) {
             >
               {isSubmitting ? (
                 <>
-                  جارٍ الإرسال...
                   <Loader2 className="w-4 h-4 animate-spin" />
+                  جارٍ الإرسال...
                 </>
               ) : (
                 <>
-                  إرسال الطلب
                   <Send className="w-4 h-4" />
+                  إرسال الطلب
                 </>
               )}
             </Button>
@@ -443,13 +443,13 @@ function RequestCard({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>إلغاء</AlertDialogCancel>
             <AlertDialogAction
               className="bg-red-600 hover:bg-red-700"
               onClick={() => onDelete(request.id)}
             >
               حذف
             </AlertDialogAction>
+            <AlertDialogCancel>إلغاء</AlertDialogCancel>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -578,12 +578,12 @@ export default function ProfessorRequestPanel() {
           <div className="flex flex-col md:flex-row gap-3">
             {/* Search */}
             <div className="flex-1 relative">
-              <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 placeholder="بحث في الطلبات..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pr-9"
+                className="ps-9"
               />
             </div>
 

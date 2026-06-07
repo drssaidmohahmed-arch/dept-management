@@ -249,12 +249,12 @@ export default function PermissionsManager() {
             <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3">
               {/* Search */}
               <div className="relative flex-1">
-                <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="بحث بالاسم أو البريد أو المنصب..."
-                  className="pr-9"
+                  className="ps-9"
                 />
               </div>
 
@@ -289,13 +289,13 @@ export default function PermissionsManager() {
               <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
                 <DialogTrigger asChild>
                   <Button className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700">
-                    إضافة عضو
                     <UserPlus className="w-4 h-4" />
+                    إضافة عضو
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-lg" dir="rtl">
                   <DialogHeader>
-                    <DialogTitle className="text-right">إضافة عضو جديد</DialogTitle>
+                    <DialogTitle>إضافة عضو جديد</DialogTitle>
                   </DialogHeader>
                   <div className="space-y-4 pt-2">
                     <div className="grid grid-cols-2 gap-4">
@@ -407,9 +407,6 @@ export default function PermissionsManager() {
                     </div>
                   </div>
                   <DialogFooter className="gap-2 sm:gap-0">
-                    <DialogClose asChild>
-                      <Button variant="outline">إلغاء</Button>
-                    </DialogClose>
                     <Button
                       onClick={handleAddMember}
                       disabled={!newName.trim() || !newEmail.trim() || !newPosition.trim()}
@@ -417,6 +414,9 @@ export default function PermissionsManager() {
                     >
                       إضافة العضو
                     </Button>
+                    <DialogClose asChild>
+                      <Button variant="outline">إلغاء</Button>
+                    </DialogClose>
                   </DialogFooter>
                 </DialogContent>
               </Dialog>
@@ -562,15 +562,12 @@ export default function PermissionsManager() {
                           </DialogTrigger>
                           <DialogContent className="sm:max-w-sm" dir="rtl">
                             <DialogHeader>
-                              <DialogTitle className="text-right">تأكيد الحذف</DialogTitle>
+                              <DialogTitle>تأكيد الحذف</DialogTitle>
                             </DialogHeader>
                             <p className="text-sm text-muted-foreground text-right">
                               هل أنت متأكد من حذف <strong>{member.name}</strong> من القسم؟ لا يمكن التراجع عن هذا الإجراء.
                             </p>
                             <DialogFooter className="gap-2 sm:gap-0">
-                              <DialogClose asChild>
-                                <Button variant="outline">إلغاء</Button>
-                              </DialogClose>
                               <Button
                                 variant="destructive"
                                 onClick={() => {
@@ -580,6 +577,9 @@ export default function PermissionsManager() {
                               >
                                 حذف
                               </Button>
+                              <DialogClose asChild>
+                                <Button variant="outline">إلغاء</Button>
+                              </DialogClose>
                             </DialogFooter>
                           </DialogContent>
                         </Dialog>

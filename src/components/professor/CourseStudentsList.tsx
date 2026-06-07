@@ -268,12 +268,12 @@ export default function CourseStudentsList() {
               </div>
 
               <div className="relative flex-1">
-                <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="بحث بالرقم الجامعي أو اسم الطالب..."
-                  className="pr-9"
+                  className="ps-9"
                 />
               </div>
 

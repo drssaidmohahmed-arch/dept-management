@@ -118,7 +118,7 @@ export default function HODDashboard() {
             <Bell className="w-4 h-4" />
             الإعلانات
             {announcements.length > 0 && (
-              <Badge variant="secondary" className="mr-1 text-xs">
+              <Badge variant="secondary" className="ms-1 text-xs">
                 {announcements.length}
               </Badge>
             )}
@@ -143,13 +143,13 @@ export default function HODDashboard() {
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild>
                 <Button className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700">
-                  إضافة إعلان
                   <Plus className="w-4 h-4" />
+                  إضافة إعلان
                 </Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-md" dir="rtl">
                 <DialogHeader>
-                  <DialogTitle className="text-right">إضافة إعلان جديد</DialogTitle>
+                  <DialogTitle>إضافة إعلان جديد</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4 pt-2">
                   <div className="space-y-2">
@@ -202,9 +202,6 @@ export default function HODDashboard() {
                   </div>
                 </div>
                 <DialogFooter className="gap-2 sm:gap-0">
-                  <DialogClose asChild>
-                    <Button variant="outline">إلغاء</Button>
-                  </DialogClose>
                   <Button
                     onClick={handleAddAnnouncement}
                     disabled={!title.trim() || !content.trim()}
@@ -212,6 +209,9 @@ export default function HODDashboard() {
                   >
                     نشر الإعلان
                   </Button>
+                  <DialogClose asChild>
+                    <Button variant="outline">إلغاء</Button>
+                  </DialogClose>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
@@ -344,8 +344,8 @@ export default function HODDashboard() {
               <CardTitle className="flex items-center justify-between">
                 إدارة المقررات الدراسية
                 <Button size="sm" className="flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700">
-                  إضافة مقرر
                   <Plus className="w-4 h-4" />
+                  إضافة مقرر
                 </Button>
               </CardTitle>
             </CardHeader>

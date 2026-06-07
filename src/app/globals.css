@@ -218,7 +218,7 @@ html[dir="rtl"] [data-radix-alert-dialog-content] {
 /* ─── 6. Alert Dialog Buttons ─── */
 html[dir="rtl"] [data-radix-alert-dialog-footer],
 html[dir="rtl"] [data-radix-dialog-footer] {
-  justify-content: flex-start;
+  justify-content: flex-end;
   direction: rtl;
 }
 
@@ -329,7 +329,7 @@ html[dir="rtl"] [data-slot="alert-dialog-header"] {
 
 html[dir="rtl"] [data-slot="dialog-footer"],
 html[dir="rtl"] [data-slot="alert-dialog-footer"] {
-  justify-content: flex-start !important;
+  justify-content: flex-end !important;
   direction: rtl;
 }
 
