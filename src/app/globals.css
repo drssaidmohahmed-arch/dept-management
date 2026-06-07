@@ -121,9 +121,95 @@
   }
 }
 
-/* Arabic RTL custom styles */
+/* ============================================
+   Arabic RTL Comprehensive Styles
+   ============================================ */
+
+/* Base RTL font */
 html[dir="rtl"] {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* ─── 1. Text Alignment in shadcn/ui ─── */
+html[dir="rtl"] [data-radix-accordion-trigger],
+html[dir="rtl"] [data-radix-dialog-description],
+html[dir="rtl"] [data-radix-alert-dialog-description],
+html[dir="rtl"] [data-radix-drawer-content],
+html[dir="rtl"] [data-radix-sidebar-menu-button] {
+  text-align: right;
+}
+
+/* ─── 2. Table Alignment ─── */
+html[dir="rtl"] table th,
+html[dir="rtl"] table td {
+  text-align: right;
+}
+
+/* ─── 3. Radix Component Direction ─── */
+html[dir="rtl"] [data-radix-popper-content-wrapper],
+html[dir="rtl"] [data-radix-select-content],
+html[dir="rtl"] [data-radix-dropdown-menu-content],
+html[dir="rtl"] [data-radix-navigation-menu-viewport],
+html[dir="rtl"] [data-radix-context-menu-content],
+html[dir="rtl"] [data-radix-menubar-content],
+html[dir="rtl"] [data-radix-popover-content],
+html[dir="rtl"] [data-radix-dialog-content] {
+  direction: rtl;
+  text-align: right;
+}
+
+/* ─── 4. Alert Dialog Buttons ─── */
+html[dir="rtl"] [data-radix-alert-dialog-footer] {
+  justify-content: flex-start;
+}
+
+/* ─── 5. Sonner Toast RTL ─── */
+html[dir="rtl"] [data-sonner-toaster] {
+  direction: rtl;
+}
+
+/* ─── 6. Calendar RTL ─── */
+html[dir="rtl"] [data-radix-calendar] {
+  direction: rtl;
+}
+
+/* ─── 7. Space-X Auto-Reverse for RTL ─── */
+html[dir="rtl"] .space-x-1 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 1;
+}
+html[dir="rtl"] .space-x-2 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 1;
+}
+html[dir="rtl"] .space-x-3 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 1;
+}
+html[dir="rtl"] .space-x-4 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 1;
+}
+html[dir="rtl"] .space-x-6 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 1;
+}
+html[dir="rtl"] .space-x-8 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 1;
+}
+
+/* ─── 8. Checkbox in dropdown menus ─── */
+html[dir="rtl"] [data-radix-dropdown-menu-item] > [data-check],
+html[dir="rtl"] [data-radix-menubar-item] > [data-check],
+html[dir="rtl"] [data-radix-context-menu-item] > [data-check] {
+  margin-left: 0;
+  margin-right: 0.5rem;
+}
+
+/* ─── 9. Sidebar RTL ─── */
+html[dir="rtl"] [data-radix-sidebar] {
+  direction: rtl;
+}
+
+/* ─── 10. Tooltip RTL ─── */
+html[dir="rtl"] [data-radix-tooltip-content] {
+  direction: rtl;
+  text-align: right;
 }
 
 /* Custom scrollbar for Arabic UI */
