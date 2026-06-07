@@ -3,14 +3,15 @@ FROM node:20-alpine AS base
 FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
-COPY package.json package-lock.json* ./
-RUN npm ci --omit=dev
+COPY package.json bun.lock* package-lock.json* ./
+RUN npm install -g bun && bun install --frozen-lockfile --prod
 
 # Rebuild the source code only when needed
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+RUN npm install -g bun
 RUN npx prisma generate
 RUN npm run build
 
@@ -26,6 +27,9 @@ COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
+
+# Create db directory with correct permissions
+RUN mkdir -p /app/db && chown -R nextjs:nodejs /app/db
 
 USER nextjs
 EXPOSE 3000

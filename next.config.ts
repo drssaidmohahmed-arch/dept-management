@@ -4,9 +4,9 @@ const nextConfig: NextConfig = {
   output: "standalone",
   /* config options here */
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false, // ✅ Enable TypeScript checking
   },
-  reactStrictMode: false,
+  reactStrictMode: true, // ✅ Enable strict mode for better error detection
 };
 
 export default nextConfig;
