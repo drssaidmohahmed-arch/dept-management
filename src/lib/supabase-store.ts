@@ -1,6 +1,6 @@
 'use client';
 
-import { useSyncExternalStore, useCallback } from 'react';
+import { useSyncExternalStore, useCallback, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
@@ -74,8 +74,31 @@ function getSupabase() {
 
 // ============ External Store Infrastructure ============
 
-// Module-level caches: table name → mapped data array
-const tableCache: Record<string, unknown[]> = {};
+// Stable empty array to prevent infinite re-renders with useSyncExternalStore
+const EMPTY_ARRAY: unknown[] = [];
+
+// Stable empty stats object to prevent infinite re-renders
+const EMPTY_STATS = {
+  totalAnnouncements: 0,
+  professors: 0,
+  employees: 0,
+  students: 156,
+  totalRequests: 0,
+  averageGPA: 3.67,
+  totalMembers: 0,
+  activeMembers: 0,
+};
+
+// Module-level caches: table name → mapped data array (pre-initialized for all tables)
+const tableCache: Record<string, unknown[]> = {
+  announcements: EMPTY_ARRAY,
+  student_requests: EMPTY_ARRAY,
+  members: EMPTY_ARRAY,
+  professor_requests: EMPTY_ARRAY,
+  professor_courses: EMPTY_ARRAY,
+  enrolled_students: EMPTY_ARRAY,
+  courses: EMPTY_ARRAY,
+};
 
 // Module-level listener sets: table name → set of callbacks
 const tableListeners: Record<string, Set<() => void>> = {};
@@ -93,6 +116,9 @@ let statsCache: {
 } | null = null;
 
 const statsListeners = new Set<() => void>();
+
+// Track which tables have been fetched to avoid duplicate fetches
+const fetchedTables = new Set<string>();
 
 function emitTableChange(tableName: string) {
   const listeners = tableListeners[tableName];
@@ -114,8 +140,9 @@ function subscribeToTable(
   }
   tableListeners[tableName].add(listener);
 
-  // If no data cached yet, trigger initial fetch
-  if (tableCache[tableName] === undefined) {
+  // If no data fetched yet, trigger initial fetch
+  if (!fetchedTables.has(tableName)) {
+    fetchedTables.add(tableName);
     fetchTableData(tableName);
   }
 
@@ -125,16 +152,24 @@ function subscribeToTable(
 }
 
 function getTableSnapshot<T>(tableName: string): T[] {
-  return (tableCache[tableName] as T[]) ?? [];
+  return (tableCache[tableName] ?? EMPTY_ARRAY) as T[];
 }
 
 async function fetchTableData(tableName: string) {
   const sb = getSupabase();
   if (!sb) return;
-  const { data, error } = await sb.from(tableName).select('*');
+  try {
+    const { data, error } = await sb.from(tableName).select('*');
 
-  if (!error && data) {
-    tableCache[tableName] = data;
+    if (!error && data) {
+      tableCache[tableName] = data;
+    } else if (!error && !data) {
+      tableCache[tableName] = EMPTY_ARRAY;
+    }
+    emitTableChange(tableName);
+  } catch (err) {
+    console.error(`Error fetching ${tableName}:`, err);
+    tableCache[tableName] = EMPTY_ARRAY;
     emitTableChange(tableName);
   }
 }
@@ -142,16 +177,20 @@ async function fetchTableData(tableName: string) {
 function setupRealtimeSubscription(tableName: string) {
   const sb = getSupabase();
   if (!sb) return;
-  sb
-    .channel(`${tableName}-realtime`)
-    .on(
-      'postgres_changes',
-      { event: '*', schema: 'public', table: tableName },
-      () => {
-        fetchTableData(tableName);
-      }
-    )
-    .subscribe();
+  try {
+    sb
+      .channel(`${tableName}-realtime`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: tableName },
+        () => {
+          fetchTableData(tableName);
+        }
+      )
+      .subscribe();
+  } catch (err) {
+    console.error(`Error setting up realtime for ${tableName}:`, err);
+  }
 }
 
 // Set up realtime subscriptions for all tables on module load
@@ -366,43 +405,39 @@ export function useCourses(): Course[] {
 export async function getStats() {
   const sb = getSupabase();
   if (!sb) {
-    return {
-      totalAnnouncements: 0,
-      professors: 0,
-      employees: 0,
-      students: 156,
-      totalRequests: 0,
-      averageGPA: 3.67,
-      totalMembers: 0,
-      activeMembers: 0,
-    };
+    return { ...EMPTY_STATS };
   }
-  const [announcementsRes, membersRes, requestsRes] = await Promise.all([
-    sb.from('announcements').select('id', { count: 'exact', head: true }),
-    sb.from('members').select('*'),
-    sb.from('student_requests').select('id', { count: 'exact', head: true }),
-  ]);
+  try {
+    const [announcementsRes, membersRes, requestsRes] = await Promise.all([
+      sb.from('announcements').select('id', { count: 'exact', head: true }),
+      sb.from('members').select('*'),
+      sb.from('student_requests').select('id', { count: 'exact', head: true }),
+    ]);
 
-  const members = membersRes.data || [];
-  const activeProfessors = members.filter(
-    (m: Record<string, unknown>) => m.role === 'professor' && m.is_active === true
-  ).length;
-  const activeEmployees = members.filter(
-    (m: Record<string, unknown>) => m.role === 'employee' && m.is_active === true
-  ).length;
+    const members = membersRes.data || [];
+    const activeProfessors = members.filter(
+      (m: Record<string, unknown>) => m.role === 'professor' && m.is_active === true
+    ).length;
+    const activeEmployees = members.filter(
+      (m: Record<string, unknown>) => m.role === 'employee' && m.is_active === true
+    ).length;
 
-  return {
-    totalAnnouncements: announcementsRes.count || 0,
-    professors: activeProfessors,
-    employees: activeEmployees,
-    students: 156,
-    totalRequests: requestsRes.count || 0,
-    averageGPA: 3.67,
-    totalMembers: members.length,
-    activeMembers: members.filter(
-      (m: Record<string, unknown>) => m.is_active === true
-    ).length,
-  };
+    return {
+      totalAnnouncements: announcementsRes.count || 0,
+      professors: activeProfessors,
+      employees: activeEmployees,
+      students: 156,
+      totalRequests: requestsRes.count || 0,
+      averageGPA: 3.67,
+      totalMembers: members.length,
+      activeMembers: members.filter(
+        (m: Record<string, unknown>) => m.is_active === true
+      ).length,
+    };
+  } catch (err) {
+    console.error('Error fetching stats:', err);
+    return { ...EMPTY_STATS };
+  }
 }
 
 export function useStats() {
@@ -432,17 +467,7 @@ export function useStats() {
 
   return useSyncExternalStore(
     subscribeFn,
-    () =>
-      statsCache ?? {
-        totalAnnouncements: 0,
-        professors: 0,
-        employees: 0,
-        students: 156,
-        totalRequests: 0,
-        averageGPA: 3.67,
-        totalMembers: 0,
-        activeMembers: 0,
-      }
+    () => statsCache ?? EMPTY_STATS
   );
 }
 
@@ -450,6 +475,18 @@ async function fetchStats() {
   const stats = await getStats();
   statsCache = stats;
   emitStatsChange();
+}
+
+// ============ Toast Notification Helper ============
+
+function showNotification(message: string, isError: boolean = false) {
+  if (typeof window !== 'undefined') {
+    // Create toast event for the Toaster component
+    const event = new CustomEvent('app-notification', {
+      detail: { message, isError }
+    });
+    window.dispatchEvent(event);
+  }
 }
 
 // ============ Announcement Actions ============
@@ -465,14 +502,24 @@ export async function addAnnouncement(
     priority: announcement.priority,
     target_role: announcement.targetRole,
   });
-  if (error) console.error('Error adding announcement:', error);
+  if (error) {
+    console.error('Error adding announcement:', error);
+    showNotification('حدث خطأ أثناء إضافة الإعلان', true);
+  } else {
+    showNotification('تم نشر الإعلان بنجاح');
+  }
 }
 
 export async function deleteAnnouncement(id: string) {
   const sb = getSupabase();
   if (!sb) return;
   const { error } = await sb.from('announcements').delete().eq('id', id);
-  if (error) console.error('Error deleting announcement:', error);
+  if (error) {
+    console.error('Error deleting announcement:', error);
+    showNotification('حدث خطأ أثناء حذف الإعلان', true);
+  } else {
+    showNotification('تم حذف الإعلان بنجاح');
+  }
 }
 
 // ============ Student Request Actions ============
@@ -487,7 +534,12 @@ export async function addStudentRequest(
     description: request.description,
     status: 'pending',
   });
-  if (error) console.error('Error adding student request:', error);
+  if (error) {
+    console.error('Error adding student request:', error);
+    showNotification('حدث خطأ أثناء تقديم الطلب', true);
+  } else {
+    showNotification('تم تقديم الطلب بنجاح');
+  }
 }
 
 export async function deleteStudentRequest(id: string) {
@@ -497,7 +549,12 @@ export async function deleteStudentRequest(id: string) {
     .from('student_requests')
     .delete()
     .eq('id', id);
-  if (error) console.error('Error deleting student request:', error);
+  if (error) {
+    console.error('Error deleting student request:', error);
+    showNotification('حدث خطأ أثناء حذف الطلب', true);
+  } else {
+    showNotification('تم حذف الطلب بنجاح');
+  }
 }
 
 // ============ Professor Request Actions ============
@@ -518,7 +575,12 @@ export async function addProfessorRequest(
     status: 'pending',
     response: null,
   });
-  if (error) console.error('Error adding professor request:', error);
+  if (error) {
+    console.error('Error adding professor request:', error);
+    showNotification('حدث خطأ أثناء تقديم الطلب', true);
+  } else {
+    showNotification('تم تقديم الطلب بنجاح');
+  }
 }
 
 export async function updateProfessorRequestStatus(
@@ -540,7 +602,12 @@ export async function updateProfessorRequestStatus(
     .from('professor_requests')
     .update(updatePayload)
     .eq('id', requestId);
-  if (error) console.error('Error updating professor request status:', error);
+  if (error) {
+    console.error('Error updating professor request status:', error);
+    showNotification('حدث خطأ أثناء تحديث حالة الطلب', true);
+  } else {
+    showNotification('تم تحديث حالة الطلب بنجاح');
+  }
 }
 
 export async function deleteProfessorRequest(id: string) {
@@ -550,7 +617,12 @@ export async function deleteProfessorRequest(id: string) {
     .from('professor_requests')
     .delete()
     .eq('id', id);
-  if (error) console.error('Error deleting professor request:', error);
+  if (error) {
+    console.error('Error deleting professor request:', error);
+    showNotification('حدث خطأ أثناء حذف الطلب', true);
+  } else {
+    showNotification('تم حذف الطلب بنجاح');
+  }
 }
 
 // ============ Member Actions ============
@@ -569,14 +641,24 @@ export async function addMember(
     is_active: member.isActive,
     permissions: member.permissions,
   });
-  if (error) console.error('Error adding member:', error);
+  if (error) {
+    console.error('Error adding member:', error);
+    showNotification('حدث خطأ أثناء إضافة العضو', true);
+  } else {
+    showNotification('تم إضافة العضو بنجاح');
+  }
 }
 
 export async function deleteMember(memberId: string) {
   const sb = getSupabase();
   if (!sb) return;
   const { error } = await sb.from('members').delete().eq('id', memberId);
-  if (error) console.error('Error deleting member:', error);
+  if (error) {
+    console.error('Error deleting member:', error);
+    showNotification('حدث خطأ أثناء حذف العضو', true);
+  } else {
+    showNotification('تم حذف العضو بنجاح');
+  }
 }
 
 export async function toggleMemberPermission(

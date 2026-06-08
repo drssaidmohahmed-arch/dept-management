@@ -47,6 +47,7 @@ import {
 import PermissionsManager from "@/components/hod/PermissionsManager";
 import {
   useAnnouncements,
+  useCourses,
   addAnnouncement,
   deleteAnnouncement,
   PRIORITY_LABELS,
@@ -64,6 +65,7 @@ export default function HODDashboard() {
 
   const announcements = useAnnouncements();
   const stats = useStats();
+  const courses = useCourses();
 
   const handleAddAnnouncement = () => {
     if (!title.trim() || !content.trim()) return;
@@ -342,53 +344,41 @@ export default function HODDashboard() {
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
                 إدارة المقررات الدراسية
-                <Button size="sm" className="flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 flex-row-reverse">
-                  <Plus className="w-4 h-4" />
-                  إضافة مقرر
-                </Button>
+                <Badge variant="secondary" className="text-xs">
+                  {courses.length} مقرر
+                </Badge>
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b bg-slate-50">
-                      <th className="text-right p-3 font-medium">رمز المقرر</th>
-                      <th className="text-right p-3 font-medium">اسم المقرر</th>
-                      <th className="text-right p-3 font-medium">الساعات</th>
-                      <th className="text-right p-3 font-medium">الفصل</th>
-                      <th className="text-right p-3 font-medium">إجراءات</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {[
-                      { code: "CS101", name: "مقدمة في علوم الحاسب", hours: 3, semester: "الأول" },
-                      { code: "CS102", name: "مبادئ البرمجة", hours: 3, semester: "الأول" },
-                      { code: "CS201", name: "هياكل البيانات", hours: 3, semester: "الثاني" },
-                      { code: "CS202", name: "قواعد البيانات", hours: 3, semester: "الثاني" },
-                      { code: "CS301", name: "تحليل الخوارزميات", hours: 3, semester: "الثالث" },
-                      { code: "CS302", name: "أنظمة التشغيل", hours: 3, semester: "الثالث" },
-                    ].map((course) => (
-                      <tr key={course.code} className="border-b hover:bg-slate-50 transition-colors">
-                        <td className="p-3 font-mono text-xs">{course.code}</td>
-                        <td className="p-3">{course.name}</td>
-                        <td className="p-3 text-center">{course.hours}</td>
-                        <td className="p-3">{course.semester}</td>
-                        <td className="p-3">
-                          <div className="flex items-center gap-1">
-                            <Button variant="ghost" size="sm" className="text-xs">
-                              تعديل
-                            </Button>
-                            <Button variant="ghost" size="sm" className="text-xs text-red-500">
-                              حذف
-                            </Button>
-                          </div>
-                        </td>
+              {courses.length === 0 ? (
+                <div className="text-center py-12 text-muted-foreground">
+                  <BookOpen className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                  <p>لا توجد مقررات حالياً</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b bg-slate-50">
+                        <th className="text-right p-3 font-medium">رمز المقرر</th>
+                        <th className="text-right p-3 font-medium">اسم المقرر</th>
+                        <th className="text-right p-3 font-medium">الساعات</th>
+                        <th className="text-right p-3 font-medium">الفصل</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody>
+                      {courses.map((course) => (
+                        <tr key={course.id} className="border-b hover:bg-slate-50 transition-colors">
+                          <td className="p-3 font-mono text-xs">{course.code}</td>
+                          <td className="p-3">{course.name}</td>
+                          <td className="p-3 text-center">{course.hours}</td>
+                          <td className="p-3">الفصل {course.semester}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>

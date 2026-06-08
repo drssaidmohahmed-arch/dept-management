@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster } from "@/components/ui/sonner";
+import { NotificationListener } from "@/components/NotificationListener";
 
 export const metadata: Metadata = {
   title: "نظام إدارة القسم الأكاديمي",
@@ -27,7 +28,8 @@ export default function RootLayout({
     <html lang="ar" dir="rtl" suppressHydrationWarning>
       <body className="antialiased bg-background text-foreground min-h-screen" suppressHydrationWarning>
         {children}
-        <Toaster />
+        <Toaster position="top-left" dir="rtl" richColors />
+        <NotificationListener />
       </body>
     </html>
   );
