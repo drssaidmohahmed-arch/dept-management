@@ -63,7 +63,6 @@ export default function ProfessorDashboard() {
     { label: "المقررات", value: professorCourses.length, icon: BookOpen, color: "bg-emerald-50 text-emerald-700" },
     { label: "الطلبة", value: uniqueStudents, icon: Users, color: "bg-orange-50 text-orange-700" },
     { label: "العاجلة", value: urgentAnnouncements.length, icon: ClipboardList, color: "bg-red-50 text-red-700" },
-    { label: "طلباتي", value: requests.length, icon: Send, color: "bg-indigo-50 text-indigo-700" },
   ];
 
   const schedule = [
@@ -80,42 +79,42 @@ export default function ProfessorDashboard() {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Urgent */}
       {urgentAnnouncements.length > 0 && (
-        <div className="bg-red-50 border border-red-200 rounded-xl p-4">
-          <h3 className="text-red-800 font-bold text-lg mb-3 flex items-center gap-2">
+        <div className="bg-red-50 border border-red-200 rounded-xl p-3 sm:p-4">
+          <h3 className="text-red-800 font-bold text-base sm:text-lg mb-3 flex items-center gap-2">
             <Bell className="w-5 h-5" />
             إعلانات عاجلة
           </h3>
-          <div className="space-y-2">
+          <div className="space-y-2 sm:space-y-3">
             {urgentAnnouncements.map((ann) => (
               <div key={ann.id} className="bg-white rounded-lg p-3 border border-red-100">
                 <div className="flex items-start justify-between gap-2">
-                  <h4 className="font-semibold text-red-900">{ann.title}</h4>
-                  <Badge variant="destructive" className="shrink-0">عاجل</Badge>
+                  <h4 className="font-semibold text-red-900 text-sm sm:text-base">{ann.title}</h4>
+                  <Badge variant="destructive" className="shrink-0 text-[10px] sm:text-xs">عاجل</Badge>
                 </div>
-                <p className="text-red-700 text-sm mt-1">{ann.content}</p>
+                <p className="text-red-700 text-xs sm:text-sm mt-1">{ann.content}</p>
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {/* Stat Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {/* Stat Cards - 2 cols on mobile */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
         {statCards.map((card) => {
           const Icon = card.icon;
           return (
             <Card key={card.label}>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3 flex-row-reverse">
-                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${card.color}`}>
-                    <Icon className="w-5 h-5" />
+              <CardContent className="p-2.5 sm:p-3 md:p-4">
+                <div className="flex items-center gap-2 sm:gap-3 flex-row-reverse">
+                  <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center shrink-0 ${card.color}`}>
+                    <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
-                  <div>
-                    <p className="text-2xl font-bold">{card.value}</p>
-                    <p className="text-xs text-muted-foreground">{card.label}</p>
+                  <div className="min-w-0">
+                    <p className="text-lg sm:text-xl md:text-2xl font-bold truncate">{card.value}</p>
+                    <p className="text-[9px] sm:text-xs text-muted-foreground truncate">{card.label}</p>
                   </div>
                 </div>
               </CardContent>
@@ -126,62 +125,49 @@ export default function ProfessorDashboard() {
 
       {/* Tabs */}
       <Tabs defaultValue="announcements" className="w-full">
-        <TabsList>
-          <TabsTrigger value="announcements" className="flex items-center gap-1">
-            <Bell className="w-4 h-4" />
-            الإعلانات
-            {professorAnnouncements.length > 0 && (
-              <Badge variant="secondary" className="ms-1 text-xs">
-                {professorAnnouncements.length}
-              </Badge>
-            )}
+        <TabsList className="w-full flex flex-wrap h-auto gap-1 p-1">
+          <TabsTrigger value="announcements" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+            <Bell className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+            <span className="truncate">الإعلانات</span>
           </TabsTrigger>
-          <TabsTrigger value="schedule" className="flex items-center gap-1">
-            <Calendar className="w-4 h-4" />
-            الجدول الأسبوعي
+          <TabsTrigger value="schedule" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+            <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+            <span className="truncate">الجدول</span>
           </TabsTrigger>
-          <TabsTrigger value="students" className="flex items-center gap-1">
-            <UserCheck className="w-4 h-4" />
-            قوائم الطلبة
-            <Badge variant="secondary" className="ms-1 text-xs">
-              {uniqueStudents}
-            </Badge>
+          <TabsTrigger value="students" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+            <UserCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+            <span className="truncate">الطلبة</span>
           </TabsTrigger>
-          <TabsTrigger value="requests" className="flex items-center gap-1">
-            <Send className="w-4 h-4" />
-            تقديم طلب
-            {pendingRequests > 0 && (
-              <Badge variant="secondary" className="ms-1 text-xs bg-yellow-100 text-yellow-800">
-                {pendingRequests}
-              </Badge>
-            )}
+          <TabsTrigger value="requests" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+            <Send className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+            <span className="truncate">طلباتي</span>
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="announcements" className="mt-4">
+        <TabsContent value="announcements" className="mt-3 sm:mt-4">
           {professorAnnouncements.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">
-              <Bell className="w-12 h-12 mx-auto mb-3 opacity-30" />
-              <p>لا توجد إعلانات حالياً</p>
+            <div className="text-center py-8 sm:py-12 text-muted-foreground">
+              <Bell className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-3 opacity-30" />
+              <p className="text-sm sm:text-base">لا توجد إعلانات حالياً</p>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               {professorAnnouncements.map((ann) => (
                 <Card key={ann.id} className="hover:shadow-md transition-shadow">
-                  <CardContent className="p-4">
-                    <div className="flex flex-wrap items-center gap-2 mb-1">
-                      <h3 className="font-semibold">{ann.title}</h3>
-                      <Badge className={`text-xs ${PRIORITY_COLORS[ann.priority]}`}>
+                  <CardContent className="p-3 sm:p-4">
+                    <div className="flex flex-wrap items-center gap-1 sm:gap-2 mb-1">
+                      <h3 className="font-semibold text-sm sm:text-base">{ann.title}</h3>
+                      <Badge className={`text-[10px] sm:text-xs ${PRIORITY_COLORS[ann.priority]}`}>
                         {PRIORITY_LABELS[ann.priority]}
                       </Badge>
-                      <Badge variant="outline" className="text-xs">
+                      <Badge variant="outline" className="text-[10px] sm:text-xs">
                         {TARGET_ROLE_LABELS[ann.targetRole]}
                       </Badge>
                     </div>
-                    <p className="text-muted-foreground text-sm leading-relaxed">
+                    <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed">
                       {ann.content}
                     </p>
-                    <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground flex-row-reverse">
+                    <div className="flex items-center gap-1 mt-1.5 sm:mt-2 text-[10px] sm:text-xs text-muted-foreground flex-row-reverse">
                       <Calendar className="w-3 h-3" />
                       {new Date(ann.createdAt).toLocaleDateString("ar-SA", {
                         year: "numeric",
@@ -196,13 +182,35 @@ export default function ProfessorDashboard() {
           )}
         </TabsContent>
 
-        <TabsContent value="schedule" className="mt-4">
+        {/* Schedule - Card-based on mobile for better readability */}
+        <TabsContent value="schedule" className="mt-3 sm:mt-4">
           <Card>
-            <CardHeader>
-              <CardTitle>الجدول الأسبوعي</CardTitle>
+            <CardHeader className="p-3 sm:p-4 sm:pb-2">
+              <CardTitle className="text-sm sm:text-base md:text-lg">الجدول الأسبوعي</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="overflow-x-auto">
+            <CardContent className="p-3 sm:p-4 sm:pt-0">
+              {/* Mobile: Card layout */}
+              <div className="sm:hidden space-y-2">
+                {schedule.map((item, i) => (
+                  <div key={i} className="bg-slate-50 rounded-lg p-2.5 border">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-medium text-xs sm:text-sm">{item.course}</span>
+                      <Badge variant={item.type === "معمل" ? "secondary" : "outline"} className="text-[10px]">
+                        {item.type}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center justify-between text-[10px] sm:text-xs text-muted-foreground">
+                      <span>{item.day} - {item.room}</span>
+                      <span className="flex items-center gap-0.5 flex-row-reverse">
+                        <Clock className="w-3 h-3" />
+                        {item.time}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {/* Desktop: Table layout */}
+              <div className="hidden sm:block overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b bg-slate-50">
@@ -226,10 +234,7 @@ export default function ProfessorDashboard() {
                         <td className="p-3">{item.course}</td>
                         <td className="p-3">{item.room}</td>
                         <td className="p-3">
-                          <Badge
-                            variant={item.type === "معمل" ? "secondary" : "outline"}
-                            className="text-xs"
-                          >
+                          <Badge variant={item.type === "معمل" ? "secondary" : "outline"} className="text-xs">
                             {item.type}
                           </Badge>
                         </td>
@@ -242,11 +247,11 @@ export default function ProfessorDashboard() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="students" className="mt-4">
+        <TabsContent value="students" className="mt-3 sm:mt-4">
           <CourseStudentsList />
         </TabsContent>
 
-        <TabsContent value="requests" className="mt-4">
+        <TabsContent value="requests" className="mt-3 sm:mt-4">
           <ProfessorRequestPanel />
         </TabsContent>
       </Tabs>

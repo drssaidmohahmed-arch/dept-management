@@ -78,7 +78,7 @@ export default function HODDashboard() {
   };
 
   const statCards = [
-    { label: "إجمالي الإعلانات", value: stats.totalAnnouncements, icon: Megaphone, color: "bg-emerald-50 text-emerald-700" },
+    { label: "الإعلانات", value: stats.totalAnnouncements, icon: Megaphone, color: "bg-emerald-50 text-emerald-700" },
     { label: "الأساتذة", value: stats.professors, icon: GraduationCap, color: "bg-sky-50 text-sky-700" },
     { label: "الموظفين", value: stats.employees, icon: UserCog, color: "bg-cyan-50 text-cyan-700" },
     { label: "الطلاب", value: stats.students, icon: BookOpen, color: "bg-orange-50 text-orange-700" },
@@ -87,23 +87,23 @@ export default function HODDashboard() {
   ];
 
   return (
-    <div className="space-y-6">
-      {/* Statistics Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+    <div className="space-y-4 sm:space-y-6">
+      {/* Statistics Cards - 3 cols on mobile, 6 on desktop */}
+      <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3 md:gap-4">
         {statCards.map((card) => {
           const Icon = card.icon;
           return (
             <Card key={card.label} className="overflow-hidden">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3 flex-row-reverse">
-                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${card.color}`}>
-                    <Icon className="w-5 h-5" />
+              <CardContent className="p-2 sm:p-3 md:p-4">
+                <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 flex-row-reverse">
+                  <div className={`w-7 h-7 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-lg flex items-center justify-center shrink-0 ${card.color}`}>
+                    <Icon className="w-3.5 h-3.5 sm:w-4.5 sm:h-4.5 md:w-5 md:h-5" />
                   </div>
-                  <div>
-                    <p className="text-2xl font-bold">
+                  <div className="min-w-0">
+                    <p className="text-lg sm:text-xl md:text-2xl font-bold truncate">
                       {card.isDecimal ? Number(card.value).toFixed(2) : card.value}
                     </p>
-                    <p className="text-xs text-muted-foreground">{card.label}</p>
+                    <p className="text-[9px] sm:text-[10px] md:text-xs text-muted-foreground truncate">{card.label}</p>
                   </div>
                 </div>
               </CardContent>
@@ -114,46 +114,43 @@ export default function HODDashboard() {
 
       {/* Tabs */}
       <Tabs defaultValue="announcements" className="w-full">
-        <TabsList>
-          <TabsTrigger value="announcements" className="flex items-center gap-1 flex-row-reverse">
-            <Bell className="w-4 h-4" />
-            الإعلانات
-            {announcements.length > 0 && (
-              <Badge variant="secondary" className="ms-1 text-xs">
-                {announcements.length}
-              </Badge>
-            )}
+        <TabsList className="w-full flex flex-wrap h-auto gap-1 p-1">
+          <TabsTrigger value="announcements" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+            <Bell className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+            <span className="truncate">الإعلانات</span>
           </TabsTrigger>
-          <TabsTrigger value="statistics" className="flex items-center gap-1 flex-row-reverse">
-            <BarChart3 className="w-4 h-4" />
-            الإحصائيات
+          <TabsTrigger value="statistics" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+            <BarChart3 className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+            <span className="truncate">الإحصائيات</span>
           </TabsTrigger>
-          <TabsTrigger value="courses" className="flex items-center gap-1 flex-row-reverse">
-            <BookOpen className="w-4 h-4" />
-            إدارة المقررات
+          <TabsTrigger value="courses" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+            <BookOpen className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+            <span className="truncate">المقررات</span>
           </TabsTrigger>
-          <TabsTrigger value="permissions" className="flex items-center gap-1 flex-row-reverse">
-            <Shield className="w-4 h-4" />
-            صلاحيات الأعضاء
+          <TabsTrigger value="permissions" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+            <Shield className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+            <span className="truncate">الصلاحيات</span>
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="announcements" className="mt-4">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold text-slate-800">إدارة الإعلانات</h2>
+        {/* Announcements Tab */}
+        <TabsContent value="announcements" className="mt-3 sm:mt-4">
+          <div className="flex items-center justify-between mb-3 sm:mb-4 gap-2">
+            <h2 className="text-sm sm:text-lg font-bold text-slate-800">إدارة الإعلانات</h2>
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild>
-                <Button className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 flex-row-reverse">
-                  <Plus className="w-4 h-4" />
-                  إضافة إعلان
+                <Button size="sm" className="flex items-center gap-1 sm:gap-2 bg-emerald-600 hover:bg-emerald-700 flex-row-reverse text-xs sm:text-sm">
+                  <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">إضافة إعلان</span>
+                  <span className="sm:hidden">إضافة</span>
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-md" dir="rtl">
+              <DialogContent className="sm:max-w-md w-[calc(100vw-2rem)] max-h-[90vh] overflow-y-auto" dir="rtl">
                 <DialogHeader>
                   <DialogTitle>إضافة إعلان جديد</DialogTitle>
                 </DialogHeader>
-                <div className="space-y-4 pt-2">
-                  <div className="space-y-2">
+                <div className="space-y-3 sm:space-y-4 pt-2">
+                  <div className="space-y-1.5 sm:space-y-2">
                     <Label htmlFor="title">عنوان الإعلان</Label>
                     <Input
                       id="title"
@@ -162,18 +159,18 @@ export default function HODDashboard() {
                       placeholder="أدخل عنوان الإعلان"
                     />
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-1.5 sm:space-y-2">
                     <Label htmlFor="content">محتوى الإعلان</Label>
                     <Textarea
                       id="content"
                       value={content}
                       onChange={(e) => setContent(e.target.value)}
                       placeholder="أدخل محتوى الإعلان"
-                      rows={4}
+                      rows={3}
                     />
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
+                  <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                    <div className="space-y-1.5 sm:space-y-2">
                       <Label>الأولوية</Label>
                       <Select value={priority} onValueChange={(v) => setPriority(v as typeof priority)}>
                         <SelectTrigger>
@@ -186,7 +183,7 @@ export default function HODDashboard() {
                         </SelectContent>
                       </Select>
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-1.5 sm:space-y-2">
                       <Label>الفئة المستهدفة</Label>
                       <Select value={targetRole} onValueChange={(v) => setTargetRole(v as typeof targetRole)}>
                         <SelectTrigger>
@@ -194,8 +191,8 @@ export default function HODDashboard() {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="all">الجميع</SelectItem>
-                          <SelectItem value="professors">أعضاء هيئة التدريس</SelectItem>
-                          <SelectItem value="employees">الموظفون الإداريون</SelectItem>
+                          <SelectItem value="professors">أعضاء التدريس</SelectItem>
+                          <SelectItem value="employees">الموظفون</SelectItem>
                           <SelectItem value="students">الطلاب</SelectItem>
                         </SelectContent>
                       </Select>
@@ -206,12 +203,12 @@ export default function HODDashboard() {
                   <Button
                     onClick={handleAddAnnouncement}
                     disabled={!title.trim() || !content.trim()}
-                    className="bg-emerald-600 hover:bg-emerald-700"
+                    className="bg-emerald-600 hover:bg-emerald-700 text-sm"
                   >
                     نشر الإعلان
                   </Button>
                   <DialogClose asChild>
-                    <Button variant="outline">إلغاء</Button>
+                    <Button variant="outline" size="sm">إلغاء</Button>
                   </DialogClose>
                 </DialogFooter>
               </DialogContent>
@@ -220,30 +217,30 @@ export default function HODDashboard() {
 
           {/* Announcements List */}
           {announcements.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">
-              <Bell className="w-12 h-12 mx-auto mb-3 opacity-30" />
-              <p>لا توجد إعلانات حالياً</p>
+            <div className="text-center py-8 sm:py-12 text-muted-foreground">
+              <Bell className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-3 opacity-30" />
+              <p className="text-sm sm:text-base">لا توجد إعلانات حالياً</p>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               {announcements.map((ann) => (
                 <Card key={ann.id} className="hover:shadow-md transition-shadow">
-                  <CardContent className="p-4">
-                    <div className="flex items-start justify-between gap-3">
+                  <CardContent className="p-3 sm:p-4">
+                    <div className="flex items-start justify-between gap-2 sm:gap-3">
                       <div className="flex-1 min-w-0">
-                        <div className="flex flex-wrap items-center gap-2 mb-1">
-                          <h3 className="font-semibold text-slate-800">{ann.title}</h3>
-                          <Badge className={`text-xs ${PRIORITY_COLORS[ann.priority]}`}>
+                        <div className="flex flex-wrap items-center gap-1 sm:gap-2 mb-1">
+                          <h3 className="font-semibold text-slate-800 text-sm sm:text-base">{ann.title}</h3>
+                          <Badge className={`text-[10px] sm:text-xs ${PRIORITY_COLORS[ann.priority]}`}>
                             {PRIORITY_LABELS[ann.priority]}
                           </Badge>
-                          <Badge variant="outline" className="text-xs">
+                          <Badge variant="outline" className="text-[10px] sm:text-xs">
                             {TARGET_ROLE_LABELS[ann.targetRole]}
                           </Badge>
                         </div>
-                        <p className="text-muted-foreground text-sm leading-relaxed">
+                        <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed">
                           {ann.content}
                         </p>
-                        <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground flex-row-reverse">
+                        <div className="flex items-center gap-1 mt-1.5 sm:mt-2 text-[10px] sm:text-xs text-muted-foreground flex-row-reverse">
                           <Calendar className="w-3 h-3" />
                           {new Date(ann.createdAt).toLocaleDateString("ar-SA", {
                             year: "numeric",
@@ -255,10 +252,10 @@ export default function HODDashboard() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="shrink-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+                        className="shrink-0 text-red-500 hover:text-red-700 hover:bg-red-50 w-8 h-8 sm:w-9 sm:h-9"
                         onClick={() => deleteAnnouncement(ann.id)}
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                       </Button>
                     </div>
                   </CardContent>
@@ -268,70 +265,51 @@ export default function HODDashboard() {
           )}
         </TabsContent>
 
-        <TabsContent value="statistics" className="mt-4">
+        {/* Statistics Tab */}
+        <TabsContent value="statistics" className="mt-3 sm:mt-4">
           <Card>
-            <CardHeader>
-              <CardTitle>الإحصائيات العامة</CardTitle>
+            <CardHeader className="p-3 sm:p-4 sm:pb-2">
+              <CardTitle className="text-sm sm:text-base md:text-lg">الإحصائيات العامة</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <h3 className="font-semibold text-slate-700">توزيع المستخدمين</h3>
+            <CardContent className="p-3 sm:p-4 sm:pt-0 md:p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                <div className="space-y-3 sm:space-y-4">
+                  <h3 className="font-semibold text-slate-700 text-sm sm:text-base">توزيع المستخدمين</h3>
                   <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">أعضاء هيئة التدريس</span>
-                      <div className="flex items-center gap-2">
-                        <div className="w-32 bg-slate-100 rounded-full h-2.5">
-                          <div
-                            className="bg-sky-500 h-2.5 rounded-full"
-                            style={{ width: `${(stats.professors / stats.students) * 100}%` }}
-                          />
+                    {[
+                      { label: "أعضاء هيئة التدريس", value: stats.professors, color: "bg-sky-500" },
+                      { label: "الموظفون الإداريون", value: stats.employees, color: "bg-cyan-500" },
+                      { label: "الطلاب", value: stats.students, color: "bg-orange-500" },
+                    ].map((item) => (
+                      <div key={item.label} className="flex items-center justify-between gap-2">
+                        <span className="text-xs sm:text-sm truncate">{item.label}</span>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <div className="w-16 sm:w-24 md:w-32 bg-slate-100 rounded-full h-2 sm:h-2.5">
+                            <div
+                              className={`${item.color} h-2 sm:h-2.5 rounded-full`}
+                              style={{ width: `${(item.value / stats.students) * 100}%` }}
+                            />
+                          </div>
+                          <span className="text-xs sm:text-sm font-medium w-6 text-left">{item.value}</span>
                         </div>
-                        <span className="text-sm font-medium">{stats.professors}</span>
                       </div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">الموظفون الإداريون</span>
-                      <div className="flex items-center gap-2">
-                        <div className="w-32 bg-slate-100 rounded-full h-2.5">
-                          <div
-                            className="bg-cyan-500 h-2.5 rounded-full"
-                            style={{ width: `${(stats.employees / stats.students) * 100}%` }}
-                          />
-                        </div>
-                        <span className="text-sm font-medium">{stats.employees}</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">الطلاب</span>
-                      <div className="flex items-center gap-2">
-                        <div className="w-32 bg-slate-100 rounded-full h-2.5">
-                          <div className="bg-orange-500 h-2.5 rounded-full w-full" />
-                        </div>
-                        <span className="text-sm font-medium">{stats.students}</span>
-                      </div>
-                    </div>
+                    ))}
                   </div>
                 </div>
-                <div className="space-y-4">
-                  <h3 className="font-semibold text-slate-700">ملخص</h3>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="bg-slate-50 rounded-lg p-3 text-center">
-                      <p className="text-2xl font-bold text-slate-800">{stats.totalAnnouncements}</p>
-                      <p className="text-xs text-muted-foreground">إعلان</p>
-                    </div>
-                    <div className="bg-slate-50 rounded-lg p-3 text-center">
-                      <p className="text-2xl font-bold text-slate-800">{stats.totalRequests}</p>
-                      <p className="text-xs text-muted-foreground">طلب</p>
-                    </div>
-                    <div className="bg-slate-50 rounded-lg p-3 text-center">
-                      <p className="text-2xl font-bold text-emerald-600">{stats.averageGPA.toFixed(2)}</p>
-                      <p className="text-xs text-muted-foreground">المعدل التراكمي</p>
-                    </div>
-                    <div className="bg-slate-50 rounded-lg p-3 text-center">
-                      <p className="text-2xl font-bold text-slate-800">{stats.professors + stats.employees + stats.students}</p>
-                      <p className="text-xs text-muted-foreground">إجمالي المستخدمين</p>
-                    </div>
+                <div className="space-y-3 sm:space-y-4">
+                  <h3 className="font-semibold text-slate-700 text-sm sm:text-base">ملخص</h3>
+                  <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                    {[
+                      { label: "إعلان", value: stats.totalAnnouncements, color: "text-slate-800" },
+                      { label: "طلب", value: stats.totalRequests, color: "text-slate-800" },
+                      { label: "المعدل التراكمي", value: stats.averageGPA.toFixed(2), color: "text-emerald-600" },
+                      { label: "إجمالي المستخدمين", value: stats.professors + stats.employees + stats.students, color: "text-slate-800" },
+                    ].map((item) => (
+                      <div key={item.label} className="bg-slate-50 rounded-lg p-2.5 sm:p-3 text-center">
+                        <p className={`text-lg sm:text-2xl font-bold ${item.color}`}>{item.value}</p>
+                        <p className="text-[10px] sm:text-xs text-muted-foreground">{item.label}</p>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -339,40 +317,41 @@ export default function HODDashboard() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="courses" className="mt-4">
+        {/* Courses Tab */}
+        <TabsContent value="courses" className="mt-3 sm:mt-4">
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                إدارة المقررات الدراسية
-                <Badge variant="secondary" className="text-xs">
+            <CardHeader className="p-3 sm:p-4 sm:pb-2">
+              <CardTitle className="flex items-center justify-between text-sm sm:text-base md:text-lg">
+                <span>إدارة المقررات الدراسية</span>
+                <Badge variant="secondary" className="text-[10px] sm:text-xs">
                   {courses.length} مقرر
                 </Badge>
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-3 sm:p-4 sm:pt-0">
               {courses.length === 0 ? (
-                <div className="text-center py-12 text-muted-foreground">
-                  <BookOpen className="w-12 h-12 mx-auto mb-3 opacity-30" />
-                  <p>لا توجد مقررات حالياً</p>
+                <div className="text-center py-8 sm:py-12 text-muted-foreground">
+                  <BookOpen className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-3 opacity-30" />
+                  <p className="text-sm sm:text-base">لا توجد مقررات حالياً</p>
                 </div>
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
+                <div className="overflow-x-auto -mx-3 sm:mx-0">
+                  <table className="w-full text-xs sm:text-sm min-w-[400px]">
                     <thead>
                       <tr className="border-b bg-slate-50">
-                        <th className="text-right p-3 font-medium">رمز المقرر</th>
-                        <th className="text-right p-3 font-medium">اسم المقرر</th>
-                        <th className="text-right p-3 font-medium">الساعات</th>
-                        <th className="text-right p-3 font-medium">الفصل</th>
+                        <th className="text-right p-2 sm:p-3 font-medium">الرمز</th>
+                        <th className="text-right p-2 sm:p-3 font-medium">اسم المقرر</th>
+                        <th className="text-right p-2 sm:p-3 font-medium text-center">الساعات</th>
+                        <th className="text-right p-2 sm:p-3 font-medium">الفصل</th>
                       </tr>
                     </thead>
                     <tbody>
                       {courses.map((course) => (
                         <tr key={course.id} className="border-b hover:bg-slate-50 transition-colors">
-                          <td className="p-3 font-mono text-xs">{course.code}</td>
-                          <td className="p-3">{course.name}</td>
-                          <td className="p-3 text-center">{course.hours}</td>
-                          <td className="p-3">الفصل {course.semester}</td>
+                          <td className="p-2 sm:p-3 font-mono text-[10px] sm:text-xs">{course.code}</td>
+                          <td className="p-2 sm:p-3 text-xs sm:text-sm">{course.name}</td>
+                          <td className="p-2 sm:p-3 text-center text-xs sm:text-sm">{course.hours}</td>
+                          <td className="p-2 sm:p-3 text-xs sm:text-sm">الفصل {course.semester}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -383,7 +362,8 @@ export default function HODDashboard() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="permissions" className="mt-4">
+        {/* Permissions Tab */}
+        <TabsContent value="permissions" className="mt-3 sm:mt-4">
           <PermissionsManager />
         </TabsContent>
       </Tabs>

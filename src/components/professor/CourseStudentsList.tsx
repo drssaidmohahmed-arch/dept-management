@@ -170,9 +170,9 @@ export default function CourseStudentsList() {
 
   return (
     <TooltipProvider delayDuration={200}>
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         {/* Summary Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
           {[
             {
               label: "مقررات الفصل",
@@ -202,14 +202,14 @@ export default function CourseStudentsList() {
             const Icon = stat.icon;
             return (
               <Card key={stat.label}>
-                <CardContent className="p-4">
-                  <div className="flex flex-row-reverse items-center gap-3">
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${stat.color}`}>
-                      <Icon className="w-5 h-5" />
+                <CardContent className="p-2.5 sm:p-3 md:p-4">
+                  <div className="flex flex-row-reverse items-center gap-2 sm:gap-3">
+                    <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center ${stat.color}`}>
+                      <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
                     </div>
                     <div>
-                      <p className="text-2xl font-bold">{stat.value}</p>
-                      <p className="text-xs text-muted-foreground">{stat.label}</p>
+                      <p className="text-xl sm:text-2xl font-bold">{stat.value}</p>
+                      <p className="text-[10px] sm:text-xs text-muted-foreground">{stat.label}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -220,19 +220,19 @@ export default function CourseStudentsList() {
 
         {/* Alert Cards */}
         {(semesterStats.withdrawn > 0 || semesterStats.incomplete > 0) && (
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
             {semesterStats.withdrawn > 0 && (
-              <div className="flex-1 flex flex-row-reverse items-center gap-2 bg-red-50 border border-red-200 rounded-lg px-4 py-3">
+              <div className="flex-1 flex flex-row-reverse items-center gap-2 bg-red-50 border border-red-200 rounded-lg px-3 sm:px-4 py-2 sm:py-3">
                 <UserX className="w-5 h-5 text-red-600 shrink-0" />
-                <p className="text-sm text-red-800">
+                <p className="text-xs sm:text-sm text-red-800">
                   <strong>{semesterStats.withdrawn}</strong> طالب منسحب في هذا الفصل
                 </p>
               </div>
             )}
             {semesterStats.incomplete > 0 && (
-              <div className="flex-1 flex flex-row-reverse items-center gap-2 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
+              <div className="flex-1 flex flex-row-reverse items-center gap-2 bg-amber-50 border border-amber-200 rounded-lg px-3 sm:px-4 py-2 sm:py-3">
                 <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0" />
-                <p className="text-sm text-amber-800">
+                <p className="text-xs sm:text-sm text-amber-800">
                   <strong>{semesterStats.incomplete}</strong> طالب حالة غير مكتملة
                 </p>
               </div>
@@ -242,10 +242,10 @@ export default function CourseStudentsList() {
 
         {/* Semester Selector + Search */}
         <Card>
-          <CardContent className="p-4">
-            <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3">
+          <CardContent className="p-2.5 sm:p-3 md:p-4">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-slate-700">الفصل الدراسي:</span>
+                <span className="text-sm sm:text-base font-medium text-slate-700">الفصل الدراسي:</span>
                 <Select
                   value={String(filterSemester)}
                   onValueChange={(v) => {
@@ -254,7 +254,7 @@ export default function CourseStudentsList() {
                     setSelectedStudentDetail(null);
                   }}
                 >
-                  <SelectTrigger className="w-[180px]">
+                  <SelectTrigger className="w-full sm:w-[180px]">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -287,13 +287,13 @@ export default function CourseStudentsList() {
         {/* Courses List with Expandable Students */}
         {semesters.length === 0 ? (
           <Card>
-            <CardContent className="py-12 text-center text-muted-foreground">
+            <CardContent className="py-8 sm:py-12 text-center text-muted-foreground">
               <BookOpen className="w-12 h-12 mx-auto mb-3 opacity-30" />
               <p>لا توجد مقررات مسندة لك في الفصل الدراسي الحالي</p>
             </CardContent>
           </Card>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-2 sm:space-y-3">
             {(coursesBySemester[filterSemester] || []).map((course) => {
               const isExpanded = expandedCourse === course.code;
               const stats = getCourseStats(course.code);
@@ -317,23 +317,23 @@ export default function CourseStudentsList() {
                 >
                   {/* Course Header */}
                   <div
-                    className="p-4 cursor-pointer"
+                    className="p-2.5 sm:p-3 md:p-4 cursor-pointer"
                     onClick={() => setExpandedCourse(isExpanded ? null : course.code)}
                   >
-                    <div className="flex flex-row-reverse items-center gap-4">
+                    <div className="flex flex-row-reverse items-center gap-2 sm:gap-4">
                       {/* Course Icon */}
-                      <div className="w-11 h-11 rounded-lg bg-sky-50 text-sky-700 flex items-center justify-center shrink-0">
-                        <BookOpen className="w-5 h-5" />
+                      <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-lg bg-sky-50 text-sky-700 flex items-center justify-center shrink-0">
+                        <BookOpen className="w-4 h-4 sm:w-5 sm:h-5" />
                       </div>
 
                       {/* Course Info */}
                       <div className="flex-1 min-w-0">
-                        <div className="flex flex-wrap items-center gap-2 mb-0.5">
-                          <h3 className="font-semibold text-slate-800">{course.name}</h3>
-                          <Badge variant="outline" className="text-xs font-mono">{course.code}</Badge>
-                          <Badge variant="secondary" className="text-xs">{course.hours} ساعة</Badge>
+                        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-0.5">
+                          <h3 className="font-semibold text-sm sm:text-base text-slate-800">{course.name}</h3>
+                          <Badge variant="outline" className="text-[10px] sm:text-xs font-mono">{course.code}</Badge>
+                          <Badge variant="secondary" className="text-[10px] sm:text-xs">{course.hours} ساعة</Badge>
                         </div>
-                        <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                        <div className="flex items-center gap-2 sm:gap-4 text-[10px] sm:text-xs text-muted-foreground">
                           <span className="flex flex-row-reverse items-center gap-1">
                             <Users className="w-3 h-3" />
                             {stats.count} طالب
@@ -365,57 +365,59 @@ export default function CourseStudentsList() {
                     <div className="border-t bg-slate-50/50">
                       {/* Grade Distribution Bar */}
                       {gradeDist.length > 0 && (
-                        <div className="px-4 py-3 border-b">
-                          <p className="text-xs font-medium text-slate-600 mb-2">توزيع الدرجات</p>
-                          <div className="flex items-center gap-1 h-6">
-                            {gradeDist.map(([grade, count]) => (
-                              <Tooltip key={grade}>
-                                <TooltipTrigger asChild>
-                                  <div
-                                    className={`flex items-center justify-center text-xs font-bold rounded-sm ${GRADE_COLORS[grade] || "text-slate-600"}`}
-                                    style={{
-                                      width: `${(count / courseStudents.length) * 100}%`,
-                                      minWidth: "28px",
-                                      backgroundColor: (() => {
-                                        const pts = GRADE_TO_POINTS[grade] || 0;
-                                        if (pts >= 3.7) return "#dcfce7";
-                                        if (pts >= 3.0) return "#e0f2fe";
-                                        if (pts >= 2.0) return "#fef3c7";
-                                        return "#fee2e2";
-                                      })(),
-                                    }}
-                                  >
-                                    {count > 1 ? `${grade} (${count})` : grade}
-                                  </div>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  {grade} - {count} طالب
-                                </TooltipContent>
-                              </Tooltip>
-                            ))}
+                        <div className="px-2.5 sm:px-4 py-2 sm:py-3 border-b">
+                          <p className="text-[10px] sm:text-xs font-medium text-slate-600 mb-1.5 sm:mb-2">توزيع الدرجات</p>
+                          <div className="overflow-x-auto">
+                            <div className="flex items-center gap-1 h-6 min-w-max">
+                              {gradeDist.map(([grade, count]) => (
+                                <Tooltip key={grade}>
+                                  <TooltipTrigger asChild>
+                                    <div
+                                      className={`flex items-center justify-center text-[10px] sm:text-xs font-bold rounded-sm ${GRADE_COLORS[grade] || "text-slate-600"}`}
+                                      style={{
+                                        width: `${(count / courseStudents.length) * 100}%`,
+                                        minWidth: "28px",
+                                        backgroundColor: (() => {
+                                          const pts = GRADE_TO_POINTS[grade] || 0;
+                                          if (pts >= 3.7) return "#dcfce7";
+                                          if (pts >= 3.0) return "#e0f2fe";
+                                          if (pts >= 2.0) return "#fef3c7";
+                                          return "#fee2e2";
+                                        })(),
+                                      }}
+                                    >
+                                      {count > 1 ? `${grade} (${count})` : grade}
+                                    </div>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    {grade} - {count} طالب
+                                  </TooltipContent>
+                                </Tooltip>
+                              ))}
+                            </div>
                           </div>
                         </div>
                       )}
 
                       {/* Students Table */}
                       {courseStudents.length === 0 ? (
-                        <div className="py-8 text-center text-muted-foreground text-sm">
+                        <div className="py-6 sm:py-8 text-center text-muted-foreground text-xs sm:text-sm">
                           لا يوجد طلبة مسجلون حالياً
                         </div>
                       ) : (
-                        <div className="overflow-x-auto">
-                          <table className="w-full text-sm">
+                        <div className="-mx-3 sm:mx-0 overflow-x-auto">
+                          <table className="w-full min-w-[600px] text-xs sm:text-sm">
                             <thead>
                               <tr className="border-b bg-slate-100/80">
-                                <th className="text-right p-3 font-medium text-xs">#</th>
-                                <th className="text-right p-3 font-medium text-xs">الرقم الجامعي</th>
-                                <th className="text-right p-3 font-medium text-xs">اسم الطالب</th>
-                                <th className="text-center p-3 font-medium text-xs">نصفي</th>
-                                <th className="text-center p-3 font-medium text-xs">نهائي</th>
-                                <th className="text-center p-3 font-medium text-xs">أعمال</th>
-                                <th className="text-center p-3 font-medium text-xs">الحضور</th>
-                                <th className="text-center p-3 font-medium text-xs">التقدير</th>
-                                <th className="text-center p-3 font-medium text-xs">الحالة</th>
+                                <th className="text-right p-2 sm:p-3 font-medium text-[10px] sm:text-xs">#</th>
+                                <th className="text-right p-2 sm:p-3 font-medium text-[10px] sm:text-xs">الرقم الجامعي</th>
+                                <th className="text-right p-2 sm:p-3 font-medium text-[10px] sm:text-xs">اسم الطالب</th>
+                                <th className="text-center p-2 sm:p-3 font-medium text-[10px] sm:text-xs">نصفي</th>
+                                <th className="text-center p-2 sm:p-3 font-medium text-[10px] sm:text-xs">نهائي</th>
+                                <th className="text-center p-2 sm:p-3 font-medium text-[10px] sm:text-xs">أعمال</th>
+                                <th className="text-center p-2 sm:p-3 font-medium text-[10px] sm:text-xs">الحضور</th>
+                                <th className="text-center p-2 sm:p-3 font-medium text-[10px] sm:text-xs">التقدير</th>
+                                <th className="text-center p-2 sm:p-3 font-medium text-[10px] sm:text-xs">الحالة</th>
                               </tr>
                             </thead>
                             <tbody>
@@ -437,13 +439,13 @@ export default function CourseStudentsList() {
                                         : "hover:bg-white"
                                     }`}
                                   >
-                                    <td className="p-3 text-muted-foreground text-xs">{idx + 1}</td>
-                                    <td className="p-3 font-mono text-xs text-slate-600">{student.studentId}</td>
-                                    <td className="p-3 font-medium text-slate-800">{student.name}</td>
-                                    <td className="p-3 text-center text-xs">{student.midTermMark ?? "—"}</td>
-                                    <td className="p-3 text-center text-xs">{student.finalMark ?? "—"}</td>
-                                    <td className="p-3 text-center text-xs">{student.assignmentsMark ?? "—"}</td>
-                                    <td className="p-3 text-center">
+                                    <td className="p-2 sm:p-3 text-muted-foreground text-[10px] sm:text-xs">{idx + 1}</td>
+                                    <td className="p-2 sm:p-3 font-mono text-[10px] sm:text-xs text-slate-600">{student.studentId}</td>
+                                    <td className="p-2 sm:p-3 font-medium text-xs sm:text-sm text-slate-800">{student.name}</td>
+                                    <td className="p-2 sm:p-3 text-center text-[10px] sm:text-xs">{student.midTermMark ?? "—"}</td>
+                                    <td className="p-2 sm:p-3 text-center text-[10px] sm:text-xs">{student.finalMark ?? "—"}</td>
+                                    <td className="p-2 sm:p-3 text-center text-[10px] sm:text-xs">{student.assignmentsMark ?? "—"}</td>
+                                    <td className="p-2 sm:p-3 text-center">
                                       <div className="flex items-center justify-center gap-1.5">
                                         <div className="w-12 bg-slate-200 rounded-full h-1.5">
                                           <div
@@ -451,22 +453,22 @@ export default function CourseStudentsList() {
                                             style={{ width: `${student.attendance}%` }}
                                           />
                                         </div>
-                                        <span className={`text-xs font-medium ${attendanceColor(student.attendance)}`}>
+                                        <span className={`text-[10px] sm:text-xs font-medium ${attendanceColor(student.attendance)}`}>
                                           {student.attendance}%
                                         </span>
                                       </div>
                                     </td>
-                                    <td className="p-3 text-center">
+                                    <td className="p-2 sm:p-3 text-center">
                                       {student.grade ? (
-                                        <span className={`text-base ${GRADE_COLORS[student.grade] || "text-slate-600"}`}>
+                                        <span className={`text-sm sm:text-base ${GRADE_COLORS[student.grade] || "text-slate-600"}`}>
                                           {student.grade}
                                         </span>
                                       ) : (
                                         <span className="text-slate-400">—</span>
                                       )}
                                     </td>
-                                    <td className="p-3 text-center">
-                                      <Badge className={`text-xs ${STUDENT_STATUS_COLORS[student.status]}`}>
+                                    <td className="p-2 sm:p-3 text-center">
+                                      <Badge className={`text-[10px] sm:text-xs ${STUDENT_STATUS_COLORS[student.status]}`}>
                                         {STUDENT_STATUS_LABELS[student.status]}
                                       </Badge>
                                     </td>
@@ -477,13 +479,13 @@ export default function CourseStudentsList() {
                             {/* Summary Row */}
                             <tfoot>
                               <tr className="border-t-2 border-slate-200 bg-slate-100/60 font-medium">
-                                <td colSpan={2} className="p-3 text-xs text-slate-600">
+                                <td colSpan={2} className="p-2 sm:p-3 text-[10px] sm:text-xs text-slate-600">
                                   الإجمالي
                                 </td>
-                                <td className="p-3 text-xs text-slate-600">
+                                <td className="p-2 sm:p-3 text-[10px] sm:text-xs text-slate-600">
                                   {courseStudents.length} طالب
                                 </td>
-                                <td className="p-3 text-center text-xs">
+                                <td className="p-2 sm:p-3 text-center text-[10px] sm:text-xs">
                                   {courseStudents.reduce((sum, s) => sum + (s.midTermMark || 0), 0) > 0
                                     ? Math.round(
                                         courseStudents.reduce((sum, s) => sum + (s.midTermMark || 0), 0) /
@@ -491,7 +493,7 @@ export default function CourseStudentsList() {
                                       )
                                     : "—"}
                                 </td>
-                                <td className="p-3 text-center text-xs">
+                                <td className="p-2 sm:p-3 text-center text-[10px] sm:text-xs">
                                   {courseStudents.reduce((sum, s) => sum + (s.finalMark || 0), 0) > 0
                                     ? Math.round(
                                         courseStudents.reduce((sum, s) => sum + (s.finalMark || 0), 0) /
@@ -499,7 +501,7 @@ export default function CourseStudentsList() {
                                       )
                                     : "—"}
                                 </td>
-                                <td className="p-3 text-center text-xs">
+                                <td className="p-2 sm:p-3 text-center text-[10px] sm:text-xs">
                                   {courseStudents.reduce((sum, s) => sum + (s.assignmentsMark || 0), 0) > 0
                                     ? Math.round(
                                         courseStudents.reduce((sum, s) => sum + (s.assignmentsMark || 0), 0) /
@@ -507,12 +509,12 @@ export default function CourseStudentsList() {
                                       )
                                     : "—"}
                                 </td>
-                                <td className="p-3 text-center text-xs">
+                                <td className="p-2 sm:p-3 text-center text-[10px] sm:text-xs">
                                   <span className={attendanceColor(stats.avgAttendance)}>
                                     {stats.avgAttendance}%
                                   </span>
                                 </td>
-                                <td className="p-3 text-center text-xs">
+                                <td className="p-2 sm:p-3 text-center text-[10px] sm:text-xs">
                                   {stats.avgGPA > 0 ? stats.avgGPA.toFixed(2) : "—"}
                                 </td>
                                 <td></td>
@@ -530,7 +532,7 @@ export default function CourseStudentsList() {
         )}
 
         {/* Footer Summary */}
-        <p className="text-xs text-muted-foreground text-center">
+        <p className="text-[10px] sm:text-xs text-muted-foreground text-center">
           عرض مقررات الفصل {SEMESTER_NAMES[filterSemester]} - {filteredStudents.length} تسجيل في {myCourses.filter((c) => c.semester === filterSemester).length} مقرر
         </p>
       </div>

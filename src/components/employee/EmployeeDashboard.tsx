@@ -12,8 +12,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Bell,
   ClipboardCheck,
-  FileText,
-  Users,
   CheckCircle2,
   Clock,
   Circle,
@@ -36,8 +34,8 @@ export default function EmployeeDashboard() {
 
   const statCards = [
     { label: "الإعلانات", value: employeeAnnouncements.length, icon: Bell, color: "bg-cyan-50 text-cyan-700" },
-    { label: "المهام المكتملة", value: 12, icon: CheckCircle2, color: "bg-emerald-50 text-emerald-700" },
-    { label: "المهام المعلقة", value: 5, icon: Clock, color: "bg-amber-50 text-amber-700" },
+    { label: "مكتملة", value: 12, icon: CheckCircle2, color: "bg-emerald-50 text-emerald-700" },
+    { label: "معلقة", value: 5, icon: Clock, color: "bg-amber-50 text-amber-700" },
     { label: "الإجمالي", value: 17, icon: ClipboardCheck, color: "bg-purple-50 text-purple-700" },
   ];
 
@@ -57,10 +55,6 @@ export default function EmployeeDashboard() {
     return <Circle className="w-4 h-4 text-amber-500" />;
   };
 
-  const statusLabel = (status: string) => {
-    return status === "completed" ? "مكتمل" : "معلق";
-  };
-
   const statusBadgeClass = (status: string) => {
     return status === "completed"
       ? "bg-emerald-100 text-emerald-800"
@@ -68,21 +62,21 @@ export default function EmployeeDashboard() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Stat Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div className="space-y-4 sm:space-y-6">
+      {/* Stat Cards - 2 cols mobile, 4 desktop */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
         {statCards.map((card) => {
           const Icon = card.icon;
           return (
             <Card key={card.label}>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3 flex-row-reverse">
-                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${card.color}`}>
-                    <Icon className="w-5 h-5" />
+              <CardContent className="p-2.5 sm:p-3 md:p-4">
+                <div className="flex items-center gap-2 sm:gap-3 flex-row-reverse">
+                  <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center shrink-0 ${card.color}`}>
+                    <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
-                  <div>
-                    <p className="text-2xl font-bold">{card.value}</p>
-                    <p className="text-xs text-muted-foreground">{card.label}</p>
+                  <div className="min-w-0">
+                    <p className="text-lg sm:text-xl md:text-2xl font-bold truncate">{card.value}</p>
+                    <p className="text-[9px] sm:text-xs text-muted-foreground truncate">{card.label}</p>
                   </div>
                 </div>
               </CardContent>
@@ -93,49 +87,41 @@ export default function EmployeeDashboard() {
 
       {/* Tabs */}
       <Tabs defaultValue="announcements" className="w-full">
-        <TabsList>
-          <TabsTrigger value="announcements" className="flex items-center gap-1 flex-row-reverse">
-            <Bell className="w-4 h-4" />
-            الإعلانات
-            {employeeAnnouncements.length > 0 && (
-              <Badge variant="secondary" className="ms-1 text-xs">
-                {employeeAnnouncements.length}
-              </Badge>
-            )}
+        <TabsList className="w-full flex h-auto">
+          <TabsTrigger value="announcements" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+            <Bell className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+            <span className="truncate">الإعلانات</span>
           </TabsTrigger>
-          <TabsTrigger value="tasks" className="flex items-center gap-1 flex-row-reverse">
-            <ClipboardCheck className="w-4 h-4" />
-            المهام
-            <Badge variant="secondary" className="ms-1 text-xs">
-              {tasks.length}
-            </Badge>
+          <TabsTrigger value="tasks" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+            <ClipboardCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+            <span className="truncate">المهام</span>
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="announcements" className="mt-4">
+        <TabsContent value="announcements" className="mt-3 sm:mt-4">
           {employeeAnnouncements.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">
-              <Bell className="w-12 h-12 mx-auto mb-3 opacity-30" />
-              <p>لا توجد إعلانات حالياً</p>
+            <div className="text-center py-8 sm:py-12 text-muted-foreground">
+              <Bell className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-3 opacity-30" />
+              <p className="text-sm sm:text-base">لا توجد إعلانات حالياً</p>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               {employeeAnnouncements.map((ann) => (
                 <Card key={ann.id} className="hover:shadow-md transition-shadow">
-                  <CardContent className="p-4">
-                    <div className="flex flex-wrap items-center gap-2 mb-1">
-                      <h3 className="font-semibold">{ann.title}</h3>
-                      <Badge className={`text-xs ${PRIORITY_COLORS[ann.priority]}`}>
+                  <CardContent className="p-3 sm:p-4">
+                    <div className="flex flex-wrap items-center gap-1 sm:gap-2 mb-1">
+                      <h3 className="font-semibold text-sm sm:text-base">{ann.title}</h3>
+                      <Badge className={`text-[10px] sm:text-xs ${PRIORITY_COLORS[ann.priority]}`}>
                         {PRIORITY_LABELS[ann.priority]}
                       </Badge>
-                      <Badge variant="outline" className="text-xs">
+                      <Badge variant="outline" className="text-[10px] sm:text-xs">
                         {TARGET_ROLE_LABELS[ann.targetRole]}
                       </Badge>
                     </div>
-                    <p className="text-muted-foreground text-sm leading-relaxed">
+                    <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed">
                       {ann.content}
                     </p>
-                    <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground flex-row-reverse">
+                    <div className="flex items-center gap-1 mt-1.5 sm:mt-2 text-[10px] sm:text-xs text-muted-foreground flex-row-reverse">
                       <Calendar className="w-3 h-3" />
                       {new Date(ann.createdAt).toLocaleDateString("ar-SA", {
                         year: "numeric",
@@ -150,17 +136,17 @@ export default function EmployeeDashboard() {
           )}
         </TabsContent>
 
-        <TabsContent value="tasks" className="mt-4">
+        <TabsContent value="tasks" className="mt-3 sm:mt-4">
           <Card>
-            <CardHeader>
-              <CardTitle>قائمة المهام</CardTitle>
+            <CardHeader className="p-3 sm:p-4 sm:pb-2">
+              <CardTitle className="text-sm sm:text-base md:text-lg">قائمة المهام</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
+            <CardContent className="p-3 sm:p-4 sm:pt-0">
+              <div className="space-y-2 sm:space-y-3">
                 {tasks.map((task) => (
                   <div
                     key={task.id}
-                    className={`flex items-center gap-3 p-3 rounded-lg border transition-colors flex-row-reverse ${
+                    className={`flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 rounded-lg border transition-colors flex-row-reverse ${
                       task.status === "completed"
                         ? "bg-emerald-50/50 border-emerald-100"
                         : "bg-white border-slate-200 hover:border-slate-300"
@@ -169,7 +155,7 @@ export default function EmployeeDashboard() {
                     {statusIcon(task.status)}
                     <div className="flex-1 min-w-0">
                       <p
-                        className={`text-sm font-medium ${
+                        className={`text-xs sm:text-sm font-medium truncate ${
                           task.status === "completed"
                             ? "line-through text-muted-foreground"
                             : "text-slate-800"
@@ -177,15 +163,15 @@ export default function EmployeeDashboard() {
                       >
                         {task.title}
                       </p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-xs text-muted-foreground flex items-center gap-1 flex-row-reverse">
-                          <Calendar className="w-3 h-3" />
+                      <div className="flex items-center gap-1 mt-0.5">
+                        <span className="text-[10px] sm:text-xs text-muted-foreground flex items-center gap-0.5 flex-row-reverse">
+                          <Calendar className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                           {new Date(task.dueDate).toLocaleDateString("ar-SA")}
                         </span>
                       </div>
                     </div>
-                    <Badge className={`text-xs shrink-0 ${statusBadgeClass(task.status)}`}>
-                      {statusLabel(task.status)}
+                    <Badge className={`text-[10px] sm:text-xs shrink-0 ${statusBadgeClass(task.status)}`}>
+                      {task.status === "completed" ? "مكتمل" : "معلق"}
                     </Badge>
                   </div>
                 ))}

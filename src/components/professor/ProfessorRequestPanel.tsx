@@ -135,29 +135,29 @@ function NewRequestDialog({ onClose }: { onClose: () => void }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="flex items-center gap-2 bg-sky-600 hover:bg-sky-700 flex-row-reverse">
-          <Plus className="w-4 h-4" />
-          تقديم طلب جديد
+        <Button className="flex items-center gap-1.5 sm:gap-2 bg-sky-600 hover:bg-sky-700 flex-row-reverse">
+          <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+          <span className="text-xs sm:text-sm">تقديم طلب جديد</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" dir="rtl">
+      <DialogContent className="w-[calc(100vw-2rem)] max-w-2xl max-h-[90vh] overflow-y-auto" dir="rtl">
         <DialogHeader>
-          <DialogTitle className="text-xl flex items-center gap-2 flex-row-reverse">
-            <Send className="w-5 h-5 text-sky-600" />
+          <DialogTitle className="text-base sm:text-xl flex items-center gap-1.5 sm:gap-2 flex-row-reverse">
+            <Send className="w-3.5 h-3.5 sm:w-5 sm:h-5 text-sky-600" />
             تقديم طلب جديد
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-xs sm:text-sm">
             اختر نوع الوجهة والتفاصيل لإرسال طلبك
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-5 mt-4">
+        <div className="space-y-3 sm:space-y-5 mt-2 sm:mt-4">
           {/* Target Direction */}
           <div>
-            <Label className="text-base font-semibold mb-3 block">
+            <Label className="text-xs sm:text-sm md:text-base font-semibold mb-2 sm:mb-3 block">
               وجهة الطلب
             </Label>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-2 sm:gap-3">
               <Card
                 className={`cursor-pointer transition-all hover:shadow-md ${
                   target === "department"
@@ -166,13 +166,13 @@ function NewRequestDialog({ onClose }: { onClose: () => void }) {
                 }`}
                 onClick={() => setTarget("department")}
               >
-                <CardContent className="p-4 flex items-center gap-3 flex-row-reverse">
-                  <div className="w-10 h-10 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center shrink-0">
-                    <Building2 className="w-5 h-5" />
+                <CardContent className="p-3 sm:p-4 flex items-center gap-2 sm:gap-3 flex-row-reverse">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center shrink-0">
+                    <Building2 className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
                   </div>
-                  <div>
-                    <p className="font-semibold text-sm">موجه للقسم</p>
-                    <p className="text-xs text-muted-foreground">
+                  <div className="min-w-0">
+                    <p className="font-semibold text-xs sm:text-sm truncate">موجه للقسم</p>
+                    <p className="text-[10px] sm:text-xs text-muted-foreground truncate">
                       إرسال الطلب لإدارة القسم
                     </p>
                   </div>
@@ -186,13 +186,13 @@ function NewRequestDialog({ onClose }: { onClose: () => void }) {
                 }`}
                 onClick={() => setTarget("student")}
               >
-                <CardContent className="p-4 flex items-center gap-3 flex-row-reverse">
-                  <div className="w-10 h-10 rounded-lg bg-orange-100 text-orange-700 flex items-center justify-center shrink-0">
-                    <GraduationCap className="w-5 h-5" />
+                <CardContent className="p-3 sm:p-4 flex items-center gap-2 sm:gap-3 flex-row-reverse">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-orange-100 text-orange-700 flex items-center justify-center shrink-0">
+                    <GraduationCap className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
                   </div>
-                  <div>
-                    <p className="font-semibold text-sm">موجه لطالب</p>
-                    <p className="text-xs text-muted-foreground">
+                  <div className="min-w-0">
+                    <p className="font-semibold text-xs sm:text-sm truncate">موجه لطالب</p>
+                    <p className="text-[10px] sm:text-xs text-muted-foreground truncate">
                       إرسال الطلب لطالب محدد
                     </p>
                   </div>
@@ -203,10 +203,10 @@ function NewRequestDialog({ onClose }: { onClose: () => void }) {
 
           {/* Student Selection (if target is student) */}
           {target === "student" && (
-            <div className="space-y-2 animate-in slide-in-from-top-2 duration-200">
-              <Label>اختر الطالب</Label>
+            <div className="space-y-1.5 sm:space-y-2 animate-in slide-in-from-top-2 duration-200">
+              <Label className="text-xs sm:text-sm">اختر الطالب</Label>
               <Select value={targetStudentId} onValueChange={setTargetStudentId}>
-                <SelectTrigger>
+                <SelectTrigger className="text-xs sm:text-sm">
                   <SelectValue placeholder="ابحث واختر الطالب..." />
                 </SelectTrigger>
                 <SelectContent>
@@ -221,14 +221,14 @@ function NewRequestDialog({ onClose }: { onClose: () => void }) {
           )}
 
           {/* Category & Priority */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>تصنيف الطلب</Label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            <div className="space-y-1.5 sm:space-y-2">
+              <Label className="text-xs sm:text-sm">تصنيف الطلب</Label>
               <Select
                 value={category}
                 onValueChange={(v) => setCategory(v as ProfessorRequestCategory)}
               >
-                <SelectTrigger>
+                <SelectTrigger className="text-xs sm:text-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -240,13 +240,13 @@ function NewRequestDialog({ onClose }: { onClose: () => void }) {
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-2">
-              <Label>الأولوية</Label>
+            <div className="space-y-1.5 sm:space-y-2">
+              <Label className="text-xs sm:text-sm">الأولوية</Label>
               <Select
                 value={priority}
                 onValueChange={(v) => setPriority(v as "urgent" | "important" | "normal")}
               >
-                <SelectTrigger>
+                <SelectTrigger className="text-xs sm:text-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -259,28 +259,30 @@ function NewRequestDialog({ onClose }: { onClose: () => void }) {
           </div>
 
           {/* Subject */}
-          <div className="space-y-2">
-            <Label>موضوع الطلب</Label>
+          <div className="space-y-1.5 sm:space-y-2">
+            <Label className="text-xs sm:text-sm">موضوع الطلب</Label>
             <Input
               placeholder="أدخل موضوع الطلب..."
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
+              className="text-xs sm:text-sm"
             />
           </div>
 
           {/* Description */}
-          <div className="space-y-2">
-            <Label>تفاصيل الطلب</Label>
+          <div className="space-y-1.5 sm:space-y-2">
+            <Label className="text-xs sm:text-sm">تفاصيل الطلب</Label>
             <Textarea
               placeholder="اكتب تفاصيل الطلب بشكل كامل..."
               rows={5}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
+              className="text-xs sm:text-sm"
             />
           </div>
 
           {/* Submit */}
-          <div className="flex gap-3 pt-2">
+          <div className="flex gap-2 sm:gap-3 pt-2">
             <Button
               onClick={handleSubmit}
               disabled={!isValid || isSubmitting || (target === "student" && !targetStudentId)}
@@ -288,17 +290,17 @@ function NewRequestDialog({ onClose }: { onClose: () => void }) {
             >
               {isSubmitting ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  جارٍ الإرسال...
+                  <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin" />
+                  <span className="text-xs sm:text-sm">جارٍ الإرسال...</span>
                 </>
               ) : (
                 <>
-                  <Send className="w-4 h-4" />
-                  إرسال الطلب
+                  <Send className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  <span className="text-xs sm:text-sm">إرسال الطلب</span>
                 </>
               )}
             </Button>
-            <Button variant="outline" onClick={() => setOpen(false)}>
+            <Button variant="outline" onClick={() => setOpen(false)} className="text-xs sm:text-sm">
               إلغاء
             </Button>
           </div>
@@ -325,21 +327,21 @@ function RequestCard({
   return (
     <>
       <Card className="hover:shadow-md transition-all duration-200 border">
-        <CardContent className="p-4">
+        <CardContent className="p-3 sm:p-4">
           {/* Header */}
-          <div className="flex items-start justify-between gap-2 mb-3">
-            <div className="flex items-center gap-2 flex-wrap">
-              <Badge className={`text-xs ${PROF_REQ_CATEGORY_COLORS[request.category]}`}>
+          <div className="flex items-start justify-between gap-1.5 sm:gap-2 mb-2 sm:mb-3">
+            <div className="flex items-center gap-1 sm:gap-1.5 flex-wrap">
+              <Badge className={`text-[10px] sm:text-xs ${PROF_REQ_CATEGORY_COLORS[request.category]}`}>
                 {PROF_REQ_CATEGORY_LABELS[request.category]}
               </Badge>
-              <Badge className={`text-xs ${PROF_REQ_TARGET_COLORS[request.target]} flex items-center gap-1`}>
-                <TargetIcon className="w-3 h-3" />
+              <Badge className={`text-[10px] sm:text-xs ${PROF_REQ_TARGET_COLORS[request.target]} flex items-center gap-0.5 sm:gap-1`}>
+                <TargetIcon className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                 {PROF_REQ_TARGET_LABELS[request.target]}
               </Badge>
-              <Badge className={`text-xs ${PROF_REQ_STATUS_COLORS[request.status]}`}>
+              <Badge className={`text-[10px] sm:text-xs ${PROF_REQ_STATUS_COLORS[request.status]}`}>
                 {PROF_REQ_STATUS_LABELS[request.status]}
               </Badge>
-              <Badge className={`text-xs ${PRIORITY_COLORS[request.priority]}`}>
+              <Badge className={`text-[10px] sm:text-xs ${PRIORITY_COLORS[request.priority]}`}>
                 {PRIORITY_LABELS[request.priority]}
               </Badge>
             </div>
@@ -347,23 +349,23 @@ function RequestCard({
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-red-500 hover:text-red-700 hover:bg-red-50 h-8 w-8 p-0"
+                className="text-red-500 hover:text-red-700 hover:bg-red-50 h-7 w-7 sm:h-8 sm:w-8 p-0 shrink-0"
                 onClick={() => setShowDelete(true)}
               >
-                <Trash2 className="w-4 h-4" />
+                <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </Button>
             )}
           </div>
 
           {/* Student info if targeted */}
           {request.target === "student" && request.targetStudentName && (
-            <div className="flex items-center gap-2 mb-2 p-2 bg-orange-50 rounded-lg">
-              <GraduationCap className="w-4 h-4 text-orange-600" />
-              <span className="text-sm font-medium text-orange-800">
+            <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2 p-1.5 sm:p-2 bg-orange-50 rounded-lg">
+              <GraduationCap className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-orange-600 shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-orange-800 truncate">
                 {request.targetStudentName}
               </span>
               {request.targetStudentId && (
-                <span className="text-xs text-orange-600">
+                <span className="text-[10px] sm:text-xs text-orange-600 shrink-0">
                   ({request.targetStudentId})
                 </span>
               )}
@@ -371,25 +373,25 @@ function RequestCard({
           )}
 
           {/* Subject */}
-          <h3 className="font-semibold text-base mb-1">{request.subject}</h3>
+          <h3 className="font-semibold text-xs sm:text-sm md:text-base mb-0.5 sm:mb-1">{request.subject}</h3>
 
           {/* Description (toggle) */}
-          <p className={`text-muted-foreground text-sm leading-relaxed ${expanded ? "" : "line-clamp-2"}`}>
+          <p className={`text-muted-foreground text-xs sm:text-sm leading-relaxed ${expanded ? "" : "line-clamp-2"}`}>
             {request.description}
           </p>
           {request.description.length > 100 && (
             <button
               onClick={() => setExpanded(!expanded)}
-              className="text-sky-600 text-xs mt-1 flex items-center gap-1 hover:underline"
+              className="text-sky-600 text-[10px] sm:text-xs mt-0.5 sm:mt-1 flex items-center gap-0.5 sm:gap-1 hover:underline"
             >
               {expanded ? (
                 <>
-                  <ChevronUp className="w-3 h-3" />
+                  <ChevronUp className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                   عرض أقل
                 </>
               ) : (
                 <>
-                  <ChevronDown className="w-3 h-3" />
+                  <ChevronDown className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                   عرض المزيد
                 </>
               )}
@@ -398,19 +400,19 @@ function RequestCard({
 
           {/* Response (if exists) */}
           {request.response && (
-            <div className="mt-3 p-3 bg-emerald-50 border border-emerald-200 rounded-lg">
-              <div className="flex items-center gap-1.5 mb-1 flex-row-reverse">
-                <MessageSquare className="w-4 h-4 text-emerald-700" />
-                <span className="text-sm font-semibold text-emerald-800">الرد:</span>
+            <div className="mt-2 sm:mt-3 p-2 sm:p-3 bg-emerald-50 border border-emerald-200 rounded-lg">
+              <div className="flex items-center gap-1 sm:gap-1.5 mb-0.5 sm:mb-1 flex-row-reverse">
+                <MessageSquare className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-700" />
+                <span className="text-xs sm:text-sm font-semibold text-emerald-800">الرد:</span>
               </div>
-              <p className="text-sm text-emerald-700 leading-relaxed">{request.response}</p>
+              <p className="text-xs sm:text-sm text-emerald-700 leading-relaxed">{request.response}</p>
             </div>
           )}
 
           {/* Footer */}
-          <div className="flex items-center justify-between mt-3 pt-3 border-t">
-            <div className="flex items-center gap-1 text-xs text-muted-foreground flex-row-reverse">
-              <Calendar className="w-3 h-3" />
+          <div className="flex items-center justify-between mt-2 sm:mt-3 pt-2 sm:pt-3 border-t">
+            <div className="flex items-center gap-0.5 sm:gap-1 text-[10px] sm:text-xs text-muted-foreground flex-row-reverse">
+              <Calendar className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
               {new Date(request.createdAt).toLocaleDateString("ar-SA", {
                 year: "numeric",
                 month: "long",
@@ -420,9 +422,9 @@ function RequestCard({
               })}
             </div>
             {request.updatedAt && (
-              <div className="flex items-center gap-1 text-xs text-muted-foreground flex-row-reverse">
-                <Clock className="w-3 h-3" />
-                آخر تحديث:{" "}
+              <div className="flex items-center gap-0.5 sm:gap-1 text-[10px] sm:text-xs text-muted-foreground flex-row-reverse">
+                <Clock className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+                <span className="hidden sm:inline">آخر تحديث:{" "}</span>
                 {new Date(request.updatedAt).toLocaleDateString("ar-SA", {
                   month: "short",
                   day: "numeric",
@@ -435,21 +437,21 @@ function RequestCard({
 
       {/* Delete Confirmation */}
       <AlertDialog open={showDelete} onOpenChange={setShowDelete}>
-        <AlertDialogContent>
+        <AlertDialogContent className="w-[calc(100vw-2rem)] max-w-md">
           <AlertDialogHeader>
-            <AlertDialogTitle>حذف الطلب</AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogTitle className="text-sm sm:text-base">حذف الطلب</AlertDialogTitle>
+            <AlertDialogDescription className="text-xs sm:text-sm">
               هل أنت متأكد من حذف هذا الطلب؟ لا يمكن التراجع عن هذا الإجراء.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogAction
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-red-600 hover:bg-red-700 text-xs sm:text-sm"
               onClick={() => onDelete(request.id)}
             >
               حذف
             </AlertDialogAction>
-            <AlertDialogCancel>إلغاء</AlertDialogCancel>
+            <AlertDialogCancel className="text-xs sm:text-sm">إلغاء</AlertDialogCancel>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -476,19 +478,19 @@ function StatsCards({ requests }: { requests: ReturnType<typeof useProfessorRequ
   ];
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3">
       {stats.map((stat) => {
         const Icon = stat.icon;
         return (
           <Card key={stat.label}>
-            <CardContent className="p-3">
-              <div className="flex items-center gap-2 flex-row-reverse">
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${stat.color}`}>
-                  <Icon className="w-4 h-4" />
+            <CardContent className="p-2 sm:p-3">
+              <div className="flex items-center gap-1.5 sm:gap-2 flex-row-reverse">
+                <div className={`w-6 h-6 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center shrink-0 ${stat.color}`}>
+                  <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 </div>
-                <div>
-                  <p className="text-lg font-bold">{stat.value}</p>
-                  <p className="text-[10px] text-muted-foreground">{stat.label}</p>
+                <div className="min-w-0">
+                  <p className="text-sm sm:text-lg font-bold">{stat.value}</p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground truncate">{stat.label}</p>
                 </div>
               </div>
             </CardContent>
@@ -554,15 +556,15 @@ export default function ProfessorRequestPanel() {
   };
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-3 sm:space-y-5">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3">
         <div>
-          <h2 className="text-lg font-bold flex items-center gap-2 flex-row-reverse">
-            <Send className="w-5 h-5 text-sky-600" />
+          <h2 className="text-base sm:text-lg font-bold flex items-center gap-1.5 sm:gap-2 flex-row-reverse">
+            <Send className="w-3.5 h-3.5 sm:w-5 sm:h-5 text-sky-600" />
             إدارة الطلبات
           </h2>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-xs sm:text-sm text-muted-foreground">
             تقديم ومتابعة الطلبات الموجهة للقسم أو للطلاب
           </p>
         </div>
@@ -574,22 +576,22 @@ export default function ProfessorRequestPanel() {
 
       {/* Filters */}
       <Card>
-        <CardContent className="p-4">
-          <div className="flex flex-col md:flex-row gap-3">
+        <CardContent className="p-2 sm:p-3 md:p-4">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
             {/* Search */}
             <div className="flex-1 relative">
-              <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Search className="absolute start-2.5 sm:start-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 sm:w-4 sm:h-4 text-muted-foreground" />
               <Input
                 placeholder="بحث في الطلبات..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="ps-9"
+                className="ps-8 sm:ps-9 text-xs sm:text-sm"
               />
             </div>
 
             {/* Status Filter */}
             <Select value={filterStatus} onValueChange={setFilterStatus}>
-              <SelectTrigger className="w-full md:w-40">
+              <SelectTrigger className="w-full sm:w-auto text-xs sm:text-sm">
                 <SelectValue placeholder="الحالة" />
               </SelectTrigger>
               <SelectContent>
@@ -603,7 +605,7 @@ export default function ProfessorRequestPanel() {
 
             {/* Target Filter */}
             <Select value={filterTarget} onValueChange={setFilterTarget}>
-              <SelectTrigger className="w-full md:w-40">
+              <SelectTrigger className="w-full sm:w-auto text-xs sm:text-sm">
                 <SelectValue placeholder="الوجهة" />
               </SelectTrigger>
               <SelectContent>
@@ -615,7 +617,7 @@ export default function ProfessorRequestPanel() {
 
             {/* Category Filter */}
             <Select value={filterCategory} onValueChange={setFilterCategory}>
-              <SelectTrigger className="w-full md:w-40">
+              <SelectTrigger className="w-full sm:w-auto text-xs sm:text-sm">
                 <SelectValue placeholder="التصنيف" />
               </SelectTrigger>
               <SelectContent>
@@ -633,9 +635,9 @@ export default function ProfessorRequestPanel() {
               variant="outline"
               size="sm"
               onClick={() => setSortBy(sortBy === "newest" ? "oldest" : "newest")}
-              className="flex items-center gap-1 shrink-0 flex-row-reverse"
+              className="flex items-center gap-1 sm:gap-1.5 shrink-0 flex-row-reverse text-xs sm:text-sm w-full sm:w-auto"
             >
-              <ArrowUpDown className="w-3.5 h-3.5" />
+              <ArrowUpDown className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               {sortBy === "newest" ? "الأحدث أولاً" : "الأقدم أولاً"}
             </Button>
           </div>
@@ -644,23 +646,23 @@ export default function ProfessorRequestPanel() {
 
       {/* Results */}
       <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">
+        <p className="text-xs sm:text-sm text-muted-foreground">
           عرض {filteredRequests.length} من {requests.length} طلب
         </p>
       </div>
 
       {filteredRequests.length === 0 ? (
-        <div className="text-center py-16 text-muted-foreground">
-          <Send className="w-12 h-12 mx-auto mb-3 opacity-30" />
-          <p className="text-lg font-medium mb-1">لا توجد طلبات</p>
-          <p className="text-sm">
+        <div className="text-center py-10 sm:py-16 text-muted-foreground">
+          <Send className="w-8 h-8 sm:w-12 sm:h-12 mx-auto mb-2 sm:mb-3 opacity-30" />
+          <p className="text-sm sm:text-lg font-medium mb-0.5 sm:mb-1">لا توجد طلبات</p>
+          <p className="text-xs sm:text-sm">
             {requests.length === 0
               ? "لم تقم بتقديم أي طلب بعد. اضغط على \"تقديم طلب جديد\" للبدء."
               : "لا توجد طلبات تطابق معايير البحث."}
           </p>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-2 sm:space-y-3">
           {filteredRequests.map((request) => (
             <RequestCard key={request.id} request={request} onDelete={handleDelete} />
           ))}

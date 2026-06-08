@@ -78,22 +78,22 @@ export default function StudentRequests() {
   return (
     <div className="space-y-4">
       {/* Summary */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-3 gap-2 sm:gap-4">
         <Card>
-          <CardContent className="p-4 text-center">
-            <p className="text-xs text-muted-foreground">معلق</p>
+          <CardContent className="p-2.5 sm:p-4 text-center">
+            <p className="text-xs sm:text-sm text-muted-foreground">معلق</p>
             <p className="text-2xl font-bold text-amber-600">{pendingCount}</p>
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="p-4 text-center">
-            <p className="text-xs text-muted-foreground">مقبول</p>
+          <CardContent className="p-2.5 sm:p-4 text-center">
+            <p className="text-xs sm:text-sm text-muted-foreground">مقبول</p>
             <p className="text-2xl font-bold text-emerald-600">{approvedCount}</p>
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="p-4 text-center">
-            <p className="text-xs text-muted-foreground">مرفوض</p>
+          <CardContent className="p-2.5 sm:p-4 text-center">
+            <p className="text-xs sm:text-sm text-muted-foreground">مرفوض</p>
             <p className="text-2xl font-bold text-red-600">{rejectedCount}</p>
           </CardContent>
         </Card>
@@ -101,23 +101,24 @@ export default function StudentRequests() {
 
       {/* Actions */}
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-bold text-slate-800">الطلبات المقدمة</h3>
+        <h3 className="text-sm sm:text-lg font-bold text-slate-800">الطلبات المقدمة</h3>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="flex items-center gap-2 flex-row-reverse bg-orange-600 hover:bg-orange-700">
+            <Button size="sm" className="flex items-center gap-1.5 sm:gap-2 flex-row-reverse bg-orange-600 hover:bg-orange-700 text-xs sm:text-sm px-2 sm:px-4">
               <Plus className="w-4 h-4" />
-              تقديم طلب جديد
+              <span className="hidden sm:inline">تقديم طلب جديد</span>
+              <span className="sm:hidden">طلب جديد</span>
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-md" dir="rtl">
+          <DialogContent className="w-[calc(100vw-2rem)] max-h-[90vh] overflow-y-auto sm:max-w-md" dir="rtl">
             <DialogHeader>
-              <DialogTitle>تقديم طلب جديد</DialogTitle>
+              <DialogTitle className="text-sm sm:text-base">تقديم طلب جديد</DialogTitle>
             </DialogHeader>
-            <div className="space-y-4 pt-2">
+            <div className="space-y-3 sm:space-y-4 pt-2">
               <div className="space-y-2">
-                <Label>نوع الطلب</Label>
+                <Label className="text-xs sm:text-sm">نوع الطلب</Label>
                 <Select value={requestType} onValueChange={setRequestType}>
-                  <SelectTrigger>
+                  <SelectTrigger className="text-xs sm:text-sm">
                     <SelectValue placeholder="اختر نوع الطلب" />
                   </SelectTrigger>
                   <SelectContent>
@@ -130,27 +131,29 @@ export default function StudentRequests() {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="request-desc">وصف الطلب</Label>
+                <Label htmlFor="request-desc" className="text-xs sm:text-sm">وصف الطلب</Label>
                 <Textarea
                   id="request-desc"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="اكتب تفاصيل طلبك هنا..."
                   rows={4}
+                  className="text-xs sm:text-sm"
                 />
               </div>
             </div>
-            <DialogFooter className="gap-2 sm:gap-0">
+            <DialogFooter className="gap-2 sm:gap-0 mt-2 sm:mt-2">
               <Button
+                size="sm"
                 onClick={handleSubmitRequest}
                 disabled={!requestType || !description.trim()}
-                className="flex items-center gap-2 flex-row-reverse bg-orange-600 hover:bg-orange-700"
+                className="flex items-center gap-1.5 sm:gap-2 flex-row-reverse bg-orange-600 hover:bg-orange-700 text-xs sm:text-sm"
               >
                 <Send className="w-4 h-4" />
                 إرسال الطلب
               </Button>
               <DialogClose asChild>
-                <Button variant="outline">إلغاء</Button>
+                <Button variant="outline" size="sm" className="text-xs sm:text-sm">إلغاء</Button>
               </DialogClose>
             </DialogFooter>
           </DialogContent>
@@ -159,34 +162,34 @@ export default function StudentRequests() {
 
       {/* Request List */}
       {requests.length === 0 ? (
-        <div className="text-center py-12 text-muted-foreground">
-          <ClipboardList className="w-12 h-12 mx-auto mb-3 opacity-30" />
-          <p>لم تقم بتقديم أي طلب بعد</p>
+        <div className="text-center py-8 sm:py-12 text-muted-foreground">
+          <ClipboardList className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-3 opacity-30" />
+          <p className="text-xs sm:text-sm">لم تقم بتقديم أي طلب بعد</p>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-2.5 sm:space-y-3">
           {requests.map((request) => (
             <Card key={request.id} className="hover:shadow-md transition-shadow">
-              <CardContent className="p-4">
-                <div className="flex items-start justify-between gap-3">
+              <CardContent className="p-3 sm:p-4">
+                <div className="flex items-start justify-between gap-2 sm:gap-3">
                   <div className="flex-1 min-w-0">
-                    <div className="flex flex-wrap items-center gap-2 mb-1">
+                    <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-1">
                       <div className="flex items-center gap-1.5 flex-row-reverse">
                         <FileText className="w-4 h-4 text-muted-foreground" />
-                        <h3 className="font-semibold text-slate-800">
+                        <h3 className="font-semibold text-slate-800 text-xs sm:text-sm">
                           {request.type}
                         </h3>
                       </div>
                       <Badge
-                        className={`text-xs ${REQUEST_STATUS_COLORS[request.status]}`}
+                        className={`text-[10px] sm:text-xs ${REQUEST_STATUS_COLORS[request.status]}`}
                       >
                         {REQUEST_STATUS_LABELS[request.status]}
                       </Badge>
                     </div>
-                    <p className="text-muted-foreground text-sm leading-relaxed">
+                    <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed">
                       {request.description}
                     </p>
-                    <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground flex-row-reverse">
+                    <div className="flex items-center gap-1 mt-2 text-[10px] sm:text-xs text-muted-foreground flex-row-reverse">
                       <Calendar className="w-3 h-3" />
                       {new Date(request.createdAt).toLocaleDateString("ar-SA", {
                         year: "numeric",
@@ -200,10 +203,10 @@ export default function StudentRequests() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="shrink-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+                    className="shrink-0 text-red-500 hover:text-red-700 hover:bg-red-50 h-8 w-8 sm:h-9 sm:w-9"
                     onClick={() => deleteStudentRequest(request.id)}
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   </Button>
                 </div>
               </CardContent>

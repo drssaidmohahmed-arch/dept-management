@@ -65,91 +65,83 @@ function LandingPage({ onSelectRole }: { onSelectRole: (role: Role) => void }) {
       title: "رئيس القسم",
       description: "لوحة التحكم الرئيسية لإدارة القسم والإعلانات والإحصائيات",
       icon: Crown,
-      color: "from-emerald-500 to-emerald-700",
       bgLight: "bg-emerald-50",
       textColor: "text-emerald-700",
-      borderColor: "border-emerald-200",
     },
     {
       id: "professor" as Role,
       title: "عضو هيئة التدريس",
       description: "عرض الإعلانات والجدول الأسبوعي والمعلومات الأكاديمية",
       icon: GraduationCap,
-      color: "from-sky-500 to-sky-700",
       bgLight: "bg-sky-50",
       textColor: "text-sky-700",
-      borderColor: "border-sky-200",
     },
     {
       id: "employee" as Role,
       title: "الموظف الإداري",
       description: "إدارة المهام الإدارية وعرض الإعلانات الداخلية",
       icon: UserCog,
-      color: "from-cyan-500 to-cyan-700",
       bgLight: "bg-cyan-50",
       textColor: "text-cyan-700",
-      borderColor: "border-cyan-200",
     },
     {
       id: "student" as Role,
       title: "الطالب",
       description: "الإعلانات والمواد الأكاديمية وتقديم الطلبات",
       icon: BookOpen,
-      color: "from-orange-500 to-orange-700",
       bgLight: "bg-orange-50",
       textColor: "text-orange-700",
-      borderColor: "border-orange-200",
     },
   ];
 
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}
-      <header className="bg-gradient-to-l from-slate-800 to-slate-900 text-white py-8 px-4">
+      <header className="bg-gradient-to-l from-slate-800 to-slate-900 text-white py-6 px-4 sm:py-8">
         <div className="max-w-6xl mx-auto text-center">
-          <div className="flex items-center justify-center gap-3 mb-3">
-            <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center">
-              <GraduationCap className="w-7 h-7" />
+          <div className="flex items-center justify-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/10 rounded-xl flex items-center justify-center">
+              <GraduationCap className="w-5 h-5 sm:w-7 sm:h-7" />
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold">
+            <h1 className="text-xl sm:text-2xl md:text-4xl font-bold">
               نظام إدارة القسم الأكاديمي
             </h1>
           </div>
-          <p className="text-slate-300 text-lg">
+          <p className="text-slate-300 text-sm sm:text-base md:text-lg">
             اختر نوع الحساب للدخول إلى لوحة التحكم الخاصة بك
           </p>
         </div>
       </header>
 
       {/* Cards Grid */}
-      <main className="flex-1 flex items-center justify-center p-6 md:p-12">
+      <main className="flex-1 flex items-center justify-center p-4 sm:p-6 md:p-12">
         <div className="max-w-5xl w-full">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
             {roles.map((role) => {
               const Icon = role.icon;
               return (
                 <Card
                   key={role.id}
-                  className="role-card cursor-pointer border-2 hover:border-transparent overflow-hidden"
+                  className="role-card cursor-pointer border-2 hover:border-transparent overflow-hidden active:scale-[0.98] transition-transform"
                   onClick={() => onSelectRole(role.id)}
                 >
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center gap-3 flex-row-reverse">
+                  <CardHeader className="p-3 sm:p-4 sm:pb-2">
+                    <div className="flex items-center gap-2.5 sm:gap-3 flex-row-reverse">
                       <div
-                        className={`w-12 h-12 rounded-xl flex items-center justify-center ${role.bgLight} ${role.textColor}`}
+                        className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center ${role.bgLight} ${role.textColor}`}
                       >
-                        <Icon className="w-6 h-6" />
+                        <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
                       </div>
-                      <CardTitle className={`text-xl ${role.textColor}`}>
+                      <CardTitle className={`text-base sm:text-xl ${role.textColor}`}>
                         {role.title}
                       </CardTitle>
                     </div>
                   </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground text-sm leading-relaxed">
+                  <CardContent className="p-3 sm:p-4 sm:pt-0">
+                    <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed">
                       {role.description}
                     </p>
-                    <div className="mt-4 flex items-center gap-1 text-sm font-medium text-primary">
+                    <div className="mt-3 sm:mt-4 flex items-center gap-1 text-sm font-medium text-primary">
                       <span>الدخول</span>
                       <ArrowLeft className="w-4 h-4" />
                     </div>
@@ -162,8 +154,8 @@ function LandingPage({ onSelectRole }: { onSelectRole: (role: Role) => void }) {
       </main>
 
       {/* Footer */}
-      <footer className="bg-slate-50 border-t py-4 px-4 mt-auto">
-        <p className="text-center text-sm text-muted-foreground">
+      <footer className="bg-slate-50 border-t py-3 sm:py-4 px-4 mt-auto">
+        <p className="text-center text-xs sm:text-sm text-muted-foreground">
           © ٢٠٢٥ نظام إدارة القسم الأكاديمي - جميع الحقوق محفوظة
         </p>
       </footer>
@@ -185,11 +177,11 @@ function StudentDashboard() {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Urgent Announcements */}
       {urgentAnnouncements.length > 0 && (
-        <div className="bg-red-50 border border-red-200 rounded-xl p-4">
-          <h3 className="text-red-800 font-bold text-lg mb-3 flex items-center gap-2 flex-row-reverse">
+        <div className="bg-red-50 border border-red-200 rounded-xl p-3 sm:p-4">
+          <h3 className="text-red-800 font-bold text-base sm:text-lg mb-3 flex items-center gap-2 flex-row-reverse">
             <Bell className="w-5 h-5" />
             إعلانات عاجلة
           </h3>
@@ -200,13 +192,13 @@ function StudentDashboard() {
                 className="bg-white rounded-lg p-3 border border-red-100"
               >
                 <div className="flex items-start justify-between gap-2">
-                  <h4 className="font-semibold text-red-900">{ann.title}</h4>
-                  <Badge variant="destructive" className="shrink-0">
+                  <h4 className="font-semibold text-red-900 text-sm sm:text-base">{ann.title}</h4>
+                  <Badge variant="destructive" className="shrink-0 text-[10px] sm:text-xs">
                     عاجل
                   </Badge>
                 </div>
-                <p className="text-red-700 text-sm mt-1">{ann.content}</p>
-                <p className="text-red-400 text-xs mt-2">
+                <p className="text-red-700 text-xs sm:text-sm mt-1">{ann.content}</p>
+                <p className="text-red-400 text-[10px] sm:text-xs mt-2">
                   {new Date(ann.createdAt).toLocaleDateString("ar-SA")}
                 </p>
               </div>
@@ -217,51 +209,49 @@ function StudentDashboard() {
 
       {/* Tabs */}
       <Tabs defaultValue="announcements" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="announcements" className="flex items-center gap-1 flex-row-reverse">
-            <Bell className="w-4 h-4" />
-            الإعلانات
-            {studentAnnouncements.length > 0 && (
-              <Badge variant="secondary" className="ms-1 text-xs">
-                {studentAnnouncements.length}
-              </Badge>
-            )}
+        <TabsList className="grid w-full grid-cols-3 h-auto">
+          <TabsTrigger value="announcements" className="flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-1.5 sm:px-3 py-1.5 sm:py-2">
+            <Bell className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <span className="hidden xs:inline">الإعلانات</span>
           </TabsTrigger>
-          <TabsTrigger value="courses" className="flex items-center gap-1 flex-row-reverse">
-            <BookOpen className="w-4 h-4" />
-            المواد الأكاديمية
+          <TabsTrigger value="courses" className="flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-1.5 sm:px-3 py-1.5 sm:py-2">
+            <BookOpen className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <span className="hidden xs:inline">المواد</span>
           </TabsTrigger>
-          <TabsTrigger value="requests" className="flex items-center gap-1 flex-row-reverse">
-            <ClipboardList className="w-4 h-4" />
-            الطلبات
+          <TabsTrigger value="requests" className="flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-1.5 sm:px-3 py-1.5 sm:py-2">
+            <ClipboardList className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <span className="hidden xs:inline">الطلبات</span>
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="announcements" className="mt-4">
+        <TabsContent value="announcements" className="mt-3 sm:mt-4">
           {studentAnnouncements.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">
-              <Bell className="w-12 h-12 mx-auto mb-3 opacity-30" />
-              <p>لا توجد إعلانات حالياً</p>
+            <div className="text-center py-8 sm:py-12 text-muted-foreground">
+              <Bell className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-3 opacity-30" />
+              <p className="text-sm sm:text-base">لا توجد إعلانات حالياً</p>
             </div>
           ) : (
             <div className="space-y-3">
               {studentAnnouncements.map((ann) => (
                 <Card key={ann.id}>
-                  <CardContent className="p-4">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-semibold">{ann.title}</h3>
+                  <CardContent className="p-3 sm:p-4">
+                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-1">
+                          <h3 className="font-semibold text-sm sm:text-base">{ann.title}</h3>
                           <Badge
-                            className={`text-xs ${PRIORITY_COLORS[ann.priority]}`}
+                            className={`text-[10px] sm:text-xs ${PRIORITY_COLORS[ann.priority]}`}
                           >
                             {PRIORITY_LABELS[ann.priority]}
                           </Badge>
+                          <Badge variant="outline" className="text-[10px] sm:text-xs">
+                            {TARGET_ROLE_LABELS[ann.targetRole]}
+                          </Badge>
                         </div>
-                        <p className="text-muted-foreground text-sm leading-relaxed">
+                        <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed">
                           {ann.content}
                         </p>
-                        <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-2 text-[10px] sm:text-xs text-muted-foreground">
                           <span className="flex items-center gap-1 flex-row-reverse">
                             <Calendar className="w-3 h-3" />
                             {new Date(ann.createdAt).toLocaleDateString("ar-SA")}
@@ -280,11 +270,11 @@ function StudentDashboard() {
           )}
         </TabsContent>
 
-        <TabsContent value="courses" className="mt-4">
+        <TabsContent value="courses" className="mt-3 sm:mt-4">
           <AcademicCourses />
         </TabsContent>
 
-        <TabsContent value="requests" className="mt-4">
+        <TabsContent value="requests" className="mt-3 sm:mt-4">
           <StudentRequests />
         </TabsContent>
       </Tabs>
@@ -298,10 +288,10 @@ export default function Home() {
   const [currentRole, setCurrentRole] = useState<Role>("landing");
 
   const roleTitles: Record<string, string> = {
-    hod: "لوحة تحكم رئيس القسم",
-    professor: "لوحة تحكم عضو هيئة التدريس",
-    employee: "لوحة تحكم الموظف الإداري",
-    student: "لوحة تحكم الطالب",
+    hod: "رئيس القسم",
+    professor: "هيئة التدريس",
+    employee: "الموظف الإداري",
+    student: "الطالب",
   };
 
   if (currentRole === "landing") {
@@ -310,30 +300,32 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50">
-      {/* Header */}
+      {/* Header - compact on mobile */}
       <header className="bg-white border-b sticky top-0 z-10">
-        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-slate-800 rounded-lg flex items-center justify-center">
-              <GraduationCap className="w-5 h-5 text-white" />
+        <div className="max-w-6xl mx-auto px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 bg-slate-800 rounded-lg flex items-center justify-center shrink-0">
+              <GraduationCap className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
             </div>
-            <h1 className="text-lg font-bold text-slate-800">
+            <h1 className="text-sm sm:text-lg font-bold text-slate-800 truncate">
               {roleTitles[currentRole]}
             </h1>
           </div>
           <Button
             variant="outline"
+            size="sm"
             onClick={() => setCurrentRole("landing")}
-            className="flex items-center gap-2"
+            className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm shrink-0"
           >
-            <ArrowRight className="w-4 h-4" />
-            العودة للرئيسية
+            <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <span className="hidden sm:inline">العودة للرئيسية</span>
+            <span className="sm:hidden">رجوع</span>
           </Button>
         </div>
       </header>
 
       {/* Dashboard Content */}
-      <main className="flex-1 max-w-6xl mx-auto w-full p-4 md:p-6">
+      <main className="flex-1 max-w-6xl mx-auto w-full p-3 sm:p-4 md:p-6">
         {currentRole === "hod" && <HODDashboard />}
         {currentRole === "professor" && <ProfessorDashboard />}
         {currentRole === "employee" && <EmployeeDashboard />}
@@ -341,8 +333,8 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t py-3 px-4 mt-auto">
-        <p className="text-center text-xs text-muted-foreground">
+      <footer className="bg-white border-t py-2 sm:py-3 px-4 mt-auto">
+        <p className="text-center text-[10px] sm:text-xs text-muted-foreground">
           © ٢٠٢٥ نظام إدارة القسم الأكاديمي
         </p>
       </footer>

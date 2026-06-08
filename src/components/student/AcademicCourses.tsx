@@ -20,6 +20,15 @@ const semesterNames = [
   "الفصل السادس",
 ];
 
+const semesterShortNames = [
+  "الأول",
+  "الثاني",
+  "الثالث",
+  "الرابع",
+  "الخامس",
+  "السادس",
+];
+
 const allCoursesData: Record<number, { name: string; code: string; hours: number }[]> = {
   1: [
     { name: "مقدمة في علوم الحاسب", code: "CS101", hours: 3 },
@@ -198,38 +207,38 @@ export default function AcademicCourses() {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 sm:space-y-4">
       {/* GPA Summary */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-3 gap-2 sm:gap-4">
         <Card>
-          <CardContent className="p-4 text-center">
+          <CardContent className="p-2.5 sm:p-4 text-center">
             <div className="flex items-center justify-center gap-1 mb-1 flex-row-reverse">
-              <Calculator className="w-4 h-4 text-muted-foreground" />
-              <span className="text-xs text-muted-foreground">المعدل الفصلي</span>
+              <Calculator className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-muted-foreground" />
+              <span className="text-[10px] sm:text-xs text-muted-foreground">المعدل الفصلي</span>
             </div>
-            <p className={`text-2xl font-bold ${gpaColor(currentGPA)}`}>
+            <p className={`text-lg sm:text-2xl font-bold ${gpaColor(currentGPA)}`}>
               {currentGPA.toFixed(2)}
             </p>
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="p-4 text-center">
+          <CardContent className="p-2.5 sm:p-4 text-center">
             <div className="flex items-center justify-center gap-1 mb-1 flex-row-reverse">
-              <TrendingUp className="w-4 h-4 text-muted-foreground" />
-              <span className="text-xs text-muted-foreground">المعدل التراكمي</span>
+              <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-muted-foreground" />
+              <span className="text-[10px] sm:text-xs text-muted-foreground">المعدل التراكمي</span>
             </div>
-            <p className={`text-2xl font-bold ${gpaColor(cumulativeGPA)}`}>
+            <p className={`text-lg sm:text-2xl font-bold ${gpaColor(cumulativeGPA)}`}>
               {cumulativeGPA.toFixed(2)}
             </p>
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="p-4 text-center">
+          <CardContent className="p-2.5 sm:p-4 text-center">
             <div className="flex items-center justify-center gap-1 mb-1 flex-row-reverse">
-              <BookOpen className="w-4 h-4 text-muted-foreground" />
-              <span className="text-xs text-muted-foreground">الساعات المكتسبة</span>
+              <BookOpen className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-muted-foreground" />
+              <span className="text-[10px] sm:text-xs text-muted-foreground">الساعات المكتسبة</span>
             </div>
-            <p className="text-2xl font-bold text-slate-800">{passedHours}</p>
+            <p className="text-lg sm:text-2xl font-bold text-slate-800">{passedHours}</p>
           </CardContent>
         </Card>
       </div>
@@ -239,31 +248,32 @@ export default function AcademicCourses() {
         value={String(activeSemester)}
         onValueChange={(v) => setActiveSemester(Number(v))}
       >
-        <TabsList className="grid w-full grid-cols-6 h-auto">
+        <TabsList className="flex w-full overflow-x-auto h-auto">
           {semesterNames.map((name, i) => (
             <TabsTrigger
               key={i}
               value={String(i + 1)}
-              className="text-xs px-2 py-1.5"
+              className="text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 shrink-0 min-w-[80px] sm:min-w-auto"
             >
-              {name}
+              <span className="sm:hidden">{semesterShortNames[i]}</span>
+              <span className="hidden sm:inline">{name}</span>
             </TabsTrigger>
           ))}
         </TabsList>
 
         {semesterNames.map((_, i) => (
-          <TabsContent key={i} value={String(i + 1)} className="mt-4">
+          <TabsContent key={i} value={String(i + 1)} className="mt-3 sm:mt-4">
             <Card>
               <CardContent className="p-0">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
+                <div className="overflow-x-auto -mx-3 sm:mx-0">
+                  <table className="w-full text-xs sm:text-sm min-w-[400px]">
                     <thead>
                       <tr className="border-b bg-slate-50">
-                        <th className="text-right p-3 font-medium">#</th>
-                        <th className="text-right p-3 font-medium">رمز المقرر</th>
-                        <th className="text-right p-3 font-medium">اسم المقرر</th>
-                        <th className="text-right p-3 font-medium text-center">الساعات</th>
-                        <th className="text-right p-3 font-medium text-center">التقدير</th>
+                        <th className="text-right p-2 sm:p-3 font-medium text-[10px] sm:text-xs">#</th>
+                        <th className="text-right p-2 sm:p-3 font-medium text-[10px] sm:text-xs">رمز المقرر</th>
+                        <th className="text-right p-2 sm:p-3 font-medium text-[10px] sm:text-xs">اسم المقرر</th>
+                        <th className="text-right p-2 sm:p-3 font-medium text-[10px] sm:text-xs text-center">الساعات</th>
+                        <th className="text-right p-2 sm:p-3 font-medium text-[10px] sm:text-xs text-center">التقدير</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -274,17 +284,17 @@ export default function AcademicCourses() {
                             key={course.code}
                             className="border-b hover:bg-slate-50 transition-colors"
                           >
-                            <td className="p-3 text-muted-foreground">{j + 1}</td>
-                            <td className="p-3 font-mono text-xs">{course.code}</td>
-                            <td className="p-3">{course.name}</td>
-                            <td className="p-3 text-center">{course.hours}</td>
-                            <td className="p-3 text-center">
+                            <td className="p-2 sm:p-3 text-muted-foreground text-[10px] sm:text-xs">{j + 1}</td>
+                            <td className="p-2 sm:p-3 font-mono text-[10px] sm:text-xs">{course.code}</td>
+                            <td className="p-2 sm:p-3 text-[10px] sm:text-xs">{course.name}</td>
+                            <td className="p-2 sm:p-3 text-center text-[10px] sm:text-xs">{course.hours}</td>
+                            <td className="p-2 sm:p-3 text-center">
                               {grade ? (
-                                <span className={`text-lg ${gradeColorClass(grade)}`}>
+                                <span className={`text-sm sm:text-lg ${gradeColorClass(grade)}`}>
                                   {grade}
                                 </span>
                               ) : (
-                                <span className="text-muted-foreground">—</span>
+                                <span className="text-muted-foreground text-[10px] sm:text-xs">—</span>
                               )}
                             </td>
                           </tr>
@@ -293,10 +303,10 @@ export default function AcademicCourses() {
                     </tbody>
                     <tfoot>
                       <tr className="border-t bg-slate-50 font-medium">
-                        <td colSpan={3} className="p-3">
+                        <td colSpan={3} className="p-2 sm:p-3 text-[10px] sm:text-xs">
                           إجمالي الساعات
                         </td>
-                        <td className="p-3 text-center">
+                        <td className="p-2 sm:p-3 text-center text-[10px] sm:text-xs">
                           {(allCoursesData[i + 1] || []).reduce(
                             (sum, c) => sum + c.hours,
                             0
