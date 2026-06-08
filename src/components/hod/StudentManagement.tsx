@@ -24,7 +24,6 @@ import {
   Award,
   TrendingUp,
   Eye,
-  X,
   Calculator,
 } from 'lucide-react';
 import {

@@ -16,6 +16,8 @@ export interface StudentRequest {
   type: string;
   description: string;
   status: "pending" | "approved" | "rejected";
+  response?: string;
+  reviewedByName?: string;
   createdAt: string;
 }
 

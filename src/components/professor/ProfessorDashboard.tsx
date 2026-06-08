@@ -19,7 +19,6 @@ import {
   TrendingUp,
   BarChart3,
   FileUser,
-  Database,
 } from "lucide-react";
 import {
   useAnnouncements,

@@ -148,6 +148,8 @@ export async function PUT(request: NextRequest) {
         console.error('[student-requests PUT] Supabase error, falling back to local:', error.message || error);
         const updated = studentRequestsStore.update(id, {
           status: status || 'pending',
+          ...(response !== undefined && { response }),
+          ...(reviewed_by_name !== undefined && { reviewedByName: reviewed_by_name }),
         });
         if (updated) return NextResponse.json(updated);
         return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
@@ -162,6 +164,8 @@ export async function PUT(request: NextRequest) {
       // Fall back to local data
       const updated = studentRequestsStore.update(id, {
         status: status || 'pending',
+        ...(response !== undefined && { response }),
+        ...(reviewed_by_name !== undefined && { reviewedByName: reviewed_by_name }),
       });
       if (updated) return NextResponse.json(updated);
       return NextResponse.json({ error: 'فشل تحديث الطلب في قاعدة البيانات' }, { status: 500 });
@@ -172,9 +176,12 @@ export async function PUT(request: NextRequest) {
   }
 
   // Fallback to local data
-  const updated = studentRequestsStore.update(id, {
+  const updates: Record<string, unknown> = {
     status: status || 'pending',
-  });
+  };
+  if (response !== undefined) updates.response = response;
+  if (reviewed_by_name !== undefined) updates.reviewedByName = reviewed_by_name;
+  const updated = studentRequestsStore.update(id, updates);
   if (!updated) {
     return NextResponse.json({ error: 'الطلب غير موجود' }, { status: 404 });
   }

@@ -29,14 +29,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -45,7 +37,6 @@ import {
 import {
   Shield,
   ShieldCheck,
-  ShieldX,
   Plus,
   Trash2,
   UserPlus,
@@ -56,7 +47,6 @@ import {
   Users,
   UserCheck,
   UserX,
-  Eye,
   Megaphone,
   BookOpen,
   ClipboardList,
@@ -64,7 +54,6 @@ import {
   Calendar,
   FileCheck,
   Download,
-  Settings,
   ChevronDown,
   ChevronUp,
   Check,

@@ -262,6 +262,8 @@ function mapStudentRequestRow(row: Record<string, unknown>): StudentRequest {
     type: row.type as string,
     description: row.description as string,
     status: row.status as StudentRequest['status'],
+    response: row.response as string | undefined,
+    reviewedByName: row.reviewed_by_name as string | undefined,
     createdAt: row.created_at as string,
   };
 }
@@ -700,7 +702,8 @@ export async function addStudentRequest(
 export async function updateStudentRequestStatus(
   requestId: string,
   status: 'approved' | 'rejected' | 'pending',
-  response?: string
+  response?: string,
+  reviewedByName?: string
 ) {
   const updatePayload: Record<string, unknown> = {
     id: requestId,
@@ -708,6 +711,9 @@ export async function updateStudentRequestStatus(
   };
   if (response !== undefined) {
     updatePayload.response = response;
+  }
+  if (reviewedByName !== undefined) {
+    updatePayload.reviewed_by_name = reviewedByName;
   }
 
   const result = await apiCall('/api/student-requests', {

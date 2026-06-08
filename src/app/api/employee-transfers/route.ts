@@ -5,6 +5,8 @@ import { employeeTransfersStore, membersStore, genId } from '@/lib/local-data';
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error) return error.message;
   if (typeof error === 'string') return error;
+  if (error && typeof error === 'object' && 'message' in error) return String((error as any).message);
+  if (error && typeof error === 'object' && 'details' in error) return String((error as any).details);
   return 'حدث خطأ غير متوقع';
 }
 
@@ -48,12 +50,12 @@ export async function GET(request: NextRequest) {
       const { data, error } = await query.order('created_at', { ascending: false });
       if (error) throw error;
       return NextResponse.json(data);
-    } catch (error: unknown) {
-      return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
+    } catch (_error: unknown) {
+      // Any error (table not found, network, etc.) → fall back to local data
     }
   }
 
-  // Fallback to local data when Supabase is unavailable
+  // Fallback to local data when Supabase is unavailable or table doesn't exist
   let items = employeeTransfersStore.getAll();
 
   const status = searchParams.get('status');
@@ -121,33 +123,44 @@ export async function PUT(request: NextRequest) {
 
   if (supabase) {
     try {
+      const payload = {
+        ...updateFields,
+        updated_at: new Date().toISOString(),
+      };
+
       const { data, error } = await supabase
         .from('employee_transfers')
-        .update(updateFields)
+        .update(payload)
         .eq('id', id)
-        .select()
-        .single();
+        .select();
 
       if (error) throw error;
 
+      // data might be empty array if RLS prevented the update
+      if (!data || data.length === 0) {
+        return NextResponse.json({ error: 'فشل تحديث طلب التحويل في قاعدة البيانات' }, { status: 500 });
+      }
+
+      const updatedRecord = data[0];
+
       // If approved, update member role
-      if (updateFields.status === 'approved' && data) {
+      if (updateFields.status === 'approved' && updatedRecord) {
         const rankMap: Record<string, string> = {
           'professor': 'أستاذ', 'associate_professor': 'أستاذ مشارك',
           'assistant_professor': 'أستاذ مساعد', 'lecturer': 'محاضر', 'teaching_assistant': 'معيد',
         };
         await supabase.from('members').update({
-          role: 'professor', position: rankMap[data.requested_rank] || 'محاضر',
-        }).eq('id', data.employee_id);
+          role: 'professor', position: rankMap[updatedRecord.requested_rank] || 'محاضر',
+        }).eq('id', updatedRecord.employee_id);
 
         await supabase.from('faculty_profiles').upsert({
-          member_id: data.employee_id, specialization: data.requested_specialization,
-          rank: data.requested_rank, qualification: data.requested_qualification,
+          member_id: updatedRecord.employee_id, specialization: updatedRecord.requested_specialization,
+          rank: updatedRecord.requested_rank, qualification: updatedRecord.requested_qualification,
           bio: '', research_interests: [],
         }, { onConflict: 'member_id' });
       }
 
-      return NextResponse.json(data);
+      return NextResponse.json(updatedRecord);
     } catch (error: unknown) {
       return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
     }

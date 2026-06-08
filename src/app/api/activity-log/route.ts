@@ -4,6 +4,8 @@ import { createClient } from '@/lib/supabase/server';
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error) return error.message;
   if (typeof error === 'string') return error;
+  if (error && typeof error === 'object' && 'message' in error) return String((error as any).message);
+  if (error && typeof error === 'object' && 'details' in error) return String((error as any).details);
   return 'حدث خطأ غير متوقع';
 }
 
@@ -47,8 +49,8 @@ export async function GET(request: NextRequest) {
       const { data, error } = await query;
       if (error) throw error;
       return NextResponse.json(data);
-    } catch (error: unknown) {
-      return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
+    } catch (_error: unknown) {
+      // Any error (table not found, network, etc.) → fall back to in-memory data
     }
   }
 
