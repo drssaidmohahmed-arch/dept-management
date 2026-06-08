@@ -67,9 +67,9 @@ export default function HODDashboard() {
   const stats = useStats();
   const courses = useCourses();
 
-  const handleAddAnnouncement = () => {
+  const handleAddAnnouncement = async () => {
     if (!title.trim() || !content.trim()) return;
-    addAnnouncement({ title: title.trim(), content: content.trim(), priority, targetRole });
+    await addAnnouncement({ title: title.trim(), content: content.trim(), priority, targetRole });
     setTitle("");
     setContent("");
     setPriority("normal");

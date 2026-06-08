@@ -481,11 +481,33 @@ async function fetchStats() {
 
 function showNotification(message: string, isError: boolean = false) {
   if (typeof window !== 'undefined') {
-    // Create toast event for the Toaster component
     const event = new CustomEvent('app-notification', {
       detail: { message, isError }
     });
     window.dispatchEvent(event);
+  }
+}
+
+// ============ API Route Helper ============
+// All write operations (insert/update/delete) go through API routes
+// for reliability. Read operations use the client-side Supabase
+// for realtime subscription support.
+
+async function apiCall(path: string, options?: RequestInit): Promise<{ ok: boolean; data?: any; error?: string }> {
+  try {
+    const res = await fetch(path, {
+      headers: { 'Content-Type': 'application/json' },
+      ...options,
+    });
+    if (!res.ok) {
+      const errBody = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
+      return { ok: false, error: errBody.error || `خطأ في الخادم (${res.status})` };
+    }
+    const data = await res.json().catch(() => null);
+    return { ok: true, data };
+  } catch (err: any) {
+    console.error(`API call failed [${path}]:`, err);
+    return { ok: false, error: err.message || 'فشل الاتصال بالخادم' };
   }
 }
 
@@ -494,16 +516,17 @@ function showNotification(message: string, isError: boolean = false) {
 export async function addAnnouncement(
   announcement: Omit<Announcement, 'id' | 'createdAt'>
 ) {
-  const sb = getSupabase();
-  if (!sb) return;
-  const { error } = await sb.from('announcements').insert({
-    title: announcement.title,
-    content: announcement.content,
-    priority: announcement.priority,
-    target_role: announcement.targetRole,
+  const result = await apiCall('/api/announcements', {
+    method: 'POST',
+    body: JSON.stringify({
+      title: announcement.title,
+      content: announcement.content,
+      priority: announcement.priority,
+      targetRole: announcement.targetRole,
+    }),
   });
-  if (error) {
-    console.error('Error adding announcement:', error);
+  if (!result.ok) {
+    console.error('Error adding announcement:', result.error);
     showNotification('حدث خطأ أثناء إضافة الإعلان', true);
   } else {
     showNotification('تم نشر الإعلان بنجاح');
@@ -511,11 +534,12 @@ export async function addAnnouncement(
 }
 
 export async function deleteAnnouncement(id: string) {
-  const sb = getSupabase();
-  if (!sb) return;
-  const { error } = await sb.from('announcements').delete().eq('id', id);
-  if (error) {
-    console.error('Error deleting announcement:', error);
+  const result = await apiCall('/api/announcements', {
+    method: 'DELETE',
+    body: JSON.stringify({ id }),
+  });
+  if (!result.ok) {
+    console.error('Error deleting announcement:', result.error);
     showNotification('حدث خطأ أثناء حذف الإعلان', true);
   } else {
     showNotification('تم حذف الإعلان بنجاح');
@@ -527,15 +551,15 @@ export async function deleteAnnouncement(id: string) {
 export async function addStudentRequest(
   request: Omit<StudentRequest, 'id' | 'createdAt' | 'status'>
 ) {
-  const sb = getSupabase();
-  if (!sb) return;
-  const { error } = await sb.from('student_requests').insert({
-    type: request.type,
-    description: request.description,
-    status: 'pending',
+  const result = await apiCall('/api/student-requests', {
+    method: 'POST',
+    body: JSON.stringify({
+      type: request.type,
+      description: request.description,
+    }),
   });
-  if (error) {
-    console.error('Error adding student request:', error);
+  if (!result.ok) {
+    console.error('Error adding student request:', result.error);
     showNotification('حدث خطأ أثناء تقديم الطلب', true);
   } else {
     showNotification('تم تقديم الطلب بنجاح');
@@ -543,14 +567,12 @@ export async function addStudentRequest(
 }
 
 export async function deleteStudentRequest(id: string) {
-  const sb = getSupabase();
-  if (!sb) return;
-  const { error } = await sb
-    .from('student_requests')
-    .delete()
-    .eq('id', id);
-  if (error) {
-    console.error('Error deleting student request:', error);
+  const result = await apiCall('/api/student-requests', {
+    method: 'DELETE',
+    body: JSON.stringify({ id }),
+  });
+  if (!result.ok) {
+    console.error('Error deleting student request:', result.error);
     showNotification('حدث خطأ أثناء حذف الطلب', true);
   } else {
     showNotification('تم حذف الطلب بنجاح');
@@ -562,21 +584,20 @@ export async function deleteStudentRequest(id: string) {
 export async function addProfessorRequest(
   request: Omit<ProfessorRequest, 'id' | 'createdAt' | 'status'>
 ) {
-  const sb = getSupabase();
-  if (!sb) return;
-  const { error } = await sb.from('professor_requests').insert({
-    category: request.category,
-    target: request.target,
-    target_student_id: request.targetStudentId ?? null,
-    target_student_name: request.targetStudentName ?? null,
-    subject: request.subject,
-    description: request.description,
-    priority: request.priority,
-    status: 'pending',
-    response: null,
+  const result = await apiCall('/api/professor-requests', {
+    method: 'POST',
+    body: JSON.stringify({
+      category: request.category,
+      target: request.target,
+      target_student_id: request.targetStudentId ?? null,
+      target_student_name: request.targetStudentName ?? null,
+      subject: request.subject,
+      description: request.description,
+      priority: request.priority,
+    }),
   });
-  if (error) {
-    console.error('Error adding professor request:', error);
+  if (!result.ok) {
+    console.error('Error adding professor request:', result.error);
     showNotification('حدث خطأ أثناء تقديم الطلب', true);
   } else {
     showNotification('تم تقديم الطلب بنجاح');
@@ -588,22 +609,20 @@ export async function updateProfessorRequestStatus(
   status: ProfessorRequestStatus,
   response?: string
 ) {
-  const sb = getSupabase();
-  if (!sb) return;
   const updatePayload: Record<string, unknown> = {
+    id: requestId,
     status,
-    updated_at: new Date().toISOString(),
   };
   if (response !== undefined) {
     updatePayload.response = response;
   }
 
-  const { error } = await sb
-    .from('professor_requests')
-    .update(updatePayload)
-    .eq('id', requestId);
-  if (error) {
-    console.error('Error updating professor request status:', error);
+  const result = await apiCall('/api/professor-requests', {
+    method: 'PUT',
+    body: JSON.stringify(updatePayload),
+  });
+  if (!result.ok) {
+    console.error('Error updating professor request status:', result.error);
     showNotification('حدث خطأ أثناء تحديث حالة الطلب', true);
   } else {
     showNotification('تم تحديث حالة الطلب بنجاح');
@@ -611,14 +630,12 @@ export async function updateProfessorRequestStatus(
 }
 
 export async function deleteProfessorRequest(id: string) {
-  const sb = getSupabase();
-  if (!sb) return;
-  const { error } = await sb
-    .from('professor_requests')
-    .delete()
-    .eq('id', id);
-  if (error) {
-    console.error('Error deleting professor request:', error);
+  const result = await apiCall('/api/professor-requests', {
+    method: 'DELETE',
+    body: JSON.stringify({ id }),
+  });
+  if (!result.ok) {
+    console.error('Error deleting professor request:', result.error);
     showNotification('حدث خطأ أثناء حذف الطلب', true);
   } else {
     showNotification('تم حذف الطلب بنجاح');
@@ -630,19 +647,20 @@ export async function deleteProfessorRequest(id: string) {
 export async function addMember(
   member: Omit<DepartmentMember, 'id' | 'joinedAt'>
 ) {
-  const sb = getSupabase();
-  if (!sb) return;
-  const { error } = await sb.from('members').insert({
-    name: member.name,
-    email: member.email,
-    role: member.role,
-    position: member.position,
-    avatar: member.avatar,
-    is_active: member.isActive,
-    permissions: member.permissions,
+  const result = await apiCall('/api/members', {
+    method: 'POST',
+    body: JSON.stringify({
+      name: member.name,
+      email: member.email,
+      role: member.role,
+      position: member.position,
+      avatar: member.avatar,
+      is_active: member.isActive,
+      permissions: member.permissions,
+    }),
   });
-  if (error) {
-    console.error('Error adding member:', error);
+  if (!result.ok) {
+    console.error('Error adding member:', result.error);
     showNotification('حدث خطأ أثناء إضافة العضو', true);
   } else {
     showNotification('تم إضافة العضو بنجاح');
@@ -650,11 +668,12 @@ export async function addMember(
 }
 
 export async function deleteMember(memberId: string) {
-  const sb = getSupabase();
-  if (!sb) return;
-  const { error } = await sb.from('members').delete().eq('id', memberId);
-  if (error) {
-    console.error('Error deleting member:', error);
+  const result = await apiCall('/api/members', {
+    method: 'DELETE',
+    body: JSON.stringify({ id: memberId }),
+  });
+  if (!result.ok) {
+    console.error('Error deleting member:', result.error);
     showNotification('حدث خطأ أثناء حذف العضو', true);
   } else {
     showNotification('تم حذف العضو بنجاح');
@@ -665,21 +684,16 @@ export async function toggleMemberPermission(
   memberId: string,
   permission: PermissionKey
 ) {
-  const sb = getSupabase();
-  if (!sb) return;
-
-  // First fetch current member permissions
-  const { data: member, error: fetchError } = await sb
-    .from('members')
-    .select('permissions')
-    .eq('id', memberId)
-    .single();
-
-  if (fetchError) {
-    console.error('Error fetching member permissions:', fetchError);
+  // First fetch current member permissions via API
+  const fetchResult = await apiCall(`/api/members?role=&status=&search=`);
+  if (!fetchResult.ok) {
+    console.error('Error fetching member permissions:', fetchResult.error);
     return;
   }
 
+  const member = (fetchResult.data || []).find(
+    (m: any) => m.id === memberId
+  );
   const currentPermissions: PermissionKey[] =
     (member?.permissions as PermissionKey[]) || [];
   const hasPermission = currentPermissions.includes(permission);
@@ -687,50 +701,50 @@ export async function toggleMemberPermission(
     ? currentPermissions.filter((p) => p !== permission)
     : [...currentPermissions, permission];
 
-  const { error } = await sb
-    .from('members')
-    .update({ permissions: updatedPermissions })
-    .eq('id', memberId);
+  const result = await apiCall('/api/members', {
+    method: 'PUT',
+    body: JSON.stringify({ id: memberId, permissions: updatedPermissions }),
+  });
 
-  if (error) console.error('Error toggling member permission:', error);
+  if (!result.ok) {
+    console.error('Error toggling member permission:', result.error);
+  }
 }
 
 export async function toggleMemberStatus(memberId: string) {
-  const sb = getSupabase();
-  if (!sb) return;
-
-  // First fetch current member status
-  const { data: member, error: fetchError } = await sb
-    .from('members')
-    .select('is_active')
-    .eq('id', memberId)
-    .single();
-
-  if (fetchError) {
-    console.error('Error fetching member status:', fetchError);
+  // First fetch current member status via API
+  const fetchResult = await apiCall(`/api/members?role=&status=&search=`);
+  if (!fetchResult.ok) {
+    console.error('Error fetching member status:', fetchResult.error);
     return;
   }
 
-  const { error } = await sb
-    .from('members')
-    .update({ is_active: !member?.is_active })
-    .eq('id', memberId);
+  const member = (fetchResult.data || []).find(
+    (m: any) => m.id === memberId
+  );
 
-  if (error) console.error('Error toggling member status:', error);
+  const result = await apiCall('/api/members', {
+    method: 'PUT',
+    body: JSON.stringify({ id: memberId, is_active: !member?.is_active }),
+  });
+
+  if (!result.ok) {
+    console.error('Error toggling member status:', result.error);
+  }
 }
 
 export async function updateMemberPermissions(
   memberId: string,
   permissions: PermissionKey[]
 ) {
-  const sb = getSupabase();
-  if (!sb) return;
-  const { error } = await sb
-    .from('members')
-    .update({ permissions })
-    .eq('id', memberId);
+  const result = await apiCall('/api/members', {
+    method: 'PUT',
+    body: JSON.stringify({ id: memberId, permissions }),
+  });
 
-  if (error) console.error('Error updating member permissions:', error);
+  if (!result.ok) {
+    console.error('Error updating member permissions:', result.error);
+  }
 }
 
 // ============ Utility Functions ============
