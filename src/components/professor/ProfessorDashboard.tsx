@@ -19,6 +19,9 @@ import {
   GraduationCap,
   UserCheck,
   Send,
+  TrendingUp,
+  BarChart3,
+  FileUser,
 } from "lucide-react";
 import {
   useAnnouncements,
@@ -31,6 +34,10 @@ import {
 } from "@/lib/supabase-store";
 import CourseStudentsList from "@/components/professor/CourseStudentsList";
 import ProfessorRequestPanel from "@/components/professor/ProfessorRequestPanel";
+import FacultyProfiles from "@/components/faculty/FacultyProfiles";
+import TeachingSchedule from "@/components/faculty/TeachingSchedule";
+import ProfessionalDevelopment from "@/components/faculty/ProfessionalDevelopment";
+import PerformanceEvaluations from "@/components/faculty/PerformanceEvaluations";
 
 export default function ProfessorDashboard() {
   const announcements = useAnnouncements();
@@ -132,7 +139,7 @@ export default function ProfessorDashboard() {
           </TabsTrigger>
           <TabsTrigger value="schedule" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
             <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
-            <span className="truncate">الجدول</span>
+            <span className="truncate">جدولي التدريسي</span>
           </TabsTrigger>
           <TabsTrigger value="students" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
             <UserCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
@@ -140,7 +147,19 @@ export default function ProfessorDashboard() {
           </TabsTrigger>
           <TabsTrigger value="requests" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
             <Send className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
-            <span className="truncate">طلباتي</span>
+            <span className="truncate">الطلبات</span>
+          </TabsTrigger>
+          <TabsTrigger value="profile" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+            <FileUser className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+            <span className="truncate">الملف الأكاديمي</span>
+          </TabsTrigger>
+          <TabsTrigger value="development" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+            <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+            <span className="truncate">التطوير المهني</span>
+          </TabsTrigger>
+          <TabsTrigger value="evaluations" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+            <BarChart3 className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+            <span className="truncate">تقييم الأداء</span>
           </TabsTrigger>
         </TabsList>
 
@@ -182,69 +201,9 @@ export default function ProfessorDashboard() {
           )}
         </TabsContent>
 
-        {/* Schedule - Card-based on mobile for better readability */}
+        {/* Teaching Schedule Tab */}
         <TabsContent value="schedule" className="mt-3 sm:mt-4">
-          <Card>
-            <CardHeader className="p-3 sm:p-4 sm:pb-2">
-              <CardTitle className="text-sm sm:text-base md:text-lg">الجدول الأسبوعي</CardTitle>
-            </CardHeader>
-            <CardContent className="p-3 sm:p-4 sm:pt-0">
-              {/* Mobile: Card layout */}
-              <div className="sm:hidden space-y-2">
-                {schedule.map((item, i) => (
-                  <div key={i} className="bg-slate-50 rounded-lg p-2.5 border">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="font-medium text-xs sm:text-sm">{item.course}</span>
-                      <Badge variant={item.type === "معمل" ? "secondary" : "outline"} className="text-[10px]">
-                        {item.type}
-                      </Badge>
-                    </div>
-                    <div className="flex items-center justify-between text-[10px] sm:text-xs text-muted-foreground">
-                      <span>{item.day} - {item.room}</span>
-                      <span className="flex items-center gap-0.5 flex-row-reverse">
-                        <Clock className="w-3 h-3" />
-                        {item.time}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              {/* Desktop: Table layout */}
-              <div className="hidden sm:block overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b bg-slate-50">
-                      <th className="text-right p-3 font-medium">اليوم</th>
-                      <th className="text-right p-3 font-medium">الوقت</th>
-                      <th className="text-right p-3 font-medium">المقرر</th>
-                      <th className="text-right p-3 font-medium">القاعة</th>
-                      <th className="text-right p-3 font-medium">النوع</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {schedule.map((item, i) => (
-                      <tr key={i} className="border-b hover:bg-slate-50 transition-colors">
-                        <td className="p-3 font-medium">{item.day}</td>
-                        <td className="p-3">
-                          <span className="flex items-center gap-1 text-xs flex-row-reverse">
-                            <Clock className="w-3 h-3" />
-                            {item.time}
-                          </span>
-                        </td>
-                        <td className="p-3">{item.course}</td>
-                        <td className="p-3">{item.room}</td>
-                        <td className="p-3">
-                          <Badge variant={item.type === "معمل" ? "secondary" : "outline"} className="text-xs">
-                            {item.type}
-                          </Badge>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </CardContent>
-          </Card>
+          <TeachingSchedule />
         </TabsContent>
 
         <TabsContent value="students" className="mt-3 sm:mt-4">
@@ -253,6 +212,21 @@ export default function ProfessorDashboard() {
 
         <TabsContent value="requests" className="mt-3 sm:mt-4">
           <ProfessorRequestPanel />
+        </TabsContent>
+
+        {/* Academic Profile Tab */}
+        <TabsContent value="profile" className="mt-3 sm:mt-4">
+          <FacultyProfiles />
+        </TabsContent>
+
+        {/* Professional Development Tab */}
+        <TabsContent value="development" className="mt-3 sm:mt-4">
+          <ProfessionalDevelopment />
+        </TabsContent>
+
+        {/* Performance Evaluations Tab */}
+        <TabsContent value="evaluations" className="mt-3 sm:mt-4">
+          <PerformanceEvaluations />
         </TabsContent>
       </Tabs>
     </div>

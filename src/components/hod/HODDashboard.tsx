@@ -43,9 +43,27 @@ import {
   Megaphone,
   TrendingUp,
   Shield,
+  UserCheck,
+  UsersRound,
+  LayoutList,
+  Clock,
+  Building2,
+  CalendarDays,
 } from "lucide-react";
 import PermissionsManager from "@/components/hod/PermissionsManager";
 import StudentManagement from "@/components/hod/StudentManagement";
+import FacultyProfiles from "@/components/faculty/FacultyProfiles";
+import TeachingSchedule from "@/components/faculty/TeachingSchedule";
+import PerformanceEvaluations from "@/components/faculty/PerformanceEvaluations";
+import ProfessionalDevelopment from "@/components/faculty/ProfessionalDevelopment";
+import StudentDataManagement from "@/components/student-affairs/StudentDataManagement";
+import AcademicAdvising from "@/components/student-affairs/AcademicAdvising";
+import TrainingAndProjects from "@/components/student-affairs/TrainingAndProjects";
+import StudyPlans from "@/components/courses/StudyPlans";
+import CourseDescriptions from "@/components/courses/CourseDescriptions";
+import CourseSections from "@/components/courses/CourseSections";
+import RoomManagement from "@/components/schedules/RoomManagement";
+import ScheduleView from "@/components/schedules/ScheduleView";
 import {
   useAnnouncements,
   useCourses,
@@ -114,29 +132,93 @@ export default function HODDashboard() {
       </div>
 
       {/* Tabs */}
-      <Tabs defaultValue="announcements" className="w-full">
+      <Tabs defaultValue="home" className="w-full">
         <TabsList className="w-full flex flex-wrap h-auto gap-1 p-1">
+          <TabsTrigger value="home" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+            <BarChart3 className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+            <span className="truncate">الرئيسية</span>
+          </TabsTrigger>
           <TabsTrigger value="announcements" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
             <Bell className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             <span className="truncate">الإعلانات</span>
           </TabsTrigger>
-          <TabsTrigger value="statistics" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
-            <BarChart3 className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
-            <span className="truncate">الإحصائيات</span>
+          <TabsTrigger value="faculty" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+            <UserCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+            <span className="truncate">هيئة التدريس</span>
           </TabsTrigger>
-          <TabsTrigger value="courses" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
-            <BookOpen className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
-            <span className="truncate">المقررات</span>
+          <TabsTrigger value="student-affairs" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+            <UsersRound className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+            <span className="truncate">شؤون الطلاب</span>
+          </TabsTrigger>
+          <TabsTrigger value="curriculum" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+            <LayoutList className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+            <span className="truncate">المقررات والمناهج</span>
+          </TabsTrigger>
+          <TabsTrigger value="scheduling" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+            <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+            <span className="truncate">الجداول والقاعات</span>
           </TabsTrigger>
           <TabsTrigger value="students" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
             <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
-            <span className="truncate">الطلبة</span>
+            <span className="truncate">الطلاب</span>
           </TabsTrigger>
           <TabsTrigger value="permissions" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
             <Shield className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             <span className="truncate">الصلاحيات</span>
           </TabsTrigger>
         </TabsList>
+
+        {/* Home / Overview Tab */}
+        <TabsContent value="home" className="mt-3 sm:mt-4">
+          <Card>
+            <CardHeader className="p-3 sm:p-4 sm:pb-2">
+              <CardTitle className="text-sm sm:text-base md:text-lg">الإحصائيات العامة</CardTitle>
+            </CardHeader>
+            <CardContent className="p-3 sm:p-4 sm:pt-0 md:p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                <div className="space-y-3 sm:space-y-4">
+                  <h3 className="font-semibold text-slate-700 text-sm sm:text-base">توزيع المستخدمين</h3>
+                  <div className="space-y-3">
+                    {[
+                      { label: "أعضاء هيئة التدريس", value: stats.professors, color: "bg-sky-500" },
+                      { label: "الموظفون الإداريون", value: stats.employees, color: "bg-cyan-500" },
+                      { label: "الطلاب", value: stats.students, color: "bg-orange-500" },
+                    ].map((item) => (
+                      <div key={item.label} className="flex items-center justify-between gap-2">
+                        <span className="text-xs sm:text-sm truncate">{item.label}</span>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <div className="w-16 sm:w-24 md:w-32 bg-slate-100 rounded-full h-2 sm:h-2.5">
+                            <div
+                              className={`${item.color} h-2 sm:h-2.5 rounded-full`}
+                              style={{ width: `${(item.value / stats.students) * 100}%` }}
+                            />
+                          </div>
+                          <span className="text-xs sm:text-sm font-medium w-6 text-left">{item.value}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="space-y-3 sm:space-y-4">
+                  <h3 className="font-semibold text-slate-700 text-sm sm:text-base">ملخص</h3>
+                  <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                    {[
+                      { label: "إعلان", value: stats.totalAnnouncements, color: "text-slate-800" },
+                      { label: "طلب", value: stats.totalRequests, color: "text-slate-800" },
+                      { label: "المعدل التراكمي", value: stats.averageGPA.toFixed(2), color: "text-emerald-600" },
+                      { label: "إجمالي المستخدمين", value: stats.professors + stats.employees + stats.students, color: "text-slate-800" },
+                    ].map((item) => (
+                      <div key={item.label} className="bg-slate-50 rounded-lg p-2.5 sm:p-3 text-center">
+                        <p className={`text-lg sm:text-2xl font-bold ${item.color}`}>{item.value}</p>
+                        <p className="text-[10px] sm:text-xs text-muted-foreground">{item.label}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         {/* Announcements Tab */}
         <TabsContent value="announcements" className="mt-3 sm:mt-4">
@@ -270,101 +352,120 @@ export default function HODDashboard() {
           )}
         </TabsContent>
 
-        {/* Statistics Tab */}
-        <TabsContent value="statistics" className="mt-3 sm:mt-4">
-          <Card>
-            <CardHeader className="p-3 sm:p-4 sm:pb-2">
-              <CardTitle className="text-sm sm:text-base md:text-lg">الإحصائيات العامة</CardTitle>
-            </CardHeader>
-            <CardContent className="p-3 sm:p-4 sm:pt-0 md:p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-                <div className="space-y-3 sm:space-y-4">
-                  <h3 className="font-semibold text-slate-700 text-sm sm:text-base">توزيع المستخدمين</h3>
-                  <div className="space-y-3">
-                    {[
-                      { label: "أعضاء هيئة التدريس", value: stats.professors, color: "bg-sky-500" },
-                      { label: "الموظفون الإداريون", value: stats.employees, color: "bg-cyan-500" },
-                      { label: "الطلاب", value: stats.students, color: "bg-orange-500" },
-                    ].map((item) => (
-                      <div key={item.label} className="flex items-center justify-between gap-2">
-                        <span className="text-xs sm:text-sm truncate">{item.label}</span>
-                        <div className="flex items-center gap-2 shrink-0">
-                          <div className="w-16 sm:w-24 md:w-32 bg-slate-100 rounded-full h-2 sm:h-2.5">
-                            <div
-                              className={`${item.color} h-2 sm:h-2.5 rounded-full`}
-                              style={{ width: `${(item.value / stats.students) * 100}%` }}
-                            />
-                          </div>
-                          <span className="text-xs sm:text-sm font-medium w-6 text-left">{item.value}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <div className="space-y-3 sm:space-y-4">
-                  <h3 className="font-semibold text-slate-700 text-sm sm:text-base">ملخص</h3>
-                  <div className="grid grid-cols-2 gap-2 sm:gap-3">
-                    {[
-                      { label: "إعلان", value: stats.totalAnnouncements, color: "text-slate-800" },
-                      { label: "طلب", value: stats.totalRequests, color: "text-slate-800" },
-                      { label: "المعدل التراكمي", value: stats.averageGPA.toFixed(2), color: "text-emerald-600" },
-                      { label: "إجمالي المستخدمين", value: stats.professors + stats.employees + stats.students, color: "text-slate-800" },
-                    ].map((item) => (
-                      <div key={item.label} className="bg-slate-50 rounded-lg p-2.5 sm:p-3 text-center">
-                        <p className={`text-lg sm:text-2xl font-bold ${item.color}`}>{item.value}</p>
-                        <p className="text-[10px] sm:text-xs text-muted-foreground">{item.label}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        {/* Faculty Management Tab with sub-tabs */}
+        <TabsContent value="faculty" className="mt-3 sm:mt-4">
+          <Tabs defaultValue="profiles" className="w-full">
+            <TabsList className="w-full flex flex-wrap h-auto gap-1 p-1 mb-3 sm:mb-4">
+              <TabsTrigger value="profiles" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5">
+                <UserCheck className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
+                <span className="truncate">الملفات الأكاديمية</span>
+              </TabsTrigger>
+              <TabsTrigger value="schedule" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5">
+                <Calendar className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
+                <span className="truncate">الجداول التدريسية</span>
+              </TabsTrigger>
+              <TabsTrigger value="evaluations" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5">
+                <BarChart3 className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
+                <span className="truncate">تقييم الأداء</span>
+              </TabsTrigger>
+              <TabsTrigger value="development" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5">
+                <TrendingUp className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
+                <span className="truncate">التطوير المهني</span>
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="profiles">
+              <FacultyProfiles />
+            </TabsContent>
+            <TabsContent value="schedule">
+              <TeachingSchedule />
+            </TabsContent>
+            <TabsContent value="evaluations">
+              <PerformanceEvaluations />
+            </TabsContent>
+            <TabsContent value="development">
+              <ProfessionalDevelopment />
+            </TabsContent>
+          </Tabs>
         </TabsContent>
 
-        {/* Courses Tab */}
-        <TabsContent value="courses" className="mt-3 sm:mt-4">
-          <Card>
-            <CardHeader className="p-3 sm:p-4 sm:pb-2">
-              <CardTitle className="flex items-center justify-between text-sm sm:text-base md:text-lg">
-                <span>إدارة المقررات الدراسية</span>
-                <Badge variant="secondary" className="text-[10px] sm:text-xs">
-                  {courses.length} مقرر
-                </Badge>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-3 sm:p-4 sm:pt-0">
-              {courses.length === 0 ? (
-                <div className="text-center py-8 sm:py-12 text-muted-foreground">
-                  <BookOpen className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-3 opacity-30" />
-                  <p className="text-sm sm:text-base">لا توجد مقررات حالياً</p>
-                </div>
-              ) : (
-                <div className="overflow-x-auto -mx-3 sm:mx-0">
-                  <table className="w-full text-xs sm:text-sm min-w-[400px]">
-                    <thead>
-                      <tr className="border-b bg-slate-50">
-                        <th className="text-right p-2 sm:p-3 font-medium">الرمز</th>
-                        <th className="text-right p-2 sm:p-3 font-medium">اسم المقرر</th>
-                        <th className="text-right p-2 sm:p-3 font-medium text-center">الساعات</th>
-                        <th className="text-right p-2 sm:p-3 font-medium">الفصل</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {courses.map((course) => (
-                        <tr key={course.id} className="border-b hover:bg-slate-50 transition-colors">
-                          <td className="p-2 sm:p-3 font-mono text-[10px] sm:text-xs">{course.code}</td>
-                          <td className="p-2 sm:p-3 text-xs sm:text-sm">{course.name}</td>
-                          <td className="p-2 sm:p-3 text-center text-xs sm:text-sm">{course.hours}</td>
-                          <td className="p-2 sm:p-3 text-xs sm:text-sm">الفصل {course.semester}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+        {/* Student Affairs Tab with sub-tabs */}
+        <TabsContent value="student-affairs" className="mt-3 sm:mt-4">
+          <Tabs defaultValue="student-data" className="w-full">
+            <TabsList className="w-full flex flex-wrap h-auto gap-1 p-1 mb-3 sm:mb-4">
+              <TabsTrigger value="student-data" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5">
+                <UsersRound className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
+                <span className="truncate">بيانات الطلاب</span>
+              </TabsTrigger>
+              <TabsTrigger value="advising" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5">
+                <GraduationCap className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
+                <span className="truncate">الإرشاد الأكاديمي</span>
+              </TabsTrigger>
+              <TabsTrigger value="training" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5">
+                <ClipboardList className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
+                <span className="truncate">التدريب والمشاريع</span>
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="student-data">
+              <StudentDataManagement />
+            </TabsContent>
+            <TabsContent value="advising">
+              <AcademicAdvising />
+            </TabsContent>
+            <TabsContent value="training">
+              <TrainingAndProjects />
+            </TabsContent>
+          </Tabs>
+        </TabsContent>
+
+        {/* Courses & Curriculum Tab with sub-tabs */}
+        <TabsContent value="curriculum" className="mt-3 sm:mt-4">
+          <Tabs defaultValue="study-plans" className="w-full">
+            <TabsList className="w-full flex flex-wrap h-auto gap-1 p-1 mb-3 sm:mb-4">
+              <TabsTrigger value="study-plans" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5">
+                <LayoutList className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
+                <span className="truncate">الخطط الدراسية</span>
+              </TabsTrigger>
+              <TabsTrigger value="descriptions" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5">
+                <BookOpen className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
+                <span className="truncate">توصيف المقررات</span>
+              </TabsTrigger>
+              <TabsTrigger value="sections" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5">
+                <UserCheck className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
+                <span className="truncate">الشعب الدراسية</span>
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="study-plans">
+              <StudyPlans />
+            </TabsContent>
+            <TabsContent value="descriptions">
+              <CourseDescriptions />
+            </TabsContent>
+            <TabsContent value="sections">
+              <CourseSections />
+            </TabsContent>
+          </Tabs>
+        </TabsContent>
+
+        {/* Scheduling & Rooms Tab with sub-tabs */}
+        <TabsContent value="scheduling" className="mt-3 sm:mt-4">
+          <Tabs defaultValue="rooms" className="w-full">
+            <TabsList className="w-full flex flex-wrap h-auto gap-1 p-1 mb-3 sm:mb-4">
+              <TabsTrigger value="rooms" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5">
+                <Building2 className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
+                <span className="truncate">إدارة القاعات</span>
+              </TabsTrigger>
+              <TabsTrigger value="schedule-view" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5">
+                <CalendarDays className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
+                <span className="truncate">الجدول الدراسي</span>
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="rooms">
+              <RoomManagement />
+            </TabsContent>
+            <TabsContent value="schedule-view">
+              <ScheduleView />
+            </TabsContent>
+          </Tabs>
         </TabsContent>
 
         {/* Students Tab */}

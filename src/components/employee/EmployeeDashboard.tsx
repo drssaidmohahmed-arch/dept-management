@@ -16,6 +16,11 @@ import {
   Clock,
   Circle,
   Calendar,
+  UsersRound,
+  GraduationCap,
+  ClipboardList,
+  UserCheck,
+  Building2,
 } from "lucide-react";
 import {
   useAnnouncements,
@@ -23,6 +28,11 @@ import {
   PRIORITY_COLORS,
   TARGET_ROLE_LABELS,
 } from "@/lib/supabase-store";
+import StudentDataManagement from "@/components/student-affairs/StudentDataManagement";
+import AcademicAdvising from "@/components/student-affairs/AcademicAdvising";
+import TrainingAndProjects from "@/components/student-affairs/TrainingAndProjects";
+import CourseSections from "@/components/courses/CourseSections";
+import RoomManagement from "@/components/schedules/RoomManagement";
 
 export default function EmployeeDashboard() {
   const announcements = useAnnouncements();
@@ -88,7 +98,7 @@ export default function EmployeeDashboard() {
 
       {/* Tabs */}
       <Tabs defaultValue="announcements" className="w-full">
-        <TabsList className="w-full flex h-auto">
+        <TabsList className="w-full flex flex-wrap h-auto gap-1 p-1">
           <TabsTrigger value="announcements" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
             <Bell className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             <span className="truncate">الإعلانات</span>
@@ -96,6 +106,26 @@ export default function EmployeeDashboard() {
           <TabsTrigger value="tasks" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
             <ClipboardCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             <span className="truncate">المهام</span>
+          </TabsTrigger>
+          <TabsTrigger value="student-data" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+            <UsersRound className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+            <span className="truncate">بيانات الطلاب</span>
+          </TabsTrigger>
+          <TabsTrigger value="advising" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+            <GraduationCap className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+            <span className="truncate">الإرشاد الأكاديمي</span>
+          </TabsTrigger>
+          <TabsTrigger value="training" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+            <ClipboardList className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+            <span className="truncate">التدريب والمشاريع</span>
+          </TabsTrigger>
+          <TabsTrigger value="sections" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+            <UserCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+            <span className="truncate">الشعب الدراسية</span>
+          </TabsTrigger>
+          <TabsTrigger value="rooms" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+            <Building2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+            <span className="truncate">إدارة القاعات</span>
           </TabsTrigger>
         </TabsList>
 
@@ -179,6 +209,31 @@ export default function EmployeeDashboard() {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* Student Data Management Tab */}
+        <TabsContent value="student-data" className="mt-3 sm:mt-4">
+          <StudentDataManagement />
+        </TabsContent>
+
+        {/* Academic Advising Tab */}
+        <TabsContent value="advising" className="mt-3 sm:mt-4">
+          <AcademicAdvising />
+        </TabsContent>
+
+        {/* Training & Projects Tab */}
+        <TabsContent value="training" className="mt-3 sm:mt-4">
+          <TrainingAndProjects />
+        </TabsContent>
+
+        {/* Course Sections Tab */}
+        <TabsContent value="sections" className="mt-3 sm:mt-4">
+          <CourseSections />
+        </TabsContent>
+
+        {/* Room Management Tab */}
+        <TabsContent value="rooms" className="mt-3 sm:mt-4">
+          <RoomManagement />
         </TabsContent>
       </Tabs>
     </div>

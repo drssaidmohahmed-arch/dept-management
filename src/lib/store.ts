@@ -262,6 +262,241 @@ export const GRADE_COLORS: Record<string, string> = {
   "ر": "text-red-600 font-bold",
 };
 
+// ============ New Module Types ============
+
+export type StudentStatus = 'active' | 'probation' | 'withdrawn' | 'graduated' | 'suspended';
+export type AcademicRank = 'professor' | 'associate_professor' | 'assistant_professor' | 'lecturer' | 'teaching_assistant';
+export type RoomType = 'lecture_hall' | 'lab' | 'meeting_room' | 'office' | 'tutorial';
+export type SessionType = 'lecture' | 'lab' | 'tutorial';
+export type DayOfWeek = 'saturday' | 'sunday' | 'monday' | 'tuesday' | 'wednesday' | 'thursday';
+export type EvaluationType = 'student_feedback' | 'peer_review' | 'self_assessment' | 'chairman_review';
+export type DevActivityType = 'conference' | 'workshop' | 'training_course' | 'seminar' | 'certification';
+export type DevStatus = 'planned' | 'completed' | 'cancelled';
+export type AdvisingType = 'academic_plan' | 'academic_warning' | 'course_guidance' | 'career_advice' | 'general';
+export type TrainingStatus = 'planned' | 'in_progress' | 'completed' | 'failed';
+export type ProjectType = 'research' | 'software' | 'system' | 'theoretical';
+export type ProjectStatus = 'proposed' | 'approved' | 'in_progress' | 'submitted' | 'defended' | 'passed' | 'failed';
+export type PlanStatus = 'active' | 'draft' | 'archived';
+export type CourseType = 'required' | 'elective' | 'university_requirement' | 'college_requirement';
+export type DescriptionStatus = 'draft' | 'approved' | 'archived';
+export type SectionStatus = 'open' | 'closed' | 'full';
+export type BookingStatus = 'pending' | 'approved' | 'rejected' | 'cancelled';
+
+export interface StudentProfile {
+  id: string;
+  studentId: string;
+  name: string;
+  email?: string;
+  phone?: string;
+  level: number;
+  major: string;
+  gpa: number;
+  cumulativeHours: number;
+  status: StudentStatus;
+  advisorName?: string;
+  enrollmentYear: number;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface FacultyProfile {
+  id: string;
+  memberId: string;
+  specialization?: string;
+  rank: AcademicRank;
+  qualification?: string;
+  grantingUniversity?: string;
+  bio: string;
+  researchInterests: string[];
+  hireDate?: string;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface Room {
+  id: string;
+  name: string;
+  code: string;
+  building: string;
+  floor: number;
+  capacity: number;
+  type: RoomType;
+  equipment: string[];
+  isAvailable: boolean;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface TeachingAssignment {
+  id: string;
+  professorId?: string;
+  professorName: string;
+  courseCode: string;
+  courseName: string;
+  section: number;
+  roomId?: string;
+  roomName: string;
+  day: DayOfWeek;
+  startTime: string;
+  endTime: string;
+  sessionType: SessionType;
+  academicYear: string;
+  semester: number;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface PerformanceEvaluation {
+  id: string;
+  facultyId?: string;
+  facultyName: string;
+  evaluationType: EvaluationType;
+  academicYear: string;
+  semester: number;
+  teachingScore: number;
+  researchScore: number;
+  serviceScore: number;
+  overallScore: number;
+  comments: string;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface ProfessionalDevelopment {
+  id: string;
+  facultyId?: string;
+  facultyName: string;
+  title: string;
+  activityType: DevActivityType;
+  provider: string;
+  location: string;
+  startDate?: string;
+  endDate?: string;
+  hours: number;
+  status: DevStatus;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface AdvisingSession {
+  id: string;
+  studentId: string;
+  studentName: string;
+  advisorId?: string;
+  advisorName: string;
+  sessionDate: string;
+  sessionType: AdvisingType;
+  notes: string;
+  actionItems: string[];
+  followUpDate?: string;
+  createdAt: string;
+}
+
+export interface FieldTraining {
+  id: string;
+  studentId: string;
+  studentName: string;
+  organizationName: string;
+  supervisorName: string;
+  supervisorContact: string;
+  startDate?: string;
+  endDate?: string;
+  trainingField: string;
+  status: TrainingStatus;
+  supervisorRating?: number;
+  advisorRating?: number;
+  reportSubmitted: boolean;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface GraduationProject {
+  id: string;
+  studentId: string;
+  studentName: string;
+  title: string;
+  description: string;
+  supervisorId?: string;
+  supervisorName: string;
+  projectType: ProjectType;
+  status: ProjectStatus;
+  grade?: string;
+  submissionDate?: string;
+  defenseDate?: string;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface StudyPlan {
+  id: string;
+  programName: string;
+  level: number;
+  totalHours: number;
+  description: string;
+  academicYear: string;
+  status: PlanStatus;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface PlanCourse {
+  id: string;
+  planId: string;
+  courseCode: string;
+  semesterOrder: number;
+  courseType: CourseType;
+  prerequisiteCodes: string[];
+  createdAt: string;
+}
+
+export interface CourseDescription {
+  id: string;
+  courseCode: string;
+  description: string;
+  objectives: string[];
+  topics: string[];
+  textbooks: string[];
+  references: string[];
+  assessmentMethod: string;
+  updatedBy: string;
+  version: number;
+  status: DescriptionStatus;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface CourseSection {
+  id: string;
+  courseCode: string;
+  sectionNumber: number;
+  professorName: string;
+  roomId?: string;
+  roomName: string;
+  capacity: number;
+  enrolled: number;
+  scheduleDays: string[];
+  scheduleTime: string;
+  semester: number;
+  academicYear: string;
+  status: SectionStatus;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface RoomBooking {
+  id: string;
+  roomId: string;
+  roomName: string;
+  bookedBy: string;
+  bookingDate: string;
+  startTime: string;
+  endTime: string;
+  purpose: string;
+  status: BookingStatus;
+  createdAt: string;
+  updatedAt?: string;
+}
+
 export interface StoreState {
   announcements: Announcement[];
   studentRequests: StudentRequest[];
@@ -270,6 +505,20 @@ export interface StoreState {
   enrolledStudents: EnrolledStudent[];
   professorCourses: ProfessorCourse[];
   professorRequests: ProfessorRequest[];
+  students: StudentProfile[];
+  facultyProfiles: FacultyProfile[];
+  rooms: Room[];
+  teachingAssignments: TeachingAssignment[];
+  performanceEvaluations: PerformanceEvaluation[];
+  professionalDevelopment: ProfessionalDevelopment[];
+  advisingSessions: AdvisingSession[];
+  fieldTraining: FieldTraining[];
+  graduationProjects: GraduationProject[];
+  studyPlans: StudyPlan[];
+  planCourses: PlanCourse[];
+  courseDescriptions: CourseDescription[];
+  courseSections: CourseSection[];
+  roomBookings: RoomBooking[];
 }
 
 // ============ Constants ============
@@ -306,6 +555,279 @@ export const REQUEST_STATUS_COLORS: Record<string, string> = {
   pending: "bg-yellow-100 text-yellow-800",
   approved: "bg-green-100 text-green-800",
   rejected: "bg-red-100 text-red-800",
+};
+
+// ============ Student Profile Labels & Colors ============
+
+export const STUDENT_PROFILE_STATUS_LABELS: Record<StudentStatus, string> = {
+  active: "نشط",
+  probation: "إنذار أكاديمي",
+  withdrawn: "منسحب",
+  graduated: "متخرج",
+  suspended: "موقوف",
+};
+
+export const STUDENT_PROFILE_STATUS_COLORS: Record<StudentStatus, string> = {
+  active: "bg-emerald-100 text-emerald-800",
+  probation: "bg-amber-100 text-amber-800",
+  withdrawn: "bg-red-100 text-red-800",
+  graduated: "bg-sky-100 text-sky-800",
+  suspended: "bg-slate-100 text-slate-800",
+};
+
+// ============ Academic Rank Labels & Colors ============
+
+export const ACADEMIC_RANK_LABELS: Record<AcademicRank, string> = {
+  professor: "أستاذ",
+  associate_professor: "أستاذ مشارك",
+  assistant_professor: "أستاذ مساعد",
+  lecturer: "محاضر",
+  teaching_assistant: "معيد",
+};
+
+export const ACADEMIC_RANK_COLORS: Record<AcademicRank, string> = {
+  professor: "bg-purple-100 text-purple-800",
+  associate_professor: "bg-violet-100 text-violet-800",
+  assistant_professor: "bg-indigo-100 text-indigo-800",
+  lecturer: "bg-sky-100 text-sky-800",
+  teaching_assistant: "bg-cyan-100 text-cyan-800",
+};
+
+// ============ Room Type Labels & Colors ============
+
+export const ROOM_TYPE_LABELS: Record<RoomType, string> = {
+  lecture_hall: "قاعة محاضرات",
+  lab: "معمل",
+  meeting_room: "قاعة اجتماعات",
+  office: "مكتب",
+  tutorial: "قاعة تعليم",
+};
+
+export const ROOM_TYPE_COLORS: Record<RoomType, string> = {
+  lecture_hall: "bg-blue-100 text-blue-800",
+  lab: "bg-teal-100 text-teal-800",
+  meeting_room: "bg-violet-100 text-violet-800",
+  office: "bg-slate-100 text-slate-800",
+  tutorial: "bg-amber-100 text-amber-800",
+};
+
+// ============ Session Type Labels & Colors ============
+
+export const SESSION_TYPE_LABELS: Record<SessionType, string> = {
+  lecture: "محاضرة",
+  lab: "عملي",
+  tutorial: "تعليمي",
+};
+
+export const SESSION_TYPE_COLORS: Record<SessionType, string> = {
+  lecture: "bg-sky-100 text-sky-800",
+  lab: "bg-teal-100 text-teal-800",
+  tutorial: "bg-amber-100 text-amber-800",
+};
+
+// ============ Day of Week Labels ============
+
+export const DAY_OF_WEEK_LABELS: Record<DayOfWeek, string> = {
+  saturday: "السبت",
+  sunday: "الأحد",
+  monday: "الاثنين",
+  tuesday: "الثلاثاء",
+  wednesday: "الأربعاء",
+  thursday: "الخميس",
+};
+
+// ============ Evaluation Type Labels & Colors ============
+
+export const EVALUATION_TYPE_LABELS: Record<EvaluationType, string> = {
+  student_feedback: "تقييم الطلاب",
+  peer_review: "تقييم الزملاء",
+  self_assessment: "تقييم ذاتي",
+  chairman_review: "تقييم رئيس القسم",
+};
+
+export const EVALUATION_TYPE_COLORS: Record<EvaluationType, string> = {
+  student_feedback: "bg-sky-100 text-sky-800",
+  peer_review: "bg-violet-100 text-violet-800",
+  self_assessment: "bg-amber-100 text-amber-800",
+  chairman_review: "bg-purple-100 text-purple-800",
+};
+
+// ============ Development Activity Type Labels & Colors ============
+
+export const DEV_ACTIVITY_TYPE_LABELS: Record<DevActivityType, string> = {
+  conference: "مؤتمر",
+  workshop: "ورشة عمل",
+  training_course: "دورة تدريبية",
+  seminar: "ندوة",
+  certification: "شهادة احترافية",
+};
+
+export const DEV_ACTIVITY_TYPE_COLORS: Record<DevActivityType, string> = {
+  conference: "bg-violet-100 text-violet-800",
+  workshop: "bg-sky-100 text-sky-800",
+  training_course: "bg-teal-100 text-teal-800",
+  seminar: "bg-amber-100 text-amber-800",
+  certification: "bg-emerald-100 text-emerald-800",
+};
+
+// ============ Development Status Labels & Colors ============
+
+export const DEV_STATUS_LABELS: Record<DevStatus, string> = {
+  planned: "مخطط",
+  completed: "مكتمل",
+  cancelled: "ملغى",
+};
+
+export const DEV_STATUS_COLORS: Record<DevStatus, string> = {
+  planned: "bg-sky-100 text-sky-800",
+  completed: "bg-emerald-100 text-emerald-800",
+  cancelled: "bg-red-100 text-red-800",
+};
+
+// ============ Advising Type Labels & Colors ============
+
+export const ADVISING_TYPE_LABELS: Record<AdvisingType, string> = {
+  academic_plan: "خطة دراسية",
+  academic_warning: "إنذار أكاديمي",
+  course_guidance: "إرشاد مقررات",
+  career_advice: "نصيحة مهنية",
+  general: "عام",
+};
+
+export const ADVISING_TYPE_COLORS: Record<AdvisingType, string> = {
+  academic_plan: "bg-sky-100 text-sky-800",
+  academic_warning: "bg-red-100 text-red-800",
+  course_guidance: "bg-emerald-100 text-emerald-800",
+  career_advice: "bg-violet-100 text-violet-800",
+  general: "bg-slate-100 text-slate-800",
+};
+
+// ============ Training Status Labels & Colors ============
+
+export const TRAINING_STATUS_LABELS: Record<TrainingStatus, string> = {
+  planned: "مخطط",
+  in_progress: "قيد التنفيذ",
+  completed: "مكتمل",
+  failed: "لم ينجح",
+};
+
+export const TRAINING_STATUS_COLORS: Record<TrainingStatus, string> = {
+  planned: "bg-sky-100 text-sky-800",
+  in_progress: "bg-amber-100 text-amber-800",
+  completed: "bg-emerald-100 text-emerald-800",
+  failed: "bg-red-100 text-red-800",
+};
+
+// ============ Project Type Labels & Colors ============
+
+export const PROJECT_TYPE_LABELS: Record<ProjectType, string> = {
+  research: "بحثي",
+  software: "برمجي",
+  system: "نظم",
+  theoretical: "نظري",
+};
+
+export const PROJECT_TYPE_COLORS: Record<ProjectType, string> = {
+  research: "bg-violet-100 text-violet-800",
+  software: "bg-sky-100 text-sky-800",
+  system: "bg-teal-100 text-teal-800",
+  theoretical: "bg-amber-100 text-amber-800",
+};
+
+// ============ Project Status Labels & Colors ============
+
+export const PROJECT_STATUS_LABELS: Record<ProjectStatus, string> = {
+  proposed: "مقترح",
+  approved: "معتمد",
+  in_progress: "قيد التنفيذ",
+  submitted: "مقدم",
+  defended: "مدافع عنه",
+  passed: "ناجح",
+  failed: "راسب",
+};
+
+export const PROJECT_STATUS_COLORS: Record<ProjectStatus, string> = {
+  proposed: "bg-slate-100 text-slate-800",
+  approved: "bg-sky-100 text-sky-800",
+  in_progress: "bg-amber-100 text-amber-800",
+  submitted: "bg-violet-100 text-violet-800",
+  defended: "bg-teal-100 text-teal-800",
+  passed: "bg-emerald-100 text-emerald-800",
+  failed: "bg-red-100 text-red-800",
+};
+
+// ============ Plan Status Labels & Colors ============
+
+export const PLAN_STATUS_LABELS: Record<PlanStatus, string> = {
+  active: "نشط",
+  draft: "مسودة",
+  archived: "مؤرشف",
+};
+
+export const PLAN_STATUS_COLORS: Record<PlanStatus, string> = {
+  active: "bg-emerald-100 text-emerald-800",
+  draft: "bg-amber-100 text-amber-800",
+  archived: "bg-slate-100 text-slate-800",
+};
+
+// ============ Course Type Labels & Colors ============
+
+export const COURSE_TYPE_LABELS: Record<CourseType, string> = {
+  required: "إجباري",
+  elective: "اختياري",
+  university_requirement: "متطلب جامعي",
+  college_requirement: "متطلب كلية",
+};
+
+export const COURSE_TYPE_COLORS: Record<CourseType, string> = {
+  required: "bg-sky-100 text-sky-800",
+  elective: "bg-violet-100 text-violet-800",
+  university_requirement: "bg-amber-100 text-amber-800",
+  college_requirement: "bg-teal-100 text-teal-800",
+};
+
+// ============ Description Status Labels & Colors ============
+
+export const DESCRIPTION_STATUS_LABELS: Record<DescriptionStatus, string> = {
+  draft: "مسودة",
+  approved: "معتمد",
+  archived: "مؤرشف",
+};
+
+export const DESCRIPTION_STATUS_COLORS: Record<DescriptionStatus, string> = {
+  draft: "bg-amber-100 text-amber-800",
+  approved: "bg-emerald-100 text-emerald-800",
+  archived: "bg-slate-100 text-slate-800",
+};
+
+// ============ Section Status Labels & Colors ============
+
+export const SECTION_STATUS_LABELS: Record<SectionStatus, string> = {
+  open: "مفتوح",
+  closed: "مغلق",
+  full: "مكتمل",
+};
+
+export const SECTION_STATUS_COLORS: Record<SectionStatus, string> = {
+  open: "bg-emerald-100 text-emerald-800",
+  closed: "bg-red-100 text-red-800",
+  full: "bg-amber-100 text-amber-800",
+};
+
+// ============ Booking Status Labels & Colors ============
+
+export const BOOKING_STATUS_LABELS: Record<BookingStatus, string> = {
+  pending: "قيد الانتظار",
+  approved: "مقبول",
+  rejected: "مرفوض",
+  cancelled: "ملغى",
+};
+
+export const BOOKING_STATUS_COLORS: Record<BookingStatus, string> = {
+  pending: "bg-yellow-100 text-yellow-800",
+  approved: "bg-green-100 text-green-800",
+  rejected: "bg-red-100 text-red-800",
+  cancelled: "bg-slate-100 text-slate-800",
 };
 
 // ============ Mock Data ============
@@ -596,6 +1118,20 @@ let state: StoreState = {
   enrolledStudents: initialEnrolledStudents,
   professorCourses: initialProfessorCourses,
   professorRequests: initialProfessorRequests,
+  students: [],
+  facultyProfiles: [],
+  rooms: [],
+  teachingAssignments: [],
+  performanceEvaluations: [],
+  professionalDevelopment: [],
+  advisingSessions: [],
+  fieldTraining: [],
+  graduationProjects: [],
+  studyPlans: [],
+  planCourses: [],
+  courseDescriptions: [],
+  courseSections: [],
+  roomBookings: [],
 };
 
 const listeners = new Set<() => void>();
