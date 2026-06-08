@@ -18,6 +18,8 @@ export type {
   ProfessorRequestStatus,
   EnrolledStudent,
   ProfessorCourse,
+  EmployeeTransfer,
+  TransferStatus,
   StoreState,
 } from './store';
 
@@ -44,6 +46,9 @@ export {
   REQUEST_STATUS_COLORS,
   MAX_CREDIT_HOURS_PER_SEMESTER,
   REGISTRATION_SEMESTER,
+  TRANSFER_STATUS_LABELS,
+  TRANSFER_STATUS_COLORS,
+  ACADEMIC_RANK_OPTIONS,
 } from './store';
 
 // Import types for local use (these are already re-exported above)
@@ -100,6 +105,7 @@ const tableCache: Record<string, unknown[]> = {
   professor_courses: EMPTY_ARRAY,
   enrolled_students: EMPTY_ARRAY,
   courses: EMPTY_ARRAY,
+  employee_transfers: EMPTY_ARRAY,
 };
 
 // Module-level listener sets: table name → set of callbacks
@@ -204,6 +210,7 @@ const SUPABASE_TABLES = [
   'professor_courses',
   'enrolled_students',
   'courses',
+  'employee_transfers',
 ];
 
 for (const table of SUPABASE_TABLES) {
@@ -299,6 +306,27 @@ function mapCourseRow(row: Record<string, unknown>): Course {
     hours: row.hours as number,
     grade: row.grade as string | undefined,
     semester: row.semester as number,
+  };
+}
+
+function mapTransferRow(row: Record<string, unknown>): import('./store').EmployeeTransfer {
+  return {
+    id: row.id as string,
+    employeeId: row.employee_id as string,
+    employeeName: row.employee_name as string,
+    currentPosition: row.current_position as string,
+    requestedRank: row.requested_rank as string,
+    requestedSpecialization: row.requested_specialization as string,
+    requestedQualification: row.requested_qualification as string,
+    coursesToTeach: (row.courses_to_teach as string[]) || [],
+    reason: row.reason as string,
+    supportingDocs: (row.supporting_docs as string[]) || [],
+    status: row.status as import('./store').EmployeeTransfer['status'],
+    reviewedBy: row.reviewed_by as string | undefined,
+    reviewedByName: row.reviewed_by_name as string | undefined,
+    reviewNotes: row.review_notes as string | undefined,
+    createdAt: row.created_at as string,
+    updatedAt: row.updated_at as string | undefined,
   };
 }
 
@@ -400,6 +428,20 @@ export function useCourses(): Course[] {
   );
 
   return raw.map(mapCourseRow);
+}
+
+export function useTransfers(): import('./store').EmployeeTransfer[] {
+  const subscribeFn = useCallback(
+    (listener: () => void) => subscribeToTable('employee_transfers', listener),
+    []
+  );
+
+  const raw = useSyncExternalStore(
+    subscribeFn,
+    () => getTableSnapshot<Record<string, unknown>>('employee_transfers')
+  );
+
+  return raw.map(mapTransferRow);
 }
 
 // ============ Stats ============
@@ -868,6 +910,72 @@ export async function deleteEnrollment(id: string) {
     showNotification('حدث خطأ أثناء إلغاء التسجيل', true);
   } else {
     showNotification('تم إلغاء التسجيل من المقرر بنجاح');
+  }
+  return result;
+}
+
+// ============ Employee Transfer Actions ============
+
+export async function addTransferRequest(transfer: {
+  employee_id: string;
+  employee_name: string;
+  current_position: string;
+  requested_rank: string;
+  requested_specialization: string;
+  requested_qualification: string;
+  courses_to_teach: string[];
+  reason: string;
+}) {
+  const result = await apiCall('/api/employee-transfers', {
+    method: 'POST',
+    body: JSON.stringify(transfer),
+  });
+  if (!result.ok) {
+    console.error('Error adding transfer request:', result.error);
+    showNotification('حدث خطأ أثناء تقديم طلب التحويل', true);
+  } else {
+    showNotification('تم تقديم طلب التحويل بنجاح');
+  }
+  return result;
+}
+
+export async function updateTransferStatus(
+  transferId: string,
+  status: string,
+  reviewedByName?: string,
+  reviewNotes?: string
+) {
+  const body: Record<string, unknown> = {
+    id: transferId,
+    status,
+  };
+  if (reviewedByName !== undefined) body.reviewed_by_name = reviewedByName;
+  if (reviewNotes !== undefined) body.review_notes = reviewNotes;
+
+  const result = await apiCall('/api/employee-transfers', {
+    method: 'PUT',
+    body: JSON.stringify(body),
+  });
+  if (!result.ok) {
+    console.error('Error updating transfer status:', result.error);
+    showNotification('حدث خطأ أثناء تحديث حالة الطلب', true);
+  } else {
+    const statusMsg = status === 'approved' ? 'تم قبول طلب التحويل وتحديث بيانات العضو' : status === 'rejected' ? 'تم رفض طلب التحويل' : 'تم تحديث حالة الطلب';
+    showNotification(statusMsg);
+  }
+  return result;
+}
+
+export async function cancelTransfer(transferId: string) {
+  const result = await apiCall('/api/employee-transfers', {
+    method: 'PUT',
+    body: JSON.stringify({ id: transferId, status: 'cancelled' }),
+  });
+  if (!result.ok) {
+    console.error('Error cancelling transfer:', result.error);
+    showNotification('حدث خطأ أثناء إلغاء الطلب', true);
+  } else {
+    showNotification('تم إلغاء طلب التحويل');
   }
   return result;
 }

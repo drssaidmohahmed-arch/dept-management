@@ -16,6 +16,7 @@ import {
   ArrowLeft,
   ArrowRight,
   Database,
+  UserCog,
 } from "lucide-react";
 import HODDashboard from "@/components/hod/HODDashboard";
 import ProfessorDashboard from "@/components/professor/ProfessorDashboard";
@@ -46,9 +47,9 @@ function LandingPage({ onSelectRole }: { onSelectRole: (role: Role) => void }) {
     },
     {
       id: "employee" as Role,
-      title: "رئيس القسم",
-      description: "إدارة القسم والطلبات وشؤون أعضاء هيئة التدريس",
-      icon: Crown,
+      title: "الموظف الإداري",
+      description: "إدارة العمليات الإدارية وتقديم طلبات التحويل",
+      icon: UserCog,
       bgLight: "bg-indigo-50",
       textColor: "text-indigo-700",
     },
@@ -139,7 +140,7 @@ export default function Home() {
   const roleTitles: Record<string, string> = {
     hod: "رئيس القسم",
     professor: "هيئة التدريس",
-    employee: "رئيس القسم",
+    employee: "الموظف الإداري",
     student: "الطالب",
   };
 

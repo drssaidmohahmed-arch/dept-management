@@ -22,8 +22,10 @@ import {
   UserCog,
   Building2,
   ListChecks,
-  Crown,
+  UserCog as UserCogIcon,
+  ArrowRightLeft,
 } from "lucide-react";
+import EmployeeTransferRequest from "@/components/employee/EmployeeTransferRequest";
 import {
   useAnnouncements,
   PRIORITY_LABELS,
@@ -61,11 +63,11 @@ export default function EmployeeDashboard() {
         <div className="relative z-10">
           <div className="flex items-center gap-2.5 sm:gap-3">
             <div className="w-9 h-9 sm:w-11 sm:h-11 bg-white/15 backdrop-blur-sm rounded-xl flex items-center justify-center">
-              <Crown className="w-4.5 h-4.5 sm:w-6 sm:h-6" />
+              <UserCogIcon className="w-4.5 h-4.5 sm:w-6 sm:h-6" />
             </div>
             <div>
-              <h2 className="text-base sm:text-xl md:text-2xl font-bold">لوحة تحكم رئيس القسم</h2>
-              <p className="text-indigo-200 text-[10px] sm:text-xs">إدارة القسم والعمليات الأكاديمية</p>
+              <h2 className="text-base sm:text-xl md:text-2xl font-bold">لوحة تحكم الموظف الإداري</h2>
+              <p className="text-indigo-200 text-[10px] sm:text-xs">إدارة العمليات الإدارية والأكاديمية</p>
             </div>
           </div>
         </div>
@@ -131,6 +133,10 @@ export default function EmployeeDashboard() {
           <TabsTrigger value="rooms" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
             <Building2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             <span className="truncate">إدارة القاعات</span>
+          </TabsTrigger>
+          <TabsTrigger value="transfer" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
+            <ArrowRightLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+            <span className="truncate">طلب تحويل</span>
           </TabsTrigger>
         </TabsList>
 
@@ -262,6 +268,10 @@ export default function EmployeeDashboard() {
 
         <TabsContent value="rooms" className="mt-3 sm:mt-4">
           <RoomManagement />
+        </TabsContent>
+
+        <TabsContent value="transfer" className="mt-3 sm:mt-4">
+          <EmployeeTransferRequest />
         </TabsContent>
       </Tabs>
     </div>

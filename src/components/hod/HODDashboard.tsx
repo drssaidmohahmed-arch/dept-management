@@ -54,11 +54,9 @@ import {
   CheckCircle2,
   AlertTriangle,
   Crown,
+  ArrowRightLeft,
 } from "lucide-react";
 import DepartmentRequestManager from "@/components/shared/DepartmentRequestManager";
-import PermissionsManager from "@/components/hod/PermissionsManager";
-import StudentManagement from "@/components/hod/StudentManagement";
-import FacultyProfiles from "@/components/faculty/FacultyProfiles";
 import TeachingSchedule from "@/components/faculty/TeachingSchedule";
 import PerformanceEvaluations from "@/components/faculty/PerformanceEvaluations";
 import ProfessionalDevelopment from "@/components/faculty/ProfessionalDevelopment";
@@ -70,6 +68,10 @@ import CourseDescriptions from "@/components/courses/CourseDescriptions";
 import CourseSections from "@/components/courses/CourseSections";
 import RoomManagement from "@/components/schedules/RoomManagement";
 import ScheduleView from "@/components/schedules/ScheduleView";
+import TransferManagement from "@/components/hod/TransferManagement";
+import PermissionsManager from "@/components/hod/PermissionsManager";
+import StudentManagement from "@/components/hod/StudentManagement";
+import FacultyProfiles from "@/components/faculty/FacultyProfiles";
 import {
   useAnnouncements,
   useCourses,
@@ -79,6 +81,7 @@ import {
   PRIORITY_COLORS,
   TARGET_ROLE_LABELS,
   useStats,
+  useTransfers,
 } from "@/lib/supabase-store";
 
 function useMigrationStatus() {
@@ -111,6 +114,7 @@ export default function HODDashboard() {
   const announcements = useAnnouncements();
   const stats = useStats();
   const courses = useCourses();
+  const transfers = useTransfers();
   const { migrated } = useMigrationStatus();
 
   const handleAddAnnouncement = async () => {
@@ -130,6 +134,7 @@ export default function HODDashboard() {
     { label: "الطلاب", value: stats.students, icon: BookOpen, color: "bg-orange-50 text-orange-700" },
     { label: "الطلبات", value: stats.totalRequests, icon: ClipboardList, color: "bg-purple-50 text-purple-700" },
     { label: "المعدل", value: stats.averageGPA, icon: TrendingUp, color: "bg-rose-50 text-rose-700", isDecimal: true },
+    { label: "التحويلات", value: transfers.length, icon: ArrowRightLeft, color: "bg-violet-50 text-violet-700" },
   ];
 
   return (
@@ -237,6 +242,10 @@ export default function HODDashboard() {
           <TabsTrigger value="requests" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
             <ClipboardList className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             <span className="truncate">الطلبات</span>
+          </TabsTrigger>
+          <TabsTrigger value="transfers" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
+            <ArrowRightLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+            <span className="truncate">التحويلات</span>
           </TabsTrigger>
           <TabsTrigger value="permissions" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
             <Shield className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
@@ -557,6 +566,11 @@ export default function HODDashboard() {
         {/* Requests Tab */}
         <TabsContent value="requests" className="mt-3 sm:mt-4">
           <DepartmentRequestManager />
+        </TabsContent>
+
+        {/* Transfers Tab */}
+        <TabsContent value="transfers" className="mt-3 sm:mt-4">
+          <TransferManagement />
         </TabsContent>
 
         {/* Permissions Tab */}
