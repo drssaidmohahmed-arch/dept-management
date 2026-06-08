@@ -1,0 +1,14 @@
+name: Force Vercel Redeploy
+on:
+  workflow_dispatch:
+  
+jobs:
+  redeploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Vercel Redeploy
+        run: |
+          curl -X POST "https://api.vercel.com/v13/deployments" \
+            -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{"name":"dept-management","gitSource":{"type":"github","repoId":"${{ github.repository }}","ref":"main"}}'
