@@ -55,6 +55,7 @@ import {
   AlertTriangle,
   Crown,
 } from "lucide-react";
+import DepartmentRequestManager from "@/components/shared/DepartmentRequestManager";
 import PermissionsManager from "@/components/hod/PermissionsManager";
 import StudentManagement from "@/components/hod/StudentManagement";
 import FacultyProfiles from "@/components/faculty/FacultyProfiles";
@@ -232,6 +233,10 @@ export default function HODDashboard() {
           <TabsTrigger value="students" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
             <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             <span className="truncate">الطلاب</span>
+          </TabsTrigger>
+          <TabsTrigger value="requests" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
+            <ClipboardList className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+            <span className="truncate">الطلبات</span>
           </TabsTrigger>
           <TabsTrigger value="permissions" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
             <Shield className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
@@ -547,6 +552,11 @@ export default function HODDashboard() {
         {/* Students Tab */}
         <TabsContent value="students" className="mt-3 sm:mt-4">
           <StudentManagement />
+        </TabsContent>
+
+        {/* Requests Tab */}
+        <TabsContent value="requests" className="mt-3 sm:mt-4">
+          <DepartmentRequestManager />
         </TabsContent>
 
         {/* Permissions Tab */}

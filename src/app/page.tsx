@@ -12,7 +12,6 @@ import Link from "next/link";
 import {
   Crown,
   GraduationCap,
-  UserCog,
   BookOpen,
   ArrowLeft,
   ArrowRight,
@@ -47,11 +46,11 @@ function LandingPage({ onSelectRole }: { onSelectRole: (role: Role) => void }) {
     },
     {
       id: "employee" as Role,
-      title: "الموظف الإداري",
-      description: "إدارة المهام الإدارية وعرض الإعلانات الداخلية",
-      icon: UserCog,
-      bgLight: "bg-cyan-50",
-      textColor: "text-cyan-700",
+      title: "رئيس القسم",
+      description: "إدارة القسم والطلبات وشؤون أعضاء هيئة التدريس",
+      icon: Crown,
+      bgLight: "bg-indigo-50",
+      textColor: "text-indigo-700",
     },
     {
       id: "student" as Role,
@@ -140,7 +139,7 @@ export default function Home() {
   const roleTitles: Record<string, string> = {
     hod: "رئيس القسم",
     professor: "هيئة التدريس",
-    employee: "الموظف الإداري",
+    employee: "رئيس القسم",
     student: "الطالب",
   };
 
