@@ -48,19 +48,18 @@ export async function POST(request: NextRequest) {
 
     const {
       faculty_id,
+      faculty_name,
       activity_type,
       title,
-      description,
       provider,
+      location,
       start_date,
       end_date,
       status,
       hours,
-      certificate_url,
-      notes,
     } = body;
 
-    if (!faculty_id || !activity_type || !title) {
+    if (!faculty_id || !faculty_name || !activity_type || !title) {
       return NextResponse.json(
         { error: 'البيانات المطلوبة غير مكتملة' },
         { status: 400 }
@@ -71,16 +70,15 @@ export async function POST(request: NextRequest) {
       .from('professional_development')
       .insert({
         faculty_id,
+        faculty_name,
         activity_type,
         title,
-        description: description || '',
         provider: provider || '',
+        location: location || '',
         start_date: start_date || null,
         end_date: end_date || null,
         status: status || 'planned',
         hours: hours ?? 0,
-        certificate_url: certificate_url || '',
-        notes: notes || '',
       })
       .select()
       .single();

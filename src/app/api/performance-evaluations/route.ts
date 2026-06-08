@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
       query = query.eq('academic_year', academicYear);
     }
 
-    const { data, error } = await query.order('evaluation_date', { ascending: false });
+    const { data, error } = await query.order('created_at', { ascending: false });
 
     if (error) throw error;
     return NextResponse.json(data);
@@ -54,15 +54,15 @@ export async function POST(request: NextRequest) {
 
     const {
       faculty_id,
-      evaluator_id,
+      faculty_name,
       evaluation_type,
-      semester,
       academic_year,
+      semester,
+      teaching_score,
+      research_score,
+      service_score,
       overall_score,
       comments,
-      recommendations,
-      criteria_scores,
-      evaluation_date,
     } = body;
 
     if (!faculty_id || !evaluation_type || !semester || !academic_year) {
@@ -76,15 +76,15 @@ export async function POST(request: NextRequest) {
       .from('performance_evaluations')
       .insert({
         faculty_id,
-        evaluator_id: evaluator_id || null,
+        faculty_name: faculty_name || '',
         evaluation_type,
-        semester: Number(semester),
         academic_year,
+        semester: Number(semester),
+        teaching_score: teaching_score ?? 0,
+        research_score: research_score ?? 0,
+        service_score: service_score ?? 0,
         overall_score: overall_score ?? 0,
         comments: comments || '',
-        recommendations: recommendations || '',
-        criteria_scores: criteria_scores || {},
-        evaluation_date: evaluation_date || new Date().toISOString(),
       })
       .select()
       .single();

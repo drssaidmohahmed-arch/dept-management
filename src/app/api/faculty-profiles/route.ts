@@ -30,16 +30,16 @@ export async function GET(request: NextRequest) {
       query = query.eq('rank', rank);
     }
 
-    // Search by name or specialization (sanitized)
+    // Search by specialization (sanitized)
     const search = searchParams.get('search');
     if (search) {
       const sanitized = sanitizeSearchInput(search);
       if (sanitized) {
-        query = query.or(`name.ilike.%${sanitized}%,specialization.ilike.%${sanitized}%`);
+        query = query.ilike('specialization', `%${sanitized}%`);
       }
     }
 
-    const { data, error } = await query.order('name', { ascending: true });
+    const { data, error } = await query.order('created_at', { ascending: false });
 
     if (error) throw error;
     return NextResponse.json(data);
@@ -55,18 +55,16 @@ export async function POST(request: NextRequest) {
 
     const {
       member_id,
-      name,
       rank,
       specialization,
-      department,
-      email,
-      phone,
+      qualification,
+      granting_university,
       bio,
-      office,
-      is_active,
+      research_interests,
+      hire_date,
     } = body;
 
-    if (!member_id || !name) {
+    if (!member_id) {
       return NextResponse.json(
         { error: 'البيانات المطلوبة غير مكتملة' },
         { status: 400 }
@@ -77,15 +75,13 @@ export async function POST(request: NextRequest) {
       .from('faculty_profiles')
       .insert({
         member_id,
-        name,
         rank: rank || 'assistant_professor',
         specialization: specialization || '',
-        department: department || '',
-        email: email || '',
-        phone: phone || '',
+        qualification: qualification || '',
+        granting_university: granting_university || '',
         bio: bio || '',
-        office: office || '',
-        is_active: is_active !== undefined ? is_active : true,
+        research_interests: research_interests || [],
+        hire_date: hire_date || null,
       })
       .select()
       .single();

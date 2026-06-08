@@ -61,10 +61,10 @@ export async function POST(request: NextRequest) {
       email,
       phone,
       gpa,
-      total_hours,
-      department,
-      admission_date,
-      advisor_id,
+      cumulative_hours,
+      major,
+      enrollment_year,
+      advisor_name,
     } = body;
 
     if (!student_id || !name) {
@@ -84,10 +84,10 @@ export async function POST(request: NextRequest) {
         email: email || '',
         phone: phone || '',
         gpa: gpa ?? 0,
-        total_hours: total_hours ?? 0,
-        department: department || '',
-        admission_date: admission_date || null,
-        advisor_id: advisor_id || null,
+        cumulative_hours: cumulative_hours ?? 0,
+        major: major || 'علوم الحاسب',
+        enrollment_year: enrollment_year || new Date().getFullYear(),
+        advisor_name: advisor_name || '',
       })
       .select()
       .single();

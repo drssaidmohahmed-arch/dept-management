@@ -67,22 +67,19 @@ export async function POST(request: NextRequest) {
 
     const {
       student_id,
+      student_name,
       supervisor_id,
+      supervisor_name,
       title,
       description,
       project_type,
       status,
-      start_date,
-      end_date,
       grade,
-      department,
-      committee_members,
-      report_url,
-      presentation_url,
-      notes,
+      submission_date,
+      defense_date,
     } = body;
 
-    if (!student_id || !title) {
+    if (!student_id || !student_name || !title) {
       return NextResponse.json(
         { error: 'البيانات المطلوبة غير مكتملة' },
         { status: 400 }
@@ -93,19 +90,16 @@ export async function POST(request: NextRequest) {
       .from('graduation_projects')
       .insert({
         student_id,
+        student_name,
         supervisor_id: supervisor_id || null,
+        supervisor_name: supervisor_name || '',
         title,
         description: description || '',
-        project_type: project_type || 'research',
+        project_type: project_type || 'software',
         status: status || 'proposed',
-        start_date: start_date || null,
-        end_date: end_date || null,
-        grade: grade || '',
-        department: department || '',
-        committee_members: committee_members || [],
-        report_url: report_url || '',
-        presentation_url: presentation_url || '',
-        notes: notes || '',
+        grade: grade || null,
+        submission_date: submission_date || null,
+        defense_date: defense_date || null,
       })
       .select()
       .single();

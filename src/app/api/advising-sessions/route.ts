@@ -48,16 +48,17 @@ export async function POST(request: NextRequest) {
 
     const {
       student_id,
+      student_name,
       advisor_id,
+      advisor_name,
       session_date,
       session_type,
-      topic,
       notes,
-      recommendations,
-      follow_up_required,
+      action_items,
+      follow_up_date,
     } = body;
 
-    if (!student_id || !advisor_id || !session_date) {
+    if (!student_id || !student_name || !advisor_name) {
       return NextResponse.json(
         { error: 'البيانات المطلوبة غير مكتملة' },
         { status: 400 }
@@ -68,13 +69,14 @@ export async function POST(request: NextRequest) {
       .from('advising_sessions')
       .insert({
         student_id,
-        advisor_id,
-        session_date,
-        session_type: session_type || 'academic',
-        topic: topic || '',
+        student_name,
+        advisor_id: advisor_id || null,
+        advisor_name,
+        session_date: session_date || new Date().toISOString(),
+        session_type: session_type || 'general',
         notes: notes || '',
-        recommendations: recommendations || '',
-        follow_up_required: follow_up_required ?? false,
+        action_items: action_items || [],
+        follow_up_date: follow_up_date || null,
       })
       .select()
       .single();

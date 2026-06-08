@@ -36,12 +36,12 @@ export async function GET(request: NextRequest) {
       query = query.eq('training_field', trainingField);
     }
 
-    // Search by organization or title (sanitized)
+    // Search by organization_name or student_name (sanitized)
     const search = searchParams.get('search');
     if (search) {
       const sanitized = sanitizeSearchInput(search);
       if (sanitized) {
-        query = query.or(`organization.ilike.%${sanitized}%,title.ilike.%${sanitized}%`);
+        query = query.or(`organization_name.ilike.%${sanitized}%,student_name.ilike.%${sanitized}%`);
       }
     }
 
@@ -61,20 +61,20 @@ export async function POST(request: NextRequest) {
 
     const {
       student_id,
-      organization,
+      student_name,
+      organization_name,
       supervisor_name,
+      supervisor_contact,
       training_field,
       start_date,
       end_date,
-      total_hours,
       status,
-      grade,
-      title,
-      report_url,
-      notes,
+      supervisor_rating,
+      advisor_rating,
+      report_submitted,
     } = body;
 
-    if (!student_id || !organization || !start_date) {
+    if (!student_id || !student_name || !organization_name) {
       return NextResponse.json(
         { error: 'البيانات المطلوبة غير مكتملة' },
         { status: 400 }
@@ -85,17 +85,17 @@ export async function POST(request: NextRequest) {
       .from('field_training')
       .insert({
         student_id,
-        organization,
+        student_name,
+        organization_name,
         supervisor_name: supervisor_name || '',
-        training_field: training_field || '',
-        start_date,
+        supervisor_contact: supervisor_contact || '',
+        training_field: training_field || 'تقنية معلومات',
+        start_date: start_date || null,
         end_date: end_date || null,
-        total_hours: total_hours ?? 0,
         status: status || 'planned',
-        grade: grade || '',
-        title: title || '',
-        report_url: report_url || '',
-        notes: notes || '',
+        supervisor_rating: supervisor_rating ?? null,
+        advisor_rating: advisor_rating ?? null,
+        report_submitted: report_submitted ?? false,
       })
       .select()
       .single();
