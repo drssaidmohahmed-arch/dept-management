@@ -55,6 +55,7 @@ import {
   AlertTriangle,
   Crown,
   ArrowRightLeft,
+  Activity,
 } from "lucide-react";
 import DepartmentRequestManager from "@/components/shared/DepartmentRequestManager";
 import TeachingSchedule from "@/components/faculty/TeachingSchedule";
@@ -72,6 +73,7 @@ import TransferManagement from "@/components/hod/TransferManagement";
 import PermissionsManager from "@/components/hod/PermissionsManager";
 import StudentManagement from "@/components/hod/StudentManagement";
 import FacultyProfiles from "@/components/faculty/FacultyProfiles";
+import ActivityLog from "@/components/shared/ActivityLog";
 import {
   useAnnouncements,
   useCourses,
@@ -250,6 +252,10 @@ export default function HODDashboard() {
           <TabsTrigger value="permissions" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
             <Shield className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             <span className="truncate">الصلاحيات</span>
+          </TabsTrigger>
+          <TabsTrigger value="activity-log" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
+            <Activity className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+            <span className="truncate">سجل العمليات</span>
           </TabsTrigger>
         </TabsList>
 
@@ -576,6 +582,11 @@ export default function HODDashboard() {
         {/* Permissions Tab */}
         <TabsContent value="permissions" className="mt-3 sm:mt-4">
           <PermissionsManager />
+        </TabsContent>
+
+        {/* Activity Log Tab */}
+        <TabsContent value="activity-log" className="mt-3 sm:mt-4">
+          <ActivityLog />
         </TabsContent>
       </Tabs>
     </div>

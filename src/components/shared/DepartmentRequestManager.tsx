@@ -43,6 +43,7 @@ import {
   useStudentRequests,
   updateProfessorRequestStatus,
   deleteStudentRequest,
+  updateStudentRequestStatus,
   PROF_REQ_STATUS_LABELS,
   PROF_REQ_STATUS_COLORS,
   PROF_REQ_CATEGORY_LABELS,
@@ -137,16 +138,13 @@ export default function DepartmentRequestManager() {
           responseText.trim() || undefined
         );
       } else {
-        // For student requests, we delete on reject, approve via marking
-        // Student requests don't have a direct update API, so we use delete for reject
-        if (actionDialog.action === "reject") {
-          await deleteStudentRequest(actionDialog.requestId);
-        } else if (actionDialog.action === "approve") {
-          // For student requests, we don't have an update API, 
-          // but since there's no update endpoint, we'll use a workaround
-          // The student request API only supports add and delete
-          // For approve, we just close the dialog (would need a proper API endpoint)
-        }
+        // For student requests: use updateStudentRequestStatus to properly approve/reject
+        const statusValue = actionDialog.action === "approve" ? "approved" : "rejected";
+        await updateStudentRequestStatus(
+          actionDialog.requestId,
+          statusValue,
+          responseText.trim() || undefined
+        );
       }
     } finally {
       setIsSubmitting(false);

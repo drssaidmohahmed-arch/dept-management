@@ -123,7 +123,7 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   const body = await request.json().catch(() => ({}));
-  const { id, status } = body;
+  const { id, status, response, reviewed_by_name } = body;
 
   if (!id) {
     return NextResponse.json({ error: 'Request ID is required' }, { status: 400 });
@@ -134,6 +134,9 @@ export async function PUT(request: NextRequest) {
   if (supabase) {
     try {
       const updatePayload: Record<string, unknown> = { status };
+      if (response !== undefined) updatePayload.response = response;
+      if (reviewed_by_name !== undefined) updatePayload.reviewed_by_name = reviewed_by_name;
+
       const { data, error } = await supabase
         .from('student_requests')
         .update(updatePayload)

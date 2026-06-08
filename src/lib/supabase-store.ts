@@ -697,6 +697,33 @@ export async function addStudentRequest(
   }
 }
 
+export async function updateStudentRequestStatus(
+  requestId: string,
+  status: 'approved' | 'rejected' | 'pending',
+  response?: string
+) {
+  const updatePayload: Record<string, unknown> = {
+    id: requestId,
+    status,
+  };
+  if (response !== undefined) {
+    updatePayload.response = response;
+  }
+
+  const result = await apiCall('/api/student-requests', {
+    method: 'PUT',
+    body: JSON.stringify(updatePayload),
+  });
+  if (!result.ok) {
+    console.error('Error updating student request status:', result.error);
+    showNotification('حدث خطأ أثناء تحديث حالة الطلب', true);
+  } else {
+    const statusMsg = status === 'approved' ? 'تم قبول طلب الطالب' : status === 'rejected' ? 'تم رفض طلب الطالب' : 'تم تحديث حالة الطلب';
+    showNotification(statusMsg);
+  }
+  return result;
+}
+
 export async function deleteStudentRequest(id: string) {
   const result = await apiCall('/api/student-requests', {
     method: 'DELETE',

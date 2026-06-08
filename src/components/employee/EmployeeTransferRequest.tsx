@@ -43,6 +43,7 @@ import {
 import {
   useTransfers,
   useMembers,
+  useCourses,
   addTransferRequest,
   cancelTransfer,
   TRANSFER_STATUS_LABELS,
@@ -55,6 +56,7 @@ import type { EmployeeTransfer } from "@/lib/supabase-store";
 export default function EmployeeTransferRequest() {
   const transfers = useTransfers();
   const members = useMembers();
+  const courses = useCourses();
 
   // Find current employee (demo: use first employee member)
   const currentEmployee = useMemo(
@@ -75,6 +77,7 @@ export default function EmployeeTransferRequest() {
   const [specialization, setSpecialization] = useState("");
   const [qualification, setQualification] = useState("");
   const [coursesInput, setCoursesInput] = useState("");
+  const [selectedCourses, setSelectedCourses] = useState<string[]>([]);
   const [reason, setReason] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [detailDialog, setDetailDialog] = useState<{
@@ -83,7 +86,7 @@ export default function EmployeeTransferRequest() {
   }>({ open: false, transfer: null });
 
   const handleSubmit = async () => {
-    if (!currentEmployee || !reason.trim()) return;
+    if (!currentEmployee || !reason.trim() || !specialization.trim()) return;
     setIsSubmitting(true);
     try {
       await addTransferRequest({
@@ -93,10 +96,12 @@ export default function EmployeeTransferRequest() {
         requested_rank: requestedRank,
         requested_specialization: specialization.trim(),
         requested_qualification: qualification.trim(),
-        courses_to_teach: coursesInput
-          .split(",")
-          .map((c) => c.trim())
-          .filter(Boolean),
+        courses_to_teach: selectedCourses.length > 0
+          ? selectedCourses
+          : coursesInput
+              .split(",")
+              .map((c) => c.trim())
+              .filter(Boolean),
         reason: reason.trim(),
       });
       setDialogOpen(false);
@@ -104,6 +109,7 @@ export default function EmployeeTransferRequest() {
       setSpecialization("");
       setQualification("");
       setCoursesInput("");
+      setSelectedCourses([]);
       setReason("");
     } finally {
       setIsSubmitting(false);
@@ -331,11 +337,43 @@ export default function EmployeeTransferRequest() {
 
             <div className="space-y-1.5">
               <Label htmlFor="courses">المقررات المقترحة للتدريس</Label>
+              {courses.length > 0 && (
+                <div className="space-y-1.5 mb-2">
+                  <p className="text-[10px] text-muted-foreground">اختر من المقررات المتاحة أو أدخل رموز يدوياً:</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {courses.map((course) => {
+                      const isSelected = selectedCourses.includes(course.code);
+                      return (
+                        <button
+                          key={course.code}
+                          type="button"
+                          onClick={() =>
+                            setSelectedCourses((prev) =>
+                              isSelected
+                                ? prev.filter((c) => c !== course.code)
+                                : [...prev, course.code]
+                            )
+                          }
+                          className={`flex items-center gap-1 text-[10px] px-2 py-1 rounded-lg border transition-all ${
+                            isSelected
+                              ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                              : "bg-white text-slate-500 border-slate-200 hover:border-slate-300"
+                          }`}
+                        >
+                          <span className="font-mono">{course.code}</span>
+                          <span>{course.name}</span>
+                          {isSelected && <CheckCircle2 className="w-3 h-3" />}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
               <Input
                 id="courses"
                 value={coursesInput}
                 onChange={(e) => setCoursesInput(e.target.value)}
-                placeholder="أدخل رموز المقررات مفصولة بفاصلة، مثال: CS101, CS201"
+                placeholder="أو أدخل رموز المقررات مفصولة بفاصلة، مثال: CS101, CS201"
               />
               <p className="text-[10px] text-muted-foreground">افصل بين رموز المقررات بفاصلة (,)</p>
             </div>
