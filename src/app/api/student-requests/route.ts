@@ -89,6 +89,12 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => ({}));
+
+  // Input validation
+  if (!body.type || !body.description) {
+    return NextResponse.json({ error: 'الحقل type و description مطلوبان' }, { status: 400 });
+  }
+
   const supabase = await getSupabaseOrFallback();
 
   if (supabase) {
@@ -123,7 +129,7 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   const body = await request.json().catch(() => ({}));
-  const { id, status, response, reviewed_by_name } = body;
+  const { id, status, response, reviewed_by, reviewed_by_name } = body;
 
   if (!id) {
     return NextResponse.json({ error: 'Request ID is required' }, { status: 400 });
@@ -131,61 +137,39 @@ export async function PUT(request: NextRequest) {
 
   const supabase = await getSupabaseOrFallback();
 
-  if (supabase) {
-    try {
-      const updatePayload: Record<string, unknown> = { status };
-      if (response !== undefined) updatePayload.response = response;
-      if (reviewed_by_name !== undefined) updatePayload.reviewed_by_name = reviewed_by_name;
+  if (!supabase) {
+    return NextResponse.json({ error: 'خطأ في الاتصال بقاعدة البيانات' }, { status: 500 });
+  }
 
-      const { data, error } = await supabase
-        .from('student_requests')
-        .update(updatePayload)
-        .eq('id', id)
-        .select();
+  try {
+    const updatePayload: Record<string, unknown> = {};
+    if (status !== undefined) updatePayload.status = status;
+    if (response !== undefined) updatePayload.response = response;
+    if (reviewed_by_name !== undefined) updatePayload.reviewed_by_name = reviewed_by_name;
 
-      if (error) {
-        // If RLS or other DB error prevents update, fall back to local data
-        console.error('[student-requests PUT] Supabase error, falling back to local:', error.message || error);
-        const updated = studentRequestsStore.update(id, {
-          status: status || 'pending',
-          ...(response !== undefined && { response }),
-          ...(reviewed_by_name !== undefined && { reviewedByName: reviewed_by_name }),
-        });
-        if (updated) return NextResponse.json(updated);
-        return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
-      }
-      
-      // data might be empty array if RLS prevented the update
-      if (data && data.length > 0) {
-        return NextResponse.json(data[0]);
-      }
-      
-      // Supabase returned no error but 0 rows affected - likely RLS issue
-      // Fall back to local data
-      const updated = studentRequestsStore.update(id, {
-        status: status || 'pending',
-        ...(response !== undefined && { response }),
-        ...(reviewed_by_name !== undefined && { reviewedByName: reviewed_by_name }),
-      });
-      if (updated) return NextResponse.json(updated);
-      return NextResponse.json({ error: 'فشل تحديث الطلب في قاعدة البيانات' }, { status: 500 });
-    } catch (error: unknown) {
-      console.error('[student-requests PUT] Exception:', error);
-      return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
+    // When status changes to approved/rejected, add review metadata
+    if (status === 'approved' || status === 'rejected') {
+      updatePayload.reviewed_at = new Date().toISOString();
+      if (reviewed_by) updatePayload.reviewed_by = reviewed_by;
     }
-  }
 
-  // Fallback to local data
-  const updates: Record<string, unknown> = {
-    status: status || 'pending',
-  };
-  if (response !== undefined) updates.response = response;
-  if (reviewed_by_name !== undefined) updates.reviewedByName = reviewed_by_name;
-  const updated = studentRequestsStore.update(id, updates);
-  if (!updated) {
-    return NextResponse.json({ error: 'الطلب غير موجود' }, { status: 404 });
+    const { data, error } = await supabase
+      .from('student_requests')
+      .update(updatePayload)
+      .eq('id', id)
+      .select();
+
+    if (error) throw error;
+
+    if (data && data.length > 0) {
+      return NextResponse.json(data[0]);
+    }
+
+    return NextResponse.json({ error: 'فشل تحديث الطلب في قاعدة البيانات' }, { status: 500 });
+  } catch (error: unknown) {
+    console.error('[student-requests PUT] Exception:', error);
+    return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
   }
-  return NextResponse.json(updated);
 }
 
 export async function DELETE(request: NextRequest) {

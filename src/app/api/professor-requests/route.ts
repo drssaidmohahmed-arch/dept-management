@@ -106,6 +106,12 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => ({}));
+
+  // Input validation
+  if (!body.category || !body.target || !body.subject || !body.description) {
+    return NextResponse.json({ error: 'الحقول category و target و subject و description مطلوبة' }, { status: 400 });
+  }
+
   const supabase = await getSupabaseOrFallback();
 
   if (supabase) {
@@ -151,7 +157,7 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   const body = await request.json().catch(() => ({}));
-  const { id, ...updateFields } = body;
+  const { id, created_at, ...updateFields } = body;
 
   if (!id) {
     return NextResponse.json({ error: 'Request ID is required' }, { status: 400 });
@@ -161,14 +167,20 @@ export async function PUT(request: NextRequest) {
 
   if (supabase) {
     try {
-      const payload = {
-        ...updateFields,
-        updated_at: new Date().toISOString(),
-      };
+      const updates: Record<string, unknown> = { updated_at: new Date().toISOString() };
+      if (updateFields.category !== undefined) updates.category = updateFields.category;
+      if (updateFields.target !== undefined) updates.target = updateFields.target;
+      if (updateFields.target_student_id !== undefined) updates.target_student_id = updateFields.target_student_id;
+      if (updateFields.target_student_name !== undefined) updates.target_student_name = updateFields.target_student_name;
+      if (updateFields.subject !== undefined) updates.subject = updateFields.subject;
+      if (updateFields.description !== undefined) updates.description = updateFields.description;
+      if (updateFields.priority !== undefined) updates.priority = updateFields.priority;
+      if (updateFields.status !== undefined) updates.status = updateFields.status;
+      if (updateFields.response !== undefined) updates.response = updateFields.response;
 
       const { data, error } = await supabase
         .from('professor_requests')
-        .update(payload)
+        .update(updates)
         .eq('id', id)
         .select()
         .single();

@@ -45,6 +45,7 @@ export interface Database {
           avatar: string
           is_active: boolean
           permissions: string[]
+          transfer_history: string[]
           joined_at: string
         }
         Insert: {
@@ -56,6 +57,7 @@ export interface Database {
           avatar: string
           is_active?: boolean
           permissions?: string[]
+          transfer_history?: string[]
           joined_at?: string
         }
         Update: {
@@ -67,6 +69,7 @@ export interface Database {
           avatar?: string
           is_active?: boolean
           permissions?: string[]
+          transfer_history?: string[]
           joined_at?: string
         }
       }
@@ -120,6 +123,10 @@ export interface Database {
           type: string
           description: string
           status: 'pending' | 'approved' | 'rejected'
+          response: string | null
+          reviewed_by: string | null
+          reviewed_by_name: string | null
+          reviewed_at: string | null
           created_at: string
         }
         Insert: {
@@ -127,6 +134,10 @@ export interface Database {
           type: string
           description: string
           status?: 'pending' | 'approved' | 'rejected'
+          response?: string | null
+          reviewed_by?: string | null
+          reviewed_by_name?: string | null
+          reviewed_at?: string | null
           created_at?: string
         }
         Update: {
@@ -134,6 +145,10 @@ export interface Database {
           type?: string
           description?: string
           status?: 'pending' | 'approved' | 'rejected'
+          response?: string | null
+          reviewed_by?: string | null
+          reviewed_by_name?: string | null
+          reviewed_at?: string | null
           created_at?: string
         }
       }
@@ -202,6 +217,8 @@ export interface Database {
           assignments_mark: number | null
           attendance: number
           status: 'active' | 'withdrawn' | 'incomplete'
+          advisor_id: string | null
+          academic_year: string | null
         }
         Insert: {
           id?: string
@@ -215,6 +232,8 @@ export interface Database {
           assignments_mark?: number | null
           attendance?: number
           status?: 'active' | 'withdrawn' | 'incomplete'
+          advisor_id?: string | null
+          academic_year?: string | null
         }
         Update: {
           id?: string
@@ -228,6 +247,8 @@ export interface Database {
           assignments_mark?: number | null
           attendance?: number
           status?: 'active' | 'withdrawn' | 'incomplete'
+          advisor_id?: string | null
+          academic_year?: string | null
         }
       }
       students: {
@@ -743,7 +764,7 @@ export interface Database {
           objectives?: string[]
           topics?: string[]
           textbooks?: string[]
-          references?: string[]
+          ref_materials?: string[]
           assessment_method?: string
           updated_by?: string
           version?: number
@@ -758,7 +779,7 @@ export interface Database {
           objectives?: string[]
           topics?: string[]
           textbooks?: string[]
-          references?: string[]
+          ref_materials?: string[]
           assessment_method?: string
           updated_by?: string
           version?: number
@@ -915,6 +936,41 @@ export interface Database {
           status?: 'pending' | 'approved' | 'rejected' | 'cancelled'
           created_at?: string
           updated_at?: string | null
+        }
+      }
+      activity_log: {
+        Row: {
+          id: string
+          action: string
+          entity_type: string
+          entity_id: string | null
+          entity_name: string | null
+          performed_by: string | null
+          performed_by_name: string | null
+          details: Json
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          action: string
+          entity_type: string
+          entity_id?: string | null
+          entity_name?: string | null
+          performed_by?: string | null
+          performed_by_name?: string | null
+          details?: Json
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          action?: string
+          entity_type?: string
+          entity_id?: string | null
+          entity_name?: string | null
+          performed_by?: string | null
+          performed_by_name?: string | null
+          details?: Json
+          created_at?: string
         }
       }
     }

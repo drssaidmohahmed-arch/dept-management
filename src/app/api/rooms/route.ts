@@ -115,8 +115,8 @@ export async function PUT(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
-  const url = new URL(request.url);
-  const id = url.searchParams.get('id');
+  const body = await request.json().catch(() => ({ id: '' }));
+  const { id } = body;
   if (!id) return NextResponse.json({ error: 'المعرف مطلوب' }, { status: 400 });
 
   const supabase = await getSupabaseOrFallback();

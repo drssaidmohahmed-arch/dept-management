@@ -1,6 +1,6 @@
 'use client';
 
-import { useSyncExternalStore, useCallback, useRef } from 'react';
+import { useSyncExternalStore, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import {
@@ -301,6 +301,7 @@ function mapProfessorRequestRow(row: Record<string, unknown>): ProfessorRequest 
 
 function mapProfessorCourseRow(row: Record<string, unknown>): ProfessorCourse {
   return {
+    id: row.id as string,
     code: (row.course_code as string) || '',
     name: (row.name as string) || '',
     hours: (row.hours as number) || 0,
@@ -627,9 +628,10 @@ function showNotification(message: string, isError: boolean = false) {
 
 async function apiCall(path: string, options?: RequestInit): Promise<{ ok: boolean; data?: any; error?: string }> {
   try {
+    const { headers: customHeaders, ...restOptions } = options || {};
     const res = await fetch(path, {
-      headers: { 'Content-Type': 'application/json' },
-      ...options,
+      ...restOptions,
+      headers: { 'Content-Type': 'application/json', ...customHeaders },
     });
     if (!res.ok) {
       const errBody = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));

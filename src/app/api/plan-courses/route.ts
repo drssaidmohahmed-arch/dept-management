@@ -87,14 +87,21 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   const body = await request.json().catch(() => ({}));
-  const { id, ...updateFields } = body;
+  const { id } = body;
   if (!id) return NextResponse.json({ error: 'المعرف مطلوب' }, { status: 400 });
 
   const supabase = await getSupabaseOrFallback();
 
   if (supabase) {
     try {
-      const { data, error } = await supabase.from('plan_courses').update(updateFields).eq('id', id).select().single();
+      const updates: Record<string, unknown> = {};
+      if (body.plan_id !== undefined) updates.plan_id = body.plan_id;
+      if (body.course_code !== undefined) updates.course_code = body.course_code;
+      if (body.semester_order !== undefined) updates.semester_order = body.semester_order;
+      if (body.course_type !== undefined) updates.course_type = body.course_type;
+      if (body.prerequisite_codes !== undefined) updates.prerequisite_codes = body.prerequisite_codes;
+
+      const { data, error } = await supabase.from('plan_courses').update(updates).eq('id', id).select().single();
       if (error) throw error;
       return NextResponse.json(data);
     } catch (error: unknown) {
@@ -104,7 +111,7 @@ export async function PUT(request: NextRequest) {
 
   // Fallback to local data
   const updates: Record<string, unknown> = {};
-  Object.keys(updateFields).forEach((k) => { updates[k] = updateFields[k]; });
+  for (const [k, v] of Object.entries(body)) { if (k !== 'id') updates[k] = v; }
   const updated = planCoursesStore.update(id, updates);
   if (!updated) return NextResponse.json({ error: 'المقرر غير موجود' }, { status: 404 });
   return NextResponse.json(updated);

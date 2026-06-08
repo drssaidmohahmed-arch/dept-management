@@ -16,6 +16,8 @@ const MIGRATION_TABLES = [
   'course_descriptions',
   'course_sections',
   'room_bookings',
+  'employee_transfers',
+  'activity_log',
 ];
 
 export async function GET() {

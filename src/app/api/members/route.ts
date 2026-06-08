@@ -105,6 +105,12 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => ({}));
+
+  // Input validation
+  if (!body.name || !body.email || !body.role || !body.position) {
+    return NextResponse.json({ error: 'الحقول name و email و role و position مطلوبة' }, { status: 400 });
+  }
+
   const supabase = await getSupabaseOrFallback();
 
   if (supabase) {

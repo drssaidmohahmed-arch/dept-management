@@ -96,14 +96,26 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   const body = await request.json().catch(() => ({}));
-  const { id, ...updateFields } = body;
+  const { id } = body;
   if (!id) return NextResponse.json({ error: 'معرف التقييم مطلوب' }, { status: 400 });
 
   const supabase = await getSupabaseOrFallback();
 
   if (supabase) {
     try {
-      const { data, error } = await supabase.from('performance_evaluations').update(updateFields).eq('id', id).select().single();
+      const updates: Record<string, unknown> = {};
+      if (body.faculty_id !== undefined) updates.faculty_id = body.faculty_id;
+      if (body.faculty_name !== undefined) updates.faculty_name = body.faculty_name;
+      if (body.evaluation_type !== undefined) updates.evaluation_type = body.evaluation_type;
+      if (body.academic_year !== undefined) updates.academic_year = body.academic_year;
+      if (body.semester !== undefined) updates.semester = body.semester;
+      if (body.teaching_score !== undefined) updates.teaching_score = body.teaching_score;
+      if (body.research_score !== undefined) updates.research_score = body.research_score;
+      if (body.service_score !== undefined) updates.service_score = body.service_score;
+      if (body.overall_score !== undefined) updates.overall_score = body.overall_score;
+      if (body.comments !== undefined) updates.comments = body.comments;
+
+      const { data, error } = await supabase.from('performance_evaluations').update(updates).eq('id', id).select().single();
       if (error) throw error;
       return NextResponse.json(data);
     } catch (error: unknown) {
@@ -113,7 +125,7 @@ export async function PUT(request: NextRequest) {
 
   // Fallback to local data
   const updates: Record<string, unknown> = { updatedAt: new Date().toISOString() };
-  Object.keys(updateFields).forEach((k) => { updates[k] = updateFields[k]; });
+  for (const [k, v] of Object.entries(body)) { if (k !== 'id') updates[k] = v; }
   const updated = performanceEvaluationsStore.update(id, updates);
   if (!updated) return NextResponse.json({ error: 'التقييم غير موجود' }, { status: 404 });
   return NextResponse.json(updated);

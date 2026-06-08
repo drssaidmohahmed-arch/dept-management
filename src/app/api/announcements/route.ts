@@ -57,6 +57,12 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => ({}));
+
+  // Input validation
+  if (!body.title || !body.content) {
+    return NextResponse.json({ error: 'الحقل title و content مطلوبان' }, { status: 400 });
+  }
+
   const supabase = await getSupabaseOrFallback();
 
   if (supabase) {

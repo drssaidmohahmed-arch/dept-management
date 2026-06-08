@@ -123,14 +123,25 @@ export async function PUT(request: NextRequest) {
 
   if (supabase) {
     try {
-      const payload = {
-        ...updateFields,
-        updated_at: new Date().toISOString(),
-      };
+      const updates: Record<string, unknown> = { updated_at: new Date().toISOString() };
+      if (updateFields.employee_id !== undefined) updates.employee_id = updateFields.employee_id;
+      if (updateFields.employee_name !== undefined) updates.employee_name = updateFields.employee_name;
+      if (updateFields.current_position !== undefined) updates.current_position = updateFields.current_position;
+      if (updateFields.requested_rank !== undefined) updates.requested_rank = updateFields.requested_rank;
+      if (updateFields.requested_specialization !== undefined) updates.requested_specialization = updateFields.requested_specialization;
+      if (updateFields.requested_qualification !== undefined) updates.requested_qualification = updateFields.requested_qualification;
+      if (updateFields.courses_to_teach !== undefined) updates.courses_to_teach = updateFields.courses_to_teach;
+      if (updateFields.reason !== undefined) updates.reason = updateFields.reason;
+      if (updateFields.supporting_docs !== undefined) updates.supporting_docs = updateFields.supporting_docs;
+      if (updateFields.status !== undefined) updates.status = updateFields.status;
+      if (updateFields.reviewed_by_name !== undefined) updates.reviewed_by_name = updateFields.reviewed_by_name;
+      if (updateFields.review_notes !== undefined) updates.review_notes = updateFields.review_notes;
+      if (updateFields.reviewed_by !== undefined) updates.reviewed_by = updateFields.reviewed_by;
+      if (updateFields.new_department !== undefined) updates.new_department = updateFields.new_department;
 
       const { data, error } = await supabase
         .from('employee_transfers')
-        .update(payload)
+        .update(updates)
         .eq('id', id)
         .select();
 
@@ -143,21 +154,60 @@ export async function PUT(request: NextRequest) {
 
       const updatedRecord = data[0];
 
-      // If approved, update member role
+      // If approved, update member role, department, log activity, and manage faculty profile
       if (updateFields.status === 'approved' && updatedRecord) {
         const rankMap: Record<string, string> = {
           'professor': 'أستاذ', 'associate_professor': 'أستاذ مشارك',
           'assistant_professor': 'أستاذ مساعد', 'lecturer': 'محاضر', 'teaching_assistant': 'معيد',
         };
-        await supabase.from('members').update({
-          role: 'professor', position: rankMap[updatedRecord.requested_rank] || 'محاضر',
-        }).eq('id', updatedRecord.employee_id);
 
-        await supabase.from('faculty_profiles').upsert({
-          member_id: updatedRecord.employee_id, specialization: updatedRecord.requested_specialization,
-          rank: updatedRecord.requested_rank, qualification: updatedRecord.requested_qualification,
-          bio: '', research_interests: [],
-        }, { onConflict: 'member_id' });
+        // Build member update object
+        const memberUpdate: Record<string, unknown> = {
+          role: 'professor',
+          position: rankMap[updatedRecord.requested_rank] || 'محاضر',
+        };
+
+        // 1. Update member's department if new_department is provided in the transfer
+        if (updatedRecord.new_department) {
+          memberUpdate.department = updatedRecord.new_department;
+        }
+
+        await supabase.from('members').update(memberUpdate).eq('id', updatedRecord.employee_id);
+
+        // 2. Log the transfer approval to activity_log
+        await supabase.from('activity_log').insert({
+          action: 'employee_transfer_approved',
+          entity_type: 'employee_transfer',
+          entity_id: updatedRecord.id,
+          entity_name: updatedRecord.employee_name,
+          performed_by: updatedRecord.reviewed_by,
+          performed_by_name: updatedRecord.reviewed_by_name,
+          details: {
+            transfer_id: updatedRecord.id,
+            employee_name: updatedRecord.employee_name,
+            employee_id: updatedRecord.employee_id,
+            requested_rank: updatedRecord.requested_rank,
+            new_department: updatedRecord.new_department || null,
+          },
+        });
+
+        // 3. Create/update faculty_profile only if the new role is teaching-related
+        const teachingRoles = new Set([
+          'professor', 'associate_professor', 'assistant_professor',
+          'lecturer', 'ta', 'teaching_assistant',
+        ]);
+        const newRole = (updatedRecord.requested_role || updatedRecord.requested_rank || '').toLowerCase();
+
+        if (teachingRoles.has(newRole)) {
+          await supabase.from('faculty_profiles').upsert({
+            member_id: updatedRecord.employee_id,
+            name: updatedRecord.employee_name,
+            department: updatedRecord.new_department || null,
+            specialization: updatedRecord.requested_specialization || null,
+            qualification: updatedRecord.requested_qualification || null,
+            status: 'active',
+          }, { onConflict: 'member_id' });
+        }
       }
 
       return NextResponse.json(updatedRecord);
@@ -172,6 +222,7 @@ export async function PUT(request: NextRequest) {
   if (updateFields.reviewed_by_name !== undefined) updates.reviewedByName = updateFields.reviewed_by_name;
   if (updateFields.review_notes !== undefined) updates.reviewNotes = updateFields.review_notes;
   if (updateFields.reviewed_by !== undefined) updates.reviewedBy = updateFields.reviewed_by;
+  if (updateFields.new_department !== undefined) updates.newDepartment = updateFields.new_department;
 
   const updated = employeeTransfersStore.update(id, updates);
   if (!updated) return NextResponse.json({ error: 'طلب التحويل غير موجود' }, { status: 404 });
@@ -182,10 +233,28 @@ export async function PUT(request: NextRequest) {
       'professor': 'أستاذ', 'associate_professor': 'أستاذ مشارك',
       'assistant_professor': 'أستاذ مساعد', 'lecturer': 'محاضر', 'teaching_assistant': 'معيد',
     };
-    membersStore.update(updated.employeeId, {
+
+    const memberUpdate: Record<string, unknown> = {
       role: 'professor',
       position: rankMap[updated.requestedRank] || 'محاضر',
-    });
+    };
+
+    // Update department if new_department is present
+    if (updated.newDepartment) {
+      memberUpdate.department = updated.newDepartment;
+    }
+
+    membersStore.update(updated.employeeId, memberUpdate);
+
+    // Create/update faculty profile for teaching-related roles
+    const teachingRoles = new Set([
+      'professor', 'associate_professor', 'assistant_professor',
+      'lecturer', 'ta', 'teaching_assistant',
+    ]);
+    const newRole = (updated.requestedRank || '').toLowerCase();
+    if (teachingRoles.has(newRole)) {
+      // Faculty profile managed via Supabase when available; local fallback updates member only
+    }
   }
 
   return NextResponse.json(updated);

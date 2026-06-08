@@ -94,14 +94,28 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   const body = await request.json().catch(() => ({}));
-  const { id, ...updateFields } = body;
+  const { id } = body;
   if (!id) return NextResponse.json({ error: 'المعرف مطلوب' }, { status: 400 });
 
   const supabase = await getSupabaseOrFallback();
 
   if (supabase) {
     try {
-      const { data, error } = await supabase.from('course_sections').update(updateFields).eq('id', id).select().single();
+      const updates: Record<string, unknown> = {};
+      if (body.course_code !== undefined) updates.course_code = body.course_code;
+      if (body.section_number !== undefined) updates.section_number = body.section_number;
+      if (body.professor_name !== undefined) updates.professor_name = body.professor_name;
+      if (body.room_id !== undefined) updates.room_id = body.room_id;
+      if (body.room_name !== undefined) updates.room_name = body.room_name;
+      if (body.capacity !== undefined) updates.capacity = body.capacity;
+      if (body.enrolled !== undefined) updates.enrolled = body.enrolled;
+      if (body.schedule_days !== undefined) updates.schedule_days = body.schedule_days;
+      if (body.schedule_time !== undefined) updates.schedule_time = body.schedule_time;
+      if (body.semester !== undefined) updates.semester = body.semester;
+      if (body.academic_year !== undefined) updates.academic_year = body.academic_year;
+      if (body.status !== undefined) updates.status = body.status;
+
+      const { data, error } = await supabase.from('course_sections').update(updates).eq('id', id).select().single();
       if (error) throw error;
       return NextResponse.json(data);
     } catch (error: unknown) {
@@ -111,7 +125,7 @@ export async function PUT(request: NextRequest) {
 
   // Fallback to local data
   const updates: Record<string, unknown> = { updatedAt: new Date().toISOString() };
-  Object.keys(updateFields).forEach((k) => { updates[k] = updateFields[k]; });
+  for (const [k, v] of Object.entries(body)) { if (k !== 'id') updates[k] = v; }
   const updated = courseSectionsStore.update(id, updates);
   if (!updated) return NextResponse.json({ error: 'الشعبة غير موجودة' }, { status: 404 });
   return NextResponse.json(updated);

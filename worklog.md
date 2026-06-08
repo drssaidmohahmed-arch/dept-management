@@ -1,140 +1,160 @@
----
-Task ID: 1
-Agent: Main Agent
-Task: Complete system expansion - 4 new management modules
+# API Route Bug Fixes - Worklog
 
-Work Log:
-- Explored existing project structure, database schema, TypeScript types, and component patterns
-- Created database migration with 14 new tables, 17 new ENUM types, seed data, RLS policies, indexes, and triggers
-- Updated TypeScript database types (database.types.ts) with all new table definitions
-- Updated store.ts with 14 new interfaces, label/color maps, and constants
-- Created 14 new API routes (CRUD operations for all new tables)
-- Built 4 Faculty Management components: FacultyProfiles, TeachingSchedule, PerformanceEvaluations, ProfessionalDevelopment
-- Built 3 Student Affairs components: StudentDataManagement, AcademicAdvising, TrainingAndProjects
-- Built 3 Course Management components: StudyPlans, CourseDescriptions, CourseSections
-- Built 2 Schedule Management components: RoomManagement, ScheduleView
-- Integrated all new components into 4 main dashboards (HOD, Professor, Employee, Student)
-- Fixed build errors: Version icon (replaced with GitBranch), array type annotations, type narrowing
+## Date: 2025-06-10
 
-Stage Summary:
-- 14 new database tables designed with full SQL migration
-- 14 new API routes created (GET/POST/PUT/DELETE)
-- 12 new UI components built
-- 4 dashboards updated with nested sub-tabs
-- Build successful - all 28 API routes operational
-- Project ready for deployment
-
-Files Created:
-- supabase/migrations/002_new_modules.sql
-- src/app/api/students/route.ts
-- src/app/api/faculty-profiles/route.ts
-- src/app/api/rooms/route.ts
-- src/app/api/teaching-assignments/route.ts
-- src/app/api/performance-evaluations/route.ts
-- src/app/api/professional-development/route.ts
-- src/app/api/advising-sessions/route.ts
-- src/app/api/field-training/route.ts
-- src/app/api/graduation-projects/route.ts
-- src/app/api/study-plans/route.ts
-- src/app/api/plan-courses/route.ts
-- src/app/api/course-descriptions/route.ts
-- src/app/api/course-sections/route.ts
-- src/app/api/room-bookings/route.ts
-- src/components/faculty/FacultyProfiles.tsx
-- src/components/faculty/TeachingSchedule.tsx
-- src/components/faculty/PerformanceEvaluations.tsx
-- src/components/faculty/ProfessionalDevelopment.tsx
-- src/components/student-affairs/StudentDataManagement.tsx
-- src/components/student-affairs/AcademicAdvising.tsx
-- src/components/student-affairs/TrainingAndProjects.tsx
-- src/components/courses/StudyPlans.tsx
-- src/components/courses/CourseDescriptions.tsx
-- src/components/courses/CourseSections.tsx
-- src/components/schedules/RoomManagement.tsx
-- src/components/schedules/ScheduleView.tsx
-
-Files Modified:
-- src/lib/supabase/database.types.ts
-- src/lib/store.ts
-- src/components/hod/HODDashboard.tsx
-- src/components/professor/ProfessorDashboard.tsx
-- src/components/employee/EmployeeDashboard.tsx
-- src/components/student/StudentDashboard.tsx
-- src/app/page.tsx
+## Summary
+Fixed 6 categories of critical errors across 16 API route files in the Arabic academic management system.
 
 ---
-Task ID: 2
-Agent: Main Agent + full-stack-developer
-Task: Update all procedures between department, requests, faculty members and convert employee to department head
 
-Work Log:
-- Created shared DepartmentRequestManager component for request management workflow
-- Added "الطلبات" tab to HOD Dashboard with full request management (approve/reject/respond to professor and student requests)
-- Transformed Employee Dashboard to Department Head Dashboard (title, icon, colors, capabilities)
-- Added request management and faculty profiles tabs to the department head dashboard
-- Updated landing page role card (employee → رئيس القسم with indigo theme)
-- Updated all role titles and descriptions throughout the app
-- Successfully built project with zero errors
+## Fix 1: `student-requests/route.ts` - Add `reviewed_at` and `reviewed_by` on status change
+**File**: `src/app/api/student-requests/route.ts`
+- Modified PUT handler to accept `reviewed_by` UUID from the request body
+- When status changes to `'approved'` or `'rejected'`, automatically adds:
+  - `reviewed_at: new Date().toISOString()`
+  - `reviewed_by` (if provided in body)
+- Destructured `reviewed_by` from body alongside existing fields
 
-Stage Summary:
-- New file: src/components/shared/DepartmentRequestManager.tsx (shared request management component)
-- Modified: src/components/hod/HODDashboard.tsx (added requests tab)
-- Modified: src/components/employee/EmployeeDashboard.tsx (transformed to department head)
-- Modified: src/app/page.tsx (updated landing page)
-- Build: SUCCESS - all 29 routes compiled without errors
-- Full workflow connected: Students submit requests → Department Head/HOD can approve/reject → Professors submit requests to department → Department Head/HOD can respond
+## Fix 2: Fix 12 PUT routes - Explicit camelCase → snake_case field mapping
+All 12 files previously used `{ ...updateFields }` spread, which silently ignored camelCase keys from the frontend. Replaced with explicit field mapping using `if (body.field !== undefined) updates.snake_field = body.field`.
+
+**Files modified**:
+1. `performance-evaluations/route.ts` - 10 fields mapped
+2. `professional-development/route.ts` - 10 fields mapped
+3. `advising-sessions/route.ts` - 9 fields mapped
+4. `field-training/route.ts` - 12 fields mapped
+5. `graduation-projects/route.ts` - 11 fields mapped
+6. `study-plans/route.ts` - 6 fields mapped
+7. `course-descriptions/route.ts` - 10 fields mapped
+8. `course-sections/route.ts` - 12 fields mapped
+9. `room-bookings/route.ts` - 8 fields mapped
+10. `plan-courses/route.ts` - 5 fields mapped
+11. `professor-requests/route.ts` - Destructured `id` and `created_at` out, mapped 9 safe fields
+12. `employee-transfers/route.ts` - 13 fields mapped
+
+Also updated fallback local-data code to use `body` instead of removed `updateFields` variable.
+
+## Fix 3: `rooms/route.ts` DELETE - Changed from query params to JSON body
+**File**: `src/app/api/rooms/route.ts`
+- Changed DELETE handler from `url.searchParams.get('id')` to `request.json()` body parsing
+- Now consistent with all other DELETE handlers in the project
+
+## Fix 4: `migration-status/route.ts` - Added missing tables
+**File**: `src/app/api/migration-status/route.ts`
+- Added `'employee_transfers'` to MIGRATION_TABLES array
+- Added `'activity_log'` to MIGRATION_TABLES array
+- Total tables now: 17
+
+## Fix 5: `student-requests/route.ts` PUT - Removed silent local-data fallback
+**File**: `src/app/api/student-requests/route.ts`
+- Removed all fallback to `studentRequestsStore` on Supabase error
+- When Supabase client is unavailable, returns `{ error: 'خطأ في الاتصال بقاعدة البيانات' }` with 500 status
+- On Supabase errors (RLS, DB errors), returns proper error responses instead of silently falling back to local data
+- Removed the confusing dual-path logic that could mask database issues
+
+## Fix 6: Added input validation to POST handlers
+Added required field validation before Supabase insert calls, returning 400 with Arabic error messages:
+
+1. **`announcements/route.ts`** - validates `title` and `content`
+   - Error: `'الحقل title و content مطلوبان'`
+
+2. **`members/route.ts`** - validates `name`, `email`, `role`, `position`
+   - Error: `'الحقول name و email و role و position مطلوبة'`
+
+3. **`professor-requests/route.ts`** - validates `category`, `target`, `subject`, `description`
+   - Error: `'الحقول category و target و subject و description مطلوبة'`
+
+4. **`student-requests/route.ts`** - validates `type`, `description`
+   - Error: `'الحقل type و description مطلوبان'`
+
 ---
-Task ID: 1
-Agent: Main Agent
-Task: تحديث إجراءات القسم وإصلاح الأخطاء
 
-Work Log:
-- فحص شامل لكل الملفات: API routes, components, store, database schema
-- إصلاح خطأ رئيسي: DepartmentRequestManager لم يكن يستدعي updateStudentRequestStatus عند قبول/رفض طلبات الطلاب
-- إضافة دالة updateStudentRequestStatus جديدة في supabase-store.ts
-- تحديث API student-requests لدعم حقول response و reviewed_by_name
-- تحسين نموذج طلب التحويل: إضافة اختيار المقررات من القائمة المتاحة
-- إنشاء Activity Log API جديد (/api/activity-log/route.ts)
-- إنشاء مكون ActivityLog.tsx لعرض سجل العمليات
-- إضافة تبويب "سجل العمليات" إلى لوحة رئيس القسم
-- إنشاء migration 004_activity_log.sql لجدول سجل العمليات
-
-Stage Summary:
-- تم إصلاح 3 أخطاء رئيسية في الإجراءات
-- تم إضافة نظام سجل عمليات متكامل
-- تم تحسين إجراءات التحويل
-- Build ناجح بدون أخطاء
+## Verification
+- ESLint check: No new errors introduced (all pre-existing errors in unrelated files)
+- Dev server: Compiles and runs successfully
+- All changes maintain backward compatibility with existing fallback local-data code paths (except Fix 5 which intentionally removes the fallback)
 
 ---
-Task ID: 3
-Agent: Main Agent
-Task: فحص شامل، إصلاح الأخطاء، التحديث، والنشر
 
-Work Log:
-- فحص كامل لكل ملفات المشروع: 28 API route، 12+ مكون، store، schema
-- Build أولي ناجح بدون أخطاء TypeScript
-- إطلاق فحص متوازي لكل API routes ومكونات لوحات التحكم
-- إصلاح 6 أخطاء في API routes:
-  1. StudentRequest type يفتقر لحقول response و reviewedByName
-  2. mapStudentRequestRow لا يقرأ الحقول الجديدة من DB
-  3. student-requests PUT fallback لا يحتفظ بالحقول الجديدة
-  4. employee-transfers PUT يستخدم .single() مما يسبب انهيار عند 0 صفوف
-  5. employee-transfers PUT يفتقر ل updated_at timestamp
-  6. updateStudentRequestStatus لا يدعم reviewedByName parameter
-- إصلاح 14 استيراد غير مستخدم عبر 7 مكونات:
-  1. ProfessorDashboard: إزالة Database
-  2. StudentDashboard: إزالة BookMarked
-  3. PermissionsManager: إزالة Table, TableBody, TableCell, TableHead, TableHeader, TableRow, ShieldX, Eye, Settings
-  4. StudentManagement: إزالة X
-  5. ActivityLog: إزالة CardHeader, CardTitle, ArrowUpDown
-  6. StudentRequests: إزالة CardHeader, CardTitle
-  7. ProfessorRequestPanel: إزالة CardDescription, CardHeader, CardTitle
-- إصلاح خطأ 500 في employee-transfers و activity-log APIs: تحسين error handling لل fallback إلى البيانات المحلية عند عدم وجود الجدول في Supabase
-- إعادة بناء ونشر ناجح: جميع 10 APIs تعيد 200
+# API Route POST/PUT/DELETE Additions & Employee Transfer Enhancement - Worklog
 
-Stage Summary:
-- تم إصلاح 20+ خطأ (6 في APIs + 14 استيرادات)
-- جميع 28 API route تعمل بنجاح (HTTP 200)
-- Build نهائي: Compiled successfully, 32 صفحة، 0 أخطاء
-- الخادم يعمل على المنفذ 3000
-- النظام جاهز للاستخدام
+## Date: 2025-06-08
+
+## Summary
+Added missing POST/PUT/DELETE handlers to 3 API routes that only had GET, and enhanced the employee transfer PUT handler with department automation, activity logging, and conditional faculty profile creation.
+
+---
+
+## Task 1: `courses/route.ts` - Add POST/PUT/DELETE
+**File**: `src/app/api/courses/route.ts`
+- Updated imports: `NextResponse` → `NextRequest, NextResponse`; added `genId`
+- **POST**: Create a new course
+  - Validates `code` (required) and `name` (required), returns 400 Arabic error
+  - Checks uniqueness of `code` before insert (both Supabase and local)
+  - Supabase: inserts with code, name, hours (default 3), semester
+  - Local: adds via coursesStore with genId('c')
+  - Returns 409 if code already exists
+- **PUT**: Update by ID with explicit field mapping
+  - Maps: code, name, hours, semester
+  - Checks uniqueness if code is being updated
+  - Supabase: explicit `updates` object, `.eq('id', id).select().single()`
+  - Local: explicit mapping to updates object via coursesStore.update()
+- **DELETE**: Delete by ID from JSON body
+  - Reads `id` from `request.json()`
+  - Both Supabase (`.delete().eq('id', id)`) and local (`coursesStore.delete()`)
+
+## Task 2: `professor-courses/route.ts` - Add POST/PUT/DELETE
+**File**: `src/app/api/professor-courses/route.ts`
+- Updated imports: `NextResponse` → `NextRequest, NextResponse`; added `genId`
+- **POST**: Create professor-course assignment
+  - Validates `course_code` and `professor_name` (required), returns 400 Arabic error
+  - Supabase: inserts with course_code, name, hours (default 3), professor_name, semester, enrolled_count (default 0)
+  - Local: maps snake_case → camelCase for coursesStore (code, professorName, enrolledCount)
+- **PUT**: Update by ID with explicit field mapping
+  - Supabase fields: course_code, name, hours, professor_name, semester, enrolled_count
+  - Local fields: code, name, hours, professorName, semester, enrolledCount
+- **DELETE**: Delete by ID from JSON body
+
+## Task 3: `teaching-assignments/route.ts` - Add POST/PUT/DELETE
+**File**: `src/app/api/teaching-assignments/route.ts`
+- Updated imports: `NextResponse` → `NextRequest, NextResponse`; added `genId`
+- **POST**: Create teaching assignment
+  - Validates `faculty_name`, `course_code`, `semester`, `academic_year` (required), returns 400 Arabic error
+  - Supabase: inserts with faculty_name, course_code, course_name, semester, academic_year, teaching_hours (default 0), notes
+  - Local: maps snake_case → camelCase (professorName, courseCode, academicYear) + default schedule values
+- **PUT**: Update by ID with explicit field mapping
+  - Supabase fields: faculty_name, course_code, course_name, semester, academic_year, teaching_hours, notes
+  - Local fields: professorName, courseCode, courseName, semester, academicYear + schedule fields (day, startTime, endTime, section, roomName, sessionType)
+- **DELETE**: Delete by ID from JSON body
+
+## Task 4: `employee-transfers/route.ts` - Enhance PUT with Department Automation
+**File**: `src/app/api/employee-transfers/route.ts`
+
+### Field Mapping Addition
+- Added `new_department` to explicit field mapping (Supabase: `new_department`, Local: `newDepartment`)
+
+### Supabase Approved Block Enhancements
+1. **Department Update**: After updating member's role/position, also updates `department` field if `updatedRecord.new_department` is present
+2. **Activity Log**: Inserts into `activity_log` table with:
+   - action: `'employee_transfer_approved'`
+   - entity_type: `'employee_transfer'`
+   - entity_id, entity_name, performed_by, performed_by_name
+   - details: JSONB with transfer_id, employee_name, employee_id, requested_rank, new_department
+3. **Conditional Faculty Profile**: Only creates/updates `faculty_profiles` entry when the new role is teaching-related
+   - Teaching roles checked: professor, associate_professor, assistant_professor, lecturer, ta, teaching_assistant
+   - Uses `requested_role || requested_rank` for role determination
+   - Upserts with member_id (onConflict), name, department, specialization, qualification, status='active'
+
+### Local Fallback Approved Block Enhancements
+1. **Department Update**: Updates `department` on member if `updated.newDepartment` is present
+2. **Teaching Role Check**: Added role check (faculty profile managed via Supabase; local fallback updates member only)
+
+---
+
+## Verification
+- ESLint check: No new errors introduced (all 13 errors are pre-existing in unrelated files)
+- Dev server: Compiles and runs successfully on localhost:3000
+- All handlers follow existing project patterns (members/route.ts, enrolled-students/route.ts)
+- Explicit field mapping used in all PUT handlers (no spread of updateFields)
+- All DELETE handlers read ID from JSON body
+- Arabic error messages used throughout

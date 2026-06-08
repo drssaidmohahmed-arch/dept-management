@@ -91,14 +91,26 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   const body = await request.json().catch(() => ({}));
-  const { id, ...updateFields } = body;
+  const { id } = body;
   if (!id) return NextResponse.json({ error: 'المعرف مطلوب' }, { status: 400 });
 
   const supabase = await getSupabaseOrFallback();
 
   if (supabase) {
     try {
-      const { data, error } = await supabase.from('course_descriptions').update(updateFields).eq('id', id).select().single();
+      const updates: Record<string, unknown> = {};
+      if (body.course_code !== undefined) updates.course_code = body.course_code;
+      if (body.description !== undefined) updates.description = body.description;
+      if (body.objectives !== undefined) updates.objectives = body.objectives;
+      if (body.topics !== undefined) updates.topics = body.topics;
+      if (body.textbooks !== undefined) updates.textbooks = body.textbooks;
+      if (body.ref_materials !== undefined) updates.ref_materials = body.ref_materials;
+      if (body.assessment_method !== undefined) updates.assessment_method = body.assessment_method;
+      if (body.updated_by !== undefined) updates.updated_by = body.updated_by;
+      if (body.version !== undefined) updates.version = body.version;
+      if (body.status !== undefined) updates.status = body.status;
+
+      const { data, error } = await supabase.from('course_descriptions').update(updates).eq('id', id).select().single();
       if (error) throw error;
       return NextResponse.json(data);
     } catch (error: unknown) {
@@ -108,7 +120,7 @@ export async function PUT(request: NextRequest) {
 
   // Fallback to local data
   const updates: Record<string, unknown> = { updatedAt: new Date().toISOString() };
-  Object.keys(updateFields).forEach((k) => { updates[k] = updateFields[k]; });
+  for (const [k, v] of Object.entries(body)) { if (k !== 'id') updates[k] = v; }
   const updated = courseDescriptionsStore.update(id, updates);
   if (!updated) return NextResponse.json({ error: 'الوصف غير موجود' }, { status: 404 });
   return NextResponse.json(updated);

@@ -93,14 +93,27 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   const body = await request.json().catch(() => ({}));
-  const { id, ...updateFields } = body;
+  const { id } = body;
   if (!id) return NextResponse.json({ error: 'المعرف مطلوب' }, { status: 400 });
 
   const supabase = await getSupabaseOrFallback();
 
   if (supabase) {
     try {
-      const { data, error } = await supabase.from('graduation_projects').update(updateFields).eq('id', id).select().single();
+      const updates: Record<string, unknown> = {};
+      if (body.student_id !== undefined) updates.student_id = body.student_id;
+      if (body.student_name !== undefined) updates.student_name = body.student_name;
+      if (body.title !== undefined) updates.title = body.title;
+      if (body.description !== undefined) updates.description = body.description;
+      if (body.supervisor_id !== undefined) updates.supervisor_id = body.supervisor_id;
+      if (body.supervisor_name !== undefined) updates.supervisor_name = body.supervisor_name;
+      if (body.project_type !== undefined) updates.project_type = body.project_type;
+      if (body.status !== undefined) updates.status = body.status;
+      if (body.grade !== undefined) updates.grade = body.grade;
+      if (body.submission_date !== undefined) updates.submission_date = body.submission_date;
+      if (body.defense_date !== undefined) updates.defense_date = body.defense_date;
+
+      const { data, error } = await supabase.from('graduation_projects').update(updates).eq('id', id).select().single();
       if (error) throw error;
       return NextResponse.json(data);
     } catch (error: unknown) {
@@ -110,7 +123,7 @@ export async function PUT(request: NextRequest) {
 
   // Fallback to local data
   const updates: Record<string, unknown> = { updatedAt: new Date().toISOString() };
-  Object.keys(updateFields).forEach((k) => { updates[k] = updateFields[k]; });
+  for (const [k, v] of Object.entries(body)) { if (k !== 'id') updates[k] = v; }
   const updated = graduationProjectsStore.update(id, updates);
   if (!updated) return NextResponse.json({ error: 'المشروع غير موجود' }, { status: 404 });
   return NextResponse.json(updated);

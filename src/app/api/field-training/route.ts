@@ -95,14 +95,28 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   const body = await request.json().catch(() => ({}));
-  const { id, ...updateFields } = body;
+  const { id } = body;
   if (!id) return NextResponse.json({ error: 'المعرف مطلوب' }, { status: 400 });
 
   const supabase = await getSupabaseOrFallback();
 
   if (supabase) {
     try {
-      const { data, error } = await supabase.from('field_training').update(updateFields).eq('id', id).select().single();
+      const updates: Record<string, unknown> = {};
+      if (body.student_id !== undefined) updates.student_id = body.student_id;
+      if (body.student_name !== undefined) updates.student_name = body.student_name;
+      if (body.organization_name !== undefined) updates.organization_name = body.organization_name;
+      if (body.supervisor_name !== undefined) updates.supervisor_name = body.supervisor_name;
+      if (body.supervisor_contact !== undefined) updates.supervisor_contact = body.supervisor_contact;
+      if (body.start_date !== undefined) updates.start_date = body.start_date;
+      if (body.end_date !== undefined) updates.end_date = body.end_date;
+      if (body.training_field !== undefined) updates.training_field = body.training_field;
+      if (body.status !== undefined) updates.status = body.status;
+      if (body.supervisor_rating !== undefined) updates.supervisor_rating = body.supervisor_rating;
+      if (body.advisor_rating !== undefined) updates.advisor_rating = body.advisor_rating;
+      if (body.report_submitted !== undefined) updates.report_submitted = body.report_submitted;
+
+      const { data, error } = await supabase.from('field_training').update(updates).eq('id', id).select().single();
       if (error) throw error;
       return NextResponse.json(data);
     } catch (error: unknown) {
@@ -112,7 +126,7 @@ export async function PUT(request: NextRequest) {
 
   // Fallback to local data
   const updates: Record<string, unknown> = { updatedAt: new Date().toISOString() };
-  Object.keys(updateFields).forEach((k) => { updates[k] = updateFields[k]; });
+  for (const [k, v] of Object.entries(body)) { if (k !== 'id') updates[k] = v; }
   const updated = fieldTrainingStore.update(id, updates);
   if (!updated) return NextResponse.json({ error: 'السجل غير موجود' }, { status: 404 });
   return NextResponse.json(updated);

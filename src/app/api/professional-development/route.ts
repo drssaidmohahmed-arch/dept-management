@@ -89,14 +89,26 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   const body = await request.json().catch(() => ({}));
-  const { id, ...updateFields } = body;
+  const { id } = body;
   if (!id) return NextResponse.json({ error: 'المعرف مطلوب' }, { status: 400 });
 
   const supabase = await getSupabaseOrFallback();
 
   if (supabase) {
     try {
-      const { data, error } = await supabase.from('professional_development').update(updateFields).eq('id', id).select().single();
+      const updates: Record<string, unknown> = {};
+      if (body.faculty_id !== undefined) updates.faculty_id = body.faculty_id;
+      if (body.faculty_name !== undefined) updates.faculty_name = body.faculty_name;
+      if (body.title !== undefined) updates.title = body.title;
+      if (body.activity_type !== undefined) updates.activity_type = body.activity_type;
+      if (body.provider !== undefined) updates.provider = body.provider;
+      if (body.location !== undefined) updates.location = body.location;
+      if (body.start_date !== undefined) updates.start_date = body.start_date;
+      if (body.end_date !== undefined) updates.end_date = body.end_date;
+      if (body.hours !== undefined) updates.hours = body.hours;
+      if (body.status !== undefined) updates.status = body.status;
+
+      const { data, error } = await supabase.from('professional_development').update(updates).eq('id', id).select().single();
       if (error) throw error;
       return NextResponse.json(data);
     } catch (error: unknown) {
@@ -106,7 +118,7 @@ export async function PUT(request: NextRequest) {
 
   // Fallback to local data
   const updates: Record<string, unknown> = { updatedAt: new Date().toISOString() };
-  Object.keys(updateFields).forEach((k) => { updates[k] = updateFields[k]; });
+  for (const [k, v] of Object.entries(body)) { if (k !== 'id') updates[k] = v; }
   const updated = professionalDevelopmentStore.update(id, updates);
   if (!updated) return NextResponse.json({ error: 'السجل غير موجود' }, { status: 404 });
   return NextResponse.json(updated);

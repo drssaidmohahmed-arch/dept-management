@@ -26,6 +26,7 @@ export interface Course {
   name: string;
   code: string;
   hours: number;
+  /** Computed/joined from enrolled_students — not a direct column on the courses table */
   grade?: string;
   semester: number;
 }
@@ -204,6 +205,7 @@ export interface EnrolledStudent {
 }
 
 export interface ProfessorCourse {
+  id: string;
   code: string;
   name: string;
   hours: number;
@@ -518,6 +520,7 @@ export interface EmployeeTransfer {
   reviewedBy?: string;
   reviewedByName?: string;
   reviewNotes?: string;
+  newDepartment?: string;
   createdAt: string;
   updatedAt?: string;
 }
@@ -965,16 +968,16 @@ const initialEnrolledStudents: EnrolledStudent[] = [
 
 const initialProfessorCourses: ProfessorCourse[] = [
   // Semester 1
-  { code: "CS101", name: "مقدمة في علوم الحاسب", hours: 3, semester: 1, professorName: "د. أحمد محمد الشريف", enrolledCount: 6 },
-  { code: "CS102", name: "مبادئ البرمجة", hours: 3, semester: 1, professorName: "د. أحمد محمد الشريف", enrolledCount: 5 },
-  { code: "MATH101", name: "رياضيات متقدمة", hours: 4, semester: 1, professorName: "د. فاطمة علي الحسن", enrolledCount: 5 },
+  { id: "pc-1", code: "CS101", name: "مقدمة في علوم الحاسب", hours: 3, semester: 1, professorName: "د. أحمد محمد الشريف", enrolledCount: 6 },
+  { id: "pc-2", code: "CS102", name: "مبادئ البرمجة", hours: 3, semester: 1, professorName: "د. أحمد محمد الشريف", enrolledCount: 5 },
+  { id: "pc-3", code: "MATH101", name: "رياضيات متقدمة", hours: 4, semester: 1, professorName: "د. فاطمة علي الحسن", enrolledCount: 5 },
   // Semester 2
-  { code: "CS201", name: "هياكل البيانات", hours: 3, semester: 2, professorName: "د. أحمد محمد الشريف", enrolledCount: 4 },
-  { code: "CS202", name: "قواعد البيانات", hours: 3, semester: 2, professorName: "د. فاطمة علي الحسن", enrolledCount: 3 },
-  { code: "CS205", name: "شبكات الحاسب ١", hours: 3, semester: 2, professorName: "د. خالد عبدالله العمري", enrolledCount: 2 },
+  { id: "pc-4", code: "CS201", name: "هياكل البيانات", hours: 3, semester: 2, professorName: "د. أحمد محمد الشريف", enrolledCount: 4 },
+  { id: "pc-5", code: "CS202", name: "قواعد البيانات", hours: 3, semester: 2, professorName: "د. فاطمة علي الحسن", enrolledCount: 3 },
+  { id: "pc-6", code: "CS205", name: "شبكات الحاسب ١", hours: 3, semester: 2, professorName: "د. خالد عبدالله العمري", enrolledCount: 2 },
   // Semester 3
-  { code: "CS301", name: "تحليل الخوارزميات", hours: 3, semester: 3, professorName: "د. أحمد محمد الشريف", enrolledCount: 3 },
-  { code: "CS305", name: "ذكاء اصطناعي", hours: 3, semester: 3, professorName: "د. فاطمة علي الحسن", enrolledCount: 3 },
+  { id: "pc-7", code: "CS301", name: "تحليل الخوارزميات", hours: 3, semester: 3, professorName: "د. أحمد محمد الشريف", enrolledCount: 3 },
+  { id: "pc-8", code: "CS305", name: "ذكاء اصطناعي", hours: 3, semester: 3, professorName: "د. فاطمة علي الحسن", enrolledCount: 3 },
 ];
 
 const initialMembers: DepartmentMember[] = [

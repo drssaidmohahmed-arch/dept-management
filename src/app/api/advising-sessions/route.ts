@@ -92,14 +92,25 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   const body = await request.json().catch(() => ({}));
-  const { id, ...updateFields } = body;
+  const { id } = body;
   if (!id) return NextResponse.json({ error: 'المعرف مطلوب' }, { status: 400 });
 
   const supabase = await getSupabaseOrFallback();
 
   if (supabase) {
     try {
-      const { data, error } = await supabase.from('advising_sessions').update(updateFields).eq('id', id).select().single();
+      const updates: Record<string, unknown> = {};
+      if (body.student_id !== undefined) updates.student_id = body.student_id;
+      if (body.student_name !== undefined) updates.student_name = body.student_name;
+      if (body.advisor_id !== undefined) updates.advisor_id = body.advisor_id;
+      if (body.advisor_name !== undefined) updates.advisor_name = body.advisor_name;
+      if (body.session_date !== undefined) updates.session_date = body.session_date;
+      if (body.session_type !== undefined) updates.session_type = body.session_type;
+      if (body.notes !== undefined) updates.notes = body.notes;
+      if (body.action_items !== undefined) updates.action_items = body.action_items;
+      if (body.follow_up_date !== undefined) updates.follow_up_date = body.follow_up_date;
+
+      const { data, error } = await supabase.from('advising_sessions').update(updates).eq('id', id).select().single();
       if (error) throw error;
       return NextResponse.json(data);
     } catch (error: unknown) {
@@ -109,7 +120,7 @@ export async function PUT(request: NextRequest) {
 
   // Fallback to local data
   const updates: Record<string, unknown> = {};
-  Object.keys(updateFields).forEach((k) => { updates[k] = updateFields[k]; });
+  for (const [k, v] of Object.entries(body)) { if (k !== 'id') updates[k] = v; }
   const updated = advisingSessionsStore.update(id, updates);
   if (!updated) return NextResponse.json({ error: 'الجلسة غير موجودة' }, { status: 404 });
   return NextResponse.json(updated);
