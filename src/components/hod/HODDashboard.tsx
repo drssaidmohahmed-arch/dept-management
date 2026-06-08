@@ -45,6 +45,7 @@ import {
   Shield,
 } from "lucide-react";
 import PermissionsManager from "@/components/hod/PermissionsManager";
+import StudentManagement from "@/components/hod/StudentManagement";
 import {
   useAnnouncements,
   useCourses,
@@ -126,6 +127,10 @@ export default function HODDashboard() {
           <TabsTrigger value="courses" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
             <BookOpen className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             <span className="truncate">المقررات</span>
+          </TabsTrigger>
+          <TabsTrigger value="students" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+            <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+            <span className="truncate">الطلبة</span>
           </TabsTrigger>
           <TabsTrigger value="permissions" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
             <Shield className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
@@ -360,6 +365,11 @@ export default function HODDashboard() {
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* Students Tab */}
+        <TabsContent value="students" className="mt-3 sm:mt-4">
+          <StudentManagement />
         </TabsContent>
 
         {/* Permissions Tab */}

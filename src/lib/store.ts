@@ -274,6 +274,9 @@ export interface StoreState {
 
 // ============ Constants ============
 
+export const MAX_CREDIT_HOURS_PER_SEMESTER = 21;
+export const REGISTRATION_SEMESTER = 3; // Current registration semester
+
 export const PRIORITY_LABELS: Record<string, string> = {
   urgent: "عاجل",
   important: "مهم",

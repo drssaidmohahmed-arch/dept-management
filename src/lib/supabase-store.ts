@@ -42,6 +42,8 @@ export {
   TARGET_ROLE_LABELS,
   REQUEST_STATUS_LABELS,
   REQUEST_STATUS_COLORS,
+  MAX_CREDIT_HOURS_PER_SEMESTER,
+  REGISTRATION_SEMESTER,
 } from './store';
 
 // Import types for local use (these are already re-exported above)
@@ -794,4 +796,78 @@ export function getAnnouncementsForRole(
     .filter(
       (a) => a.targetRole === 'all' || a.targetRole === role
     );
+}
+
+// ============ Enrollment Actions ============
+
+export async function addEnrollment(enrollment: {
+  studentId: string;
+  studentName: string;
+  courseCode: string;
+  semester: number;
+  status?: string;
+}) {
+  const result = await apiCall('/api/enrolled-students', {
+    method: 'POST',
+    body: JSON.stringify({
+      student_id: enrollment.studentId,
+      student_name: enrollment.studentName,
+      course_code: enrollment.courseCode,
+      semester: enrollment.semester,
+      status: enrollment.status || 'active',
+    }),
+  });
+  if (!result.ok) {
+    console.error('Error adding enrollment:', result.error);
+    showNotification('حدث خطأ أثناء التسجيل في المقرر', true);
+  } else {
+    showNotification('تم التسجيل في المقرر بنجاح');
+  }
+  return result;
+}
+
+export async function updateEnrollmentGrade(
+  id: string,
+  updates: {
+    grade?: string;
+    midTermMark?: number;
+    finalMark?: number;
+    assignmentsMark?: number;
+    attendance?: number;
+    status?: string;
+  }
+) {
+  const body: Record<string, unknown> = { id };
+  if (updates.grade !== undefined) body.grade = updates.grade;
+  if (updates.midTermMark !== undefined) body.mid_term_mark = updates.midTermMark;
+  if (updates.finalMark !== undefined) body.final_mark = updates.finalMark;
+  if (updates.assignmentsMark !== undefined) body.assignments_mark = updates.assignmentsMark;
+  if (updates.attendance !== undefined) body.attendance = updates.attendance;
+  if (updates.status !== undefined) body.status = updates.status;
+
+  const result = await apiCall('/api/enrolled-students', {
+    method: 'PUT',
+    body: JSON.stringify(body),
+  });
+  if (!result.ok) {
+    console.error('Error updating enrollment:', result.error);
+    showNotification('حدث خطأ أثناء تحديث البيانات', true);
+  } else {
+    showNotification('تم تحديث البيانات بنجاح');
+  }
+  return result;
+}
+
+export async function deleteEnrollment(id: string) {
+  const result = await apiCall('/api/enrolled-students', {
+    method: 'DELETE',
+    body: JSON.stringify({ id }),
+  });
+  if (!result.ok) {
+    console.error('Error deleting enrollment:', result.error);
+    showNotification('حدث خطأ أثناء إلغاء التسجيل', true);
+  } else {
+    showNotification('تم إلغاء التسجيل من المقرر بنجاح');
+  }
+  return result;
 }
