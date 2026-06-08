@@ -32,13 +32,7 @@ export default function EmployeeDashboard() {
     [announcements]
   );
 
-  const statCards = [
-    { label: "الإعلانات", value: employeeAnnouncements.length, icon: Bell, color: "bg-cyan-50 text-cyan-700" },
-    { label: "مكتملة", value: 12, icon: CheckCircle2, color: "bg-emerald-50 text-emerald-700" },
-    { label: "معلقة", value: 5, icon: Clock, color: "bg-amber-50 text-amber-700" },
-    { label: "الإجمالي", value: 17, icon: ClipboardCheck, color: "bg-purple-50 text-purple-700" },
-  ];
-
+  // Note: Tasks are mock data. In production, connect to a tasks API/table.
   const tasks = [
     { id: 1, title: "تحديث سجلات الطلاب", status: "completed", dueDate: "2025-01-15" },
     { id: 2, title: "إعداد تقرير الفصل الدراسي", status: "pending", dueDate: "2025-01-20" },
@@ -48,6 +42,13 @@ export default function EmployeeDashboard() {
     { id: 6, title: "متابعة صيانة المعامل", status: "pending", dueDate: "2025-01-25" },
     { id: 7, title: "أرشفة الوثائق القديمة", status: "completed", dueDate: "2025-01-10" },
     { id: 8, title: "تحديث بيانات المقررات", status: "pending", dueDate: "2025-01-28" },
+  ];
+
+  const statCards = [
+    { label: "الإعلانات", value: employeeAnnouncements.length, icon: Bell, color: "bg-cyan-50 text-cyan-700" },
+    { label: "مكتملة", value: tasks.filter((t) => t.status === "completed").length, icon: CheckCircle2, color: "bg-emerald-50 text-emerald-700" },
+    { label: "معلقة", value: tasks.filter((t) => t.status === "pending").length, icon: Clock, color: "bg-amber-50 text-amber-700" },
+    { label: "الإجمالي", value: tasks.length, icon: ClipboardCheck, color: "bg-purple-50 text-purple-700" },
   ];
 
   const statusIcon = (status: string) => {

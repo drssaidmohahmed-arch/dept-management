@@ -212,15 +212,15 @@ function StudentDashboard() {
         <TabsList className="grid w-full grid-cols-3 h-auto">
           <TabsTrigger value="announcements" className="flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-1.5 sm:px-3 py-1.5 sm:py-2">
             <Bell className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-            <span className="hidden xs:inline">الإعلانات</span>
+            <span className="hidden sm:inline">الإعلانات</span>
           </TabsTrigger>
           <TabsTrigger value="courses" className="flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-1.5 sm:px-3 py-1.5 sm:py-2">
             <BookOpen className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-            <span className="hidden xs:inline">المواد</span>
+            <span className="hidden sm:inline">المواد</span>
           </TabsTrigger>
           <TabsTrigger value="requests" className="flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-1.5 sm:px-3 py-1.5 sm:py-2">
             <ClipboardList className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-            <span className="hidden xs:inline">الطلبات</span>
+            <span className="hidden sm:inline">الطلبات</span>
           </TabsTrigger>
         </TabsList>
 

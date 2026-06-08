@@ -175,6 +175,7 @@ function useToast() {
   const [state, setState] = React.useState<State>(memoryState)
 
   React.useEffect(() => {
+    setState(memoryState)
     listeners.push(setState)
     return () => {
       const index = listeners.indexOf(setState)
@@ -182,7 +183,7 @@ function useToast() {
         listeners.splice(index, 1)
       }
     }
-  }, [state])
+  }, [])
 
   return {
     ...state,

@@ -1,6 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  if (typeof error === 'string') return error;
+  return 'حدث خطأ غير متوقع';
+}
+
+function sanitizeSearchInput(input: string): string {
+  return input.replace(/[%_.(),]/g, '').trim();
+}
+
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient();
@@ -14,18 +24,21 @@ export async function GET(request: NextRequest) {
       query = query.eq('status', status);
     }
 
-    // Search by type or description
+    // Search by type or description (sanitized)
     const search = searchParams.get('search');
     if (search) {
-      query = query.or(`type.ilike.%${search}%,description.ilike.%${search}%`);
+      const sanitized = sanitizeSearchInput(search);
+      if (sanitized) {
+        query = query.or(`type.ilike.%${sanitized}%,description.ilike.%${sanitized}%`);
+      }
     }
 
     const { data, error } = await query.order('created_at', { ascending: false });
 
     if (error) throw error;
     return NextResponse.json(data);
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
   }
 }
 
@@ -46,8 +59,8 @@ export async function POST(request: NextRequest) {
 
     if (error) throw error;
     return NextResponse.json(data, { status: 201 });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
   }
 }
 
@@ -67,7 +80,7 @@ export async function DELETE(request: NextRequest) {
 
     if (error) throw error;
     return NextResponse.json({ success: true });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
   }
 }

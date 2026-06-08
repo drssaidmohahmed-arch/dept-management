@@ -1,6 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  if (typeof error === 'string') return error;
+  return 'حدث خطأ غير متوقع';
+}
+
+function sanitizeSearchInput(input: string): string {
+  // Remove characters that could break Supabase PostgREST filter syntax
+  return input.replace(/[%_.(),]/g, '').trim();
+}
+
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient();
@@ -20,17 +31,20 @@ export async function GET(request: NextRequest) {
       query = query.eq('semester', Number(semester));
     }
 
-    // Search by student ID or name
+    // Search by student ID or name (sanitized)
     const search = searchParams.get('search');
     if (search) {
-      query = query.or(`student_id.ilike.%${search}%,student_name.ilike.%${search}%`);
+      const sanitized = sanitizeSearchInput(search);
+      if (sanitized) {
+        query = query.or(`student_id.ilike.%${sanitized}%,student_name.ilike.%${sanitized}%`);
+      }
     }
 
     const { data, error } = await query.order('student_id', { ascending: true });
 
     if (error) throw error;
     return NextResponse.json(data);
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
   }
 }

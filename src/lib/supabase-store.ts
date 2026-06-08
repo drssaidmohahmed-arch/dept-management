@@ -82,9 +82,9 @@ const EMPTY_STATS = {
   totalAnnouncements: 0,
   professors: 0,
   employees: 0,
-  students: 156,
+  students: 0,
   totalRequests: 0,
-  averageGPA: 3.67,
+  averageGPA: 0,
   totalMembers: 0,
   activeMembers: 0,
 };
@@ -422,13 +422,48 @@ export async function getStats() {
       (m: Record<string, unknown>) => m.role === 'employee' && m.is_active === true
     ).length;
 
+    // Count unique students from enrolled_students table
+    const enrolledRes = await sb
+      .from('enrolled_students')
+      .select('student_id', { head: true })
+      .neq('student_id', null);
+
+    // Calculate average GPA from enrolled students with grades
+    const gradedRes = await sb
+      .from('enrolled_students')
+      .select('grade')
+      .not('grade', 'is', null);
+
+    const gradeToPoints: Record<string, number> = {
+      'أ+': 4.0, 'أ': 4.0, 'أ-': 3.7,
+      'ب+': 3.3, 'ب': 3.0, 'ب-': 2.7,
+      'ج+': 2.3, 'ج': 2.0, 'ج-': 1.7,
+      'د+': 1.3, 'د': 1.0, 'د-': 0.7,
+      'ر': 0.0,
+    };
+
+    const gradedStudents = gradedRes.data || [];
+    const totalPoints = gradedStudents.reduce(
+      (sum: number, row: Record<string, unknown>) =>
+        sum + (gradeToPoints[String(row.grade)] || 0),
+      0
+    );
+    const averageGPA = gradedStudents.length > 0
+      ? Math.round((totalPoints / gradedStudents.length) * 100) / 100
+      : 0;
+
+    // Get unique student count from enrolled_students
+    const studentSet = new Set(
+      (enrolledRes.data || []).map((r: Record<string, unknown>) => String(r.student_id))
+    );
+
     return {
       totalAnnouncements: announcementsRes.count || 0,
       professors: activeProfessors,
       employees: activeEmployees,
-      students: 156,
+      students: studentSet.size,
       totalRequests: requestsRes.count || 0,
-      averageGPA: 3.67,
+      averageGPA,
       totalMembers: members.length,
       activeMembers: members.filter(
         (m: Record<string, unknown>) => m.is_active === true
@@ -505,9 +540,10 @@ async function apiCall(path: string, options?: RequestInit): Promise<{ ok: boole
     }
     const data = await res.json().catch(() => null);
     return { ok: true, data };
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'فشل الاتصال بالخادم';
     console.error(`API call failed [${path}]:`, err);
-    return { ok: false, error: err.message || 'فشل الاتصال بالخادم' };
+    return { ok: false, error: message };
   }
 }
 
