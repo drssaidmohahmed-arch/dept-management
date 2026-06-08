@@ -219,7 +219,7 @@ CREATE TABLE course_descriptions (
   objectives TEXT[] DEFAULT '{}',
   topics TEXT[] DEFAULT '{}',
   textbooks TEXT[] DEFAULT '{}',
-  references TEXT[] DEFAULT '{}',
+  ref_materials TEXT[] DEFAULT '{}',
   assessment_method TEXT DEFAULT '',
   updated_by TEXT DEFAULT '',
   version INTEGER DEFAULT 1,
@@ -615,7 +615,7 @@ INSERT INTO plan_courses (id, plan_id, course_code, semester_order, course_type,
 -- -----------------------------------------------------------------------------
 -- Course Descriptions (8 records - matching existing courses)
 -- -----------------------------------------------------------------------------
-INSERT INTO course_descriptions (id, course_code, description, objectives, topics, textbooks, references, assessment_method, updated_by, version, status, created_at) VALUES
+INSERT INTO course_descriptions (id, course_code, description, objectives, topics, textbooks, ref_materials, assessment_method, updated_by, version, status, created_at) VALUES
   ('88880012-0000-0000-0000-000000000001', 'CS101', 'مقرر تأسيسي يقدم مقدمة شاملة في مجال علوم الحاسب، يغطي المفاهيم الأساسية للتقنية والحوسبة وتاريخ تطور علوم الحاسب.', ARRAY['فهم المفاهيم الأساسية لعلوم الحاسب', 'التعرف على أنظمة الأرقام والتحويلات', 'فهم بنية الحاسوب ومكوناته', 'تطبيق مهارات التفكير الحسابي'], ARRAY['تاريخ علوم الحاسب', 'أنظمة الأرقام والتحويلات', 'بنية الحاسوب', 'أنظمة التشغيل', 'الشبكات والإنترنت', 'أمن المعلومات'], ARRAY['Computer Science Illuminated', 'مقدمة في علوم الحاسب - ترجمة عربية'], ARRAY['ACM Computer Science Curricula', 'IEEE Computer Society Standards'], 'مشاريع 20% + وسط 30% + نهائي 50%', 'د. أحمد محمد الشريف', 2, 'approved', '2024-09-01T00:00:00.000Z'),
   ('88880012-0000-0000-0000-000000000002', 'CS102', 'مقرر تأسيسي في البرمجة يركز على تعلم أساسيات البرمجة باستخدام لغة Python مع التطبيق العملي من خلال مشاريع.', ARRAY['اكتساب مهارات البرمجة الأساسية', 'فهم المفاهيم البرمجية', 'كتابة برامج صحيحة وكفؤة', 'حل المشكلات باستخدام البرمجة'], ARRAY['متغيرات وأنواع البيانات', 'العمليات الحسابية والمنطقية', 'الجمل الشرطية', 'الحلقات التكرارية', 'الدوال والإجراءات', 'المصفوفات'], ARRAY['Python Crash Course', 'Think Python'], ARRAY['The Python Tutorial - python.org'], 'أعمال 30% + وسط 30% + نهائي 40%', 'د. أحمد محمد الشريف', 3, 'approved', '2024-09-01T00:00:00.000Z'),
   ('88880012-0000-0000-0000-000000000003', 'MATH101', 'مقرر في الرياضيات المتقدمة يغطي التفاضل والتكامل والجبر الخطي ومفاهيم الرياضيات الأساسية لطلاب علوم الحاسب.', ARRAY['فهم المفاهيم الأساسية للتفاضل والتكامل', 'تطبيق التقنيات الرياضية في حل المسائل', 'فهم أساسيات الجبر الخطي', 'تطوير التفكير الرياضي والتحليلي'], ARRAY['الدوال والنهايات', 'الاشتقاق والتفاضل', 'التكامل', 'المتتاليات والمتسلسلات', 'الجبر الخطي الأساسي'], ARRAY['Calculus: Early Transcendentals', 'Linear Algebra and Its Applications'], ARRAY['Khan Academy Math Resources', 'MIT OpenCourseWare'], 'واجبات 20% + وسط 30% + نهائي 50%', 'د. فاطمة علي الحسن', 1, 'approved', '2024-09-01T00:00:00.000Z'),

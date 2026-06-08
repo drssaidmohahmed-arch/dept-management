@@ -728,7 +728,7 @@ export interface Database {
           objectives: string[]
           topics: string[]
           textbooks: string[]
-          references: string[]
+          ref_materials: string[]
           assessment_method: string
           updated_by: string
           version: number

@@ -456,7 +456,7 @@ export interface CourseDescription {
   objectives: string[];
   topics: string[];
   textbooks: string[];
-  references: string[];
+  refMaterials: string[];
   assessmentMethod: string;
   updatedBy: string;
   version: number;

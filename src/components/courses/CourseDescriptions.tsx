@@ -80,9 +80,7 @@ const mockDescriptions: CourseDescription[] = [
       "مقدمة في الخوارزميات",
     ],
     textbooks: ["مقدمة في علوم الحاسب - د. أحمد الشريف"],
-    references: [
-      "Computer Science Illuminated - Nell Dale",
-      "Structured Computer Organization - Andrew Tanenbaum",
+    refMaterials: [
     ],
     assessmentMethod: "40% أعمال فصلية، 60% نهائي",
     updatedBy: "د. أحمد محمد الشريف",
@@ -112,7 +110,7 @@ const mockDescriptions: CourseDescription[] = [
       "خوارزميات البحث والترتيب",
     ],
     textbooks: ["هياكل البيانات وتحليل الخوارزميات - د. فاطمة الحسن"],
-    references: [
+    refMaterials: [
       "Introduction to Algorithms - Cormen et al.",
       "Data Structures and Algorithms in Java - Robert Lafore",
     ],
@@ -130,7 +128,7 @@ const mockDescriptions: CourseDescription[] = [
     objectives: ["فهم مفاهيم الذكاء الاصطناعي", "تطبيق خوارزميات البحث", "بناء نماذج تعلم بسيطة"],
     topics: ["مقدمة في الذكاء الاصطناعي", "خوارزميات البحث", "شبكات عصبية بسيطة"],
     textbooks: ["Artificial Intelligence: A Modern Approach"],
-    references: [],
+    refMaterials: [],
     assessmentMethod: "40% أعمال فصلية، 60% مشروع",
     updatedBy: "د. خالد العمري",
     version: 1,
@@ -167,8 +165,8 @@ export default function CourseDescriptions() {
     topicInput: "",
     textbooks: [] as string[],
     textbookInput: "",
-    references: [] as string[],
-    referenceInput: "",
+    refMaterials: [] as string[],
+    refMaterialInput: "",
     assessmentMethod: "",
     updatedBy: "",
     status: "draft" as DescriptionStatus,
@@ -256,8 +254,8 @@ export default function CourseDescriptions() {
       topicInput: "",
       textbooks: [...desc.textbooks],
       textbookInput: "",
-      references: [...desc.references],
-      referenceInput: "",
+      refMaterials: [...(desc as any).refMaterials || (desc as any).references || []],
+      refMaterialInput: "",
       assessmentMethod: desc.assessmentMethod,
       updatedBy: desc.updatedBy,
       status: desc.status,
@@ -275,8 +273,8 @@ export default function CourseDescriptions() {
       topicInput: "",
       textbooks: [],
       textbookInput: "",
-      references: [],
-      referenceInput: "",
+      refMaterials: [],
+      refMaterialInput: "",
       assessmentMethod: "",
       updatedBy: "",
       status: "draft",
@@ -284,15 +282,15 @@ export default function CourseDescriptions() {
   };
 
   // Array field helpers
-  const addToArray = (field: "objectives" | "topics" | "textbooks" | "references", inputField: string) => {
-    const inputKey = `${field === "objectives" ? "objectiveInput" : field === "topics" ? "topicInput" : field === "textbooks" ? "textbookInput" : "referenceInput"}` as keyof typeof form;
+  const addToArray = (field: "objectives" | "topics" | "textbooks" | "refMaterials", inputField: string) => {
+    const inputKey = `${field === "objectives" ? "objectiveInput" : field === "topics" ? "topicInput" : field === "textbooks" ? "textbookInput" : "refMaterialInput"}` as keyof typeof form;
     const val = (form[inputKey] as string).trim();
     if (val && !form[field].includes(val)) {
       setForm({ ...form, [field]: [...form[field], val], [inputKey]: "" });
     }
   };
 
-  const removeFromArray = (field: "objectives" | "topics" | "textbooks" | "references", index: number) => {
+  const removeFromArray = (field: "objectives" | "topics" | "textbooks" | "refMaterials", index: number) => {
     setForm({ ...form, [field]: form[field].filter((_, i) => i !== index) });
   };
 
@@ -331,10 +329,10 @@ export default function CourseDescriptions() {
           <ol className="list-decimal list-inside mb-4">{selectedDesc.topics.map((t, i) => <li key={i}>{t}</li>)}</ol>
           <h3 className="font-bold text-lg mb-2">الكتب المقررة</h3>
           <ul className="list-disc list-inside mb-4">{selectedDesc.textbooks.map((t, i) => <li key={i}>{t}</li>)}</ul>
-          {selectedDesc.references.length > 0 && (
+          {(selectedDesc as any).refMaterials?.length > 0 && (
             <>
               <h3 className="font-bold text-lg mb-2">المراجع</h3>
-              <ul className="list-disc list-inside mb-4">{selectedDesc.references.map((r, i) => <li key={i}>{r}</li>)}</ul>
+              <ul className="list-disc list-inside mb-4">{(selectedDesc as any).refMaterials.map((r: string, i: number) => <li key={i}>{r}</li>)}</ul>
             </>
           )}
           <h3 className="font-bold text-lg mb-2">طريقة التقييم</h3>
@@ -438,17 +436,17 @@ export default function CourseDescriptions() {
                 )}
               </div>
               <div className="space-y-1.5">
-                <Label>المراجع ({form.references.length})</Label>
+                <Label>المراجع ({form.refMaterials.length})</Label>
                 <div className="flex gap-2">
-                  <Input value={form.referenceInput} onChange={(e) => setForm({ ...form, referenceInput: e.target.value })} placeholder="المرجع" onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addToArray("references", "referenceInput"); } }} />
-                  <Button variant="outline" size="sm" onClick={() => addToArray("references", "referenceInput")}>إضافة</Button>
+                  <Input value={form.refMaterialInput} onChange={(e) => setForm({ ...form, refMaterialInput: e.target.value })} placeholder="المرجع" onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addToArray("refMaterials", "refMaterialInput"); } }} />
+                  <Button variant="outline" size="sm" onClick={() => addToArray("refMaterials", "refMaterialInput")}>إضافة</Button>
                 </div>
-                {form.references.length > 0 && (
+                {form.refMaterials.length > 0 && (
                   <div className="flex flex-wrap gap-1 mt-1">
-                    {form.references.map((r, i) => (
+                    {form.refMaterials.map((r, i) => (
                       <Badge key={i} variant="outline" className="text-xs flex items-center gap-1">
                         {r}
-                        <button onClick={() => removeFromArray("references", i)} className="hover:text-red-500">×</button>
+                        <button onClick={() => removeFromArray("refMaterials", i)} className="hover:text-red-500">×</button>
                       </Badge>
                     ))}
                   </div>
@@ -610,14 +608,14 @@ export default function CourseDescriptions() {
             </Card>
 
             {/* References */}
-            {selectedDesc.references.length > 0 && (
+            {(selectedDesc as any).refMaterials?.length > 0 && (
               <Card>
                 <CardHeader className="p-3 pb-2">
                   <CardTitle className="text-sm">المراجع</CardTitle>
                 </CardHeader>
                 <CardContent className="p-3 pt-0">
                   <ul className="space-y-1.5">
-                    {selectedDesc.references.map((r, i) => (
+                    {(selectedDesc as any).refMaterials.map((r: string, i: number) => (
                       <li key={i} className="text-sm text-muted-foreground">{i + 1}. {r}</li>
                     ))}
                   </ul>
