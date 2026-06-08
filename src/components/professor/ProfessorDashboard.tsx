@@ -4,8 +4,6 @@ import { useMemo } from "react";
 import {
   Card,
   CardContent,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -15,13 +13,13 @@ import {
   Users,
   ClipboardList,
   Calendar,
-  Clock,
   GraduationCap,
   UserCheck,
   Send,
   TrendingUp,
   BarChart3,
   FileUser,
+  Database,
 } from "lucide-react";
 import {
   useAnnouncements,
@@ -72,22 +70,25 @@ export default function ProfessorDashboard() {
     { label: "العاجلة", value: urgentAnnouncements.length, icon: ClipboardList, color: "bg-red-50 text-red-700" },
   ];
 
-  const schedule = [
-    { day: "الأحد", time: "08:00 - 09:30", course: "مقدمة في علوم الحاسب", room: "قاعة 101", type: "محاضرة" },
-    { day: "الأحد", time: "10:00 - 11:30", course: "هياكل البيانات", room: "قاعة 203", type: "محاضرة" },
-    { day: "الأحد", time: "13:00 - 14:00", course: "مقدمة في علوم الحاسب", room: "معمل 5", type: "معمل" },
-    { day: "الاثنين", time: "08:00 - 09:30", course: "قواعد البيانات", room: "قاعة 105", type: "محاضرة" },
-    { day: "الاثنين", time: "10:00 - 11:30", course: "تحليل الخوارزميات", room: "قاعة 301", type: "محاضرة" },
-    { day: "الثلاثاء", time: "08:00 - 09:30", course: "هياكل البيانات", room: "معمل 3", type: "معمل" },
-    { day: "الثلاثاء", time: "13:00 - 14:30", course: "قواعد البيانات", room: "معمل 2", type: "معمل" },
-    { day: "الأربعاء", time: "08:00 - 09:30", course: "مقدمة في علوم الحاسب", room: "قاعة 101", type: "محاضرة" },
-    { day: "الأربعاء", time: "10:00 - 11:30", course: "تحليل الخوارزميات", room: "قاعة 301", type: "محاضرة" },
-    { day: "الخميس", time: "08:00 - 09:30", course: "هياكل البيانات", room: "قاعة 203", type: "محاضرة" },
-  ];
-
   return (
     <div className="space-y-4 sm:space-y-6">
-      {/* Urgent */}
+      {/* Gradient Header */}
+      <div className="bg-gradient-to-l from-emerald-600 to-emerald-800 rounded-2xl p-4 sm:p-6 text-white relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSA2MCAwIEwgMCAwIDAgNjAiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSgyNTUsMjU1LDI1NSwwLjAzKSIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-50" />
+        <div className="relative z-10">
+          <div className="flex items-center gap-2.5 sm:gap-3 mb-3">
+            <div className="w-9 h-9 sm:w-11 sm:h-11 bg-white/15 backdrop-blur-sm rounded-xl flex items-center justify-center">
+              <GraduationCap className="w-4.5 h-4.5 sm:w-6 sm:h-6" />
+            </div>
+            <div>
+              <h2 className="text-base sm:text-xl md:text-2xl font-bold">لوحة تحكم عضو هيئة التدريس</h2>
+              <p className="text-emerald-200 text-[10px] sm:text-xs">المعلومات الأكاديمية والجدول التدريسي</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Urgent Announcements Banner */}
       {urgentAnnouncements.length > 0 && (
         <div className="bg-red-50 border border-red-200 rounded-xl p-3 sm:p-4">
           <h3 className="text-red-800 font-bold text-base sm:text-lg mb-3 flex items-center gap-2">
@@ -108,12 +109,12 @@ export default function ProfessorDashboard() {
         </div>
       )}
 
-      {/* Stat Cards - 2 cols on mobile */}
+      {/* Stat Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
         {statCards.map((card) => {
           const Icon = card.icon;
           return (
-            <Card key={card.label}>
+            <Card key={card.label} className="hover:shadow-md transition-shadow">
               <CardContent className="p-2.5 sm:p-3 md:p-4">
                 <div className="flex items-center gap-2 sm:gap-3 flex-row-reverse">
                   <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center shrink-0 ${card.color}`}>
@@ -132,32 +133,32 @@ export default function ProfessorDashboard() {
 
       {/* Tabs */}
       <Tabs defaultValue="announcements" className="w-full">
-        <TabsList className="w-full flex flex-wrap h-auto gap-1 p-1">
-          <TabsTrigger value="announcements" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+        <TabsList className="w-full flex flex-wrap h-auto gap-1 p-1 bg-white border rounded-xl shadow-sm">
+          <TabsTrigger value="announcements" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
             <Bell className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             <span className="truncate">الإعلانات</span>
           </TabsTrigger>
-          <TabsTrigger value="schedule" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+          <TabsTrigger value="schedule" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
             <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             <span className="truncate">جدولي التدريسي</span>
           </TabsTrigger>
-          <TabsTrigger value="students" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+          <TabsTrigger value="students" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
             <UserCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             <span className="truncate">الطلبة</span>
           </TabsTrigger>
-          <TabsTrigger value="requests" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+          <TabsTrigger value="requests" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
             <Send className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             <span className="truncate">الطلبات</span>
           </TabsTrigger>
-          <TabsTrigger value="profile" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+          <TabsTrigger value="profile" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
             <FileUser className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             <span className="truncate">الملف الأكاديمي</span>
           </TabsTrigger>
-          <TabsTrigger value="development" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+          <TabsTrigger value="development" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
             <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             <span className="truncate">التطوير المهني</span>
           </TabsTrigger>
-          <TabsTrigger value="evaluations" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+          <TabsTrigger value="evaluations" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
             <BarChart3 className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             <span className="truncate">تقييم الأداء</span>
           </TabsTrigger>
@@ -201,7 +202,6 @@ export default function ProfessorDashboard() {
           )}
         </TabsContent>
 
-        {/* Teaching Schedule Tab */}
         <TabsContent value="schedule" className="mt-3 sm:mt-4">
           <TeachingSchedule />
         </TabsContent>
@@ -214,17 +214,14 @@ export default function ProfessorDashboard() {
           <ProfessorRequestPanel />
         </TabsContent>
 
-        {/* Academic Profile Tab */}
         <TabsContent value="profile" className="mt-3 sm:mt-4">
           <FacultyProfiles />
         </TabsContent>
 
-        {/* Professional Development Tab */}
         <TabsContent value="development" className="mt-3 sm:mt-4">
           <ProfessionalDevelopment />
         </TabsContent>
 
-        {/* Performance Evaluations Tab */}
         <TabsContent value="evaluations" className="mt-3 sm:mt-4">
           <PerformanceEvaluations />
         </TabsContent>

@@ -8,6 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import {
   Crown,
   GraduationCap,
@@ -15,6 +16,7 @@ import {
   BookOpen,
   ArrowLeft,
   ArrowRight,
+  Database,
 } from "lucide-react";
 import HODDashboard from "@/components/hod/HODDashboard";
 import ProfessorDashboard from "@/components/professor/ProfessorDashboard";
@@ -147,7 +149,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50">
+    <div className="min-h-screen flex flex-col bg-slate-50 relative">
       {/* Header - compact on mobile */}
       <header className="bg-white border-b sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between">
@@ -186,6 +188,17 @@ export default function Home() {
           © ٢٠٢٥ نظام إدارة القسم الأكاديمي
         </p>
       </footer>
+
+      {/* Floating Migration Button */}
+      <Link
+        href="/migrate"
+        className="fixed bottom-4 left-4 z-50 flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-white rounded-full px-3 py-2 shadow-lg hover:shadow-xl transition-all text-[10px] sm:text-xs"
+        title="تشغيل Migration"
+      >
+        <Database className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+        <span className="hidden sm:inline">تشغيل Migration</span>
+        <span className="sm:hidden">Migration</span>
+      </Link>
     </div>
   );
 }

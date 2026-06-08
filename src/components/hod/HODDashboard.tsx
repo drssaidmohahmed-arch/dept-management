@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Dialog,
   DialogContent,
@@ -49,6 +50,10 @@ import {
   Clock,
   Building2,
   CalendarDays,
+  Database,
+  CheckCircle2,
+  AlertTriangle,
+  Crown,
 } from "lucide-react";
 import PermissionsManager from "@/components/hod/PermissionsManager";
 import StudentManagement from "@/components/hod/StudentManagement";
@@ -75,6 +80,26 @@ import {
   useStats,
 } from "@/lib/supabase-store";
 
+function useMigrationStatus() {
+  const [migrated, setMigrated] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch('/api/migration-status');
+        const data = await res.json();
+        if (!cancelled) setMigrated(data.migrated);
+      } catch {
+        if (!cancelled) setMigrated(null);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  return { migrated };
+}
+
 export default function HODDashboard() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [title, setTitle] = useState("");
@@ -85,6 +110,7 @@ export default function HODDashboard() {
   const announcements = useAnnouncements();
   const stats = useStats();
   const courses = useCourses();
+  const { migrated } = useMigrationStatus();
 
   const handleAddAnnouncement = async () => {
     if (!title.trim() || !content.trim()) return;
@@ -107,12 +133,57 @@ export default function HODDashboard() {
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      {/* Statistics Cards - 3 cols on mobile, 6 on desktop */}
+      {/* Gradient Header */}
+      <div className="bg-gradient-to-l from-blue-700 to-blue-900 rounded-2xl p-4 sm:p-6 text-white relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSA2MCAwIEwgMCAwIDAgNjAiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSgyNTUsMjU1LDI1NSwwLjAzKSIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-50" />
+        <div className="relative z-10">
+          <div className="flex items-center justify-between gap-3 mb-3 sm:mb-4">
+            <div className="flex items-center gap-2.5 sm:gap-3">
+              <div className="w-9 h-9 sm:w-11 sm:h-11 bg-white/15 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                <Crown className="w-4.5 h-4.5 sm:w-6 sm:h-6" />
+              </div>
+              <div>
+                <h2 className="text-base sm:text-xl md:text-2xl font-bold">لوحة تحكم رئيس القسم</h2>
+                <p className="text-blue-200 text-[10px] sm:text-xs">نظرة شاملة على القسم الأكاديمي</p>
+              </div>
+            </div>
+            {/* System Status Badge */}
+            <Badge
+              className={`text-[9px] sm:text-[10px] px-2 py-1 shrink-0 ${
+                migrated === true
+                  ? "bg-emerald-500/20 text-emerald-100 border border-emerald-400/30"
+                  : migrated === false
+                  ? "bg-amber-500/20 text-amber-100 border border-amber-400/30"
+                  : "bg-white/10 text-blue-200 border border-white/20"
+              }`}
+            >
+              {migrated === true ? (
+                <span className="flex items-center gap-1">
+                  <Database className="w-3 h-3" />
+                  قاعدة البيانات: محدثة ✓
+                </span>
+              ) : migrated === false ? (
+                <span className="flex items-center gap-1">
+                  <Database className="w-3 h-3" />
+                  تحتاج تحديث ⚠
+                </span>
+              ) : (
+                <span className="flex items-center gap-1">
+                  <Database className="w-3 h-3 animate-pulse" />
+                  جاري الفحص...
+                </span>
+              )}
+            </Badge>
+          </div>
+        </div>
+      </div>
+
+      {/* Statistics Cards */}
       <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3 md:gap-4">
         {statCards.map((card) => {
           const Icon = card.icon;
           return (
-            <Card key={card.label} className="overflow-hidden">
+            <Card key={card.label} className="overflow-hidden hover:shadow-md transition-shadow">
               <CardContent className="p-2 sm:p-3 md:p-4">
                 <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 flex-row-reverse">
                   <div className={`w-7 h-7 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-lg flex items-center justify-center shrink-0 ${card.color}`}>
@@ -133,36 +204,36 @@ export default function HODDashboard() {
 
       {/* Tabs */}
       <Tabs defaultValue="home" className="w-full">
-        <TabsList className="w-full flex flex-wrap h-auto gap-1 p-1">
-          <TabsTrigger value="home" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+        <TabsList className="w-full flex flex-wrap h-auto gap-1 p-1 bg-white border rounded-xl shadow-sm">
+          <TabsTrigger value="home" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
             <BarChart3 className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             <span className="truncate">الرئيسية</span>
           </TabsTrigger>
-          <TabsTrigger value="announcements" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+          <TabsTrigger value="announcements" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
             <Bell className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             <span className="truncate">الإعلانات</span>
           </TabsTrigger>
-          <TabsTrigger value="faculty" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+          <TabsTrigger value="faculty" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
             <UserCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             <span className="truncate">هيئة التدريس</span>
           </TabsTrigger>
-          <TabsTrigger value="student-affairs" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+          <TabsTrigger value="student-affairs" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
             <UsersRound className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             <span className="truncate">شؤون الطلاب</span>
           </TabsTrigger>
-          <TabsTrigger value="curriculum" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+          <TabsTrigger value="curriculum" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
             <LayoutList className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
-            <span className="truncate">المقررات والمناهج</span>
+            <span className="truncate">المقررات</span>
           </TabsTrigger>
-          <TabsTrigger value="scheduling" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+          <TabsTrigger value="scheduling" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
             <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
-            <span className="truncate">الجداول والقاعات</span>
+            <span className="truncate">الجداول</span>
           </TabsTrigger>
-          <TabsTrigger value="students" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+          <TabsTrigger value="students" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
             <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             <span className="truncate">الطلاب</span>
           </TabsTrigger>
-          <TabsTrigger value="permissions" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+          <TabsTrigger value="permissions" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
             <Shield className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             <span className="truncate">الصلاحيات</span>
           </TabsTrigger>
@@ -170,9 +241,12 @@ export default function HODDashboard() {
 
         {/* Home / Overview Tab */}
         <TabsContent value="home" className="mt-3 sm:mt-4">
-          <Card>
-            <CardHeader className="p-3 sm:p-4 sm:pb-2">
-              <CardTitle className="text-sm sm:text-base md:text-lg">الإحصائيات العامة</CardTitle>
+          <Card className="overflow-hidden">
+            <CardHeader className="p-3 sm:p-4 sm:pb-2 bg-gradient-to-l from-slate-50 to-white">
+              <CardTitle className="text-sm sm:text-base md:text-lg flex items-center gap-2">
+                <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
+                الإحصائيات العامة
+              </CardTitle>
             </CardHeader>
             <CardContent className="p-3 sm:p-4 sm:pt-0 md:p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
@@ -189,8 +263,8 @@ export default function HODDashboard() {
                         <div className="flex items-center gap-2 shrink-0">
                           <div className="w-16 sm:w-24 md:w-32 bg-slate-100 rounded-full h-2 sm:h-2.5">
                             <div
-                              className={`${item.color} h-2 sm:h-2.5 rounded-full`}
-                              style={{ width: `${(item.value / stats.students) * 100}%` }}
+                              className={`${item.color} h-2 sm:h-2.5 rounded-full transition-all duration-500`}
+                              style={{ width: `${Math.min((item.value / Math.max(stats.students, 1)) * 100, 100)}%` }}
                             />
                           </div>
                           <span className="text-xs sm:text-sm font-medium w-6 text-left">{item.value}</span>
@@ -208,7 +282,7 @@ export default function HODDashboard() {
                       { label: "المعدل التراكمي", value: stats.averageGPA.toFixed(2), color: "text-emerald-600" },
                       { label: "إجمالي المستخدمين", value: stats.professors + stats.employees + stats.students, color: "text-slate-800" },
                     ].map((item) => (
-                      <div key={item.label} className="bg-slate-50 rounded-lg p-2.5 sm:p-3 text-center">
+                      <div key={item.label} className="bg-gradient-to-bl from-slate-50 to-white rounded-xl p-2.5 sm:p-3 text-center border border-slate-100">
                         <p className={`text-lg sm:text-2xl font-bold ${item.color}`}>{item.value}</p>
                         <p className="text-[10px] sm:text-xs text-muted-foreground">{item.label}</p>
                       </div>
@@ -223,10 +297,13 @@ export default function HODDashboard() {
         {/* Announcements Tab */}
         <TabsContent value="announcements" className="mt-3 sm:mt-4">
           <div className="flex items-center justify-between mb-3 sm:mb-4 gap-2">
-            <h2 className="text-sm sm:text-lg font-bold text-slate-800">إدارة الإعلانات</h2>
+            <h2 className="text-sm sm:text-lg font-bold text-slate-800 flex items-center gap-2">
+              <Bell className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
+              إدارة الإعلانات
+            </h2>
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild>
-                <Button size="sm" className="flex items-center gap-1 sm:gap-2 bg-emerald-600 hover:bg-emerald-700 flex-row-reverse text-xs sm:text-sm">
+                <Button size="sm" className="flex items-center gap-1 sm:gap-2 bg-emerald-600 hover:bg-emerald-700 flex-row-reverse text-xs sm:text-sm rounded-lg">
                   <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   <span className="hidden sm:inline">إضافة إعلان</span>
                   <span className="sm:hidden">إضافة</span>
@@ -302,7 +379,6 @@ export default function HODDashboard() {
             </Dialog>
           </div>
 
-          {/* Announcements List */}
           {announcements.length === 0 ? (
             <div className="text-center py-8 sm:py-12 text-muted-foreground">
               <Bell className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-3 opacity-30" />
@@ -339,7 +415,7 @@ export default function HODDashboard() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="shrink-0 text-red-500 hover:text-red-700 hover:bg-red-50 w-8 h-8 sm:w-9 sm:h-9"
+                        className="shrink-0 text-red-500 hover:text-red-700 hover:bg-red-50 w-8 h-8 sm:w-9 sm:h-9 rounded-lg"
                         onClick={() => deleteAnnouncement(ann.id)}
                       >
                         <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -352,23 +428,23 @@ export default function HODDashboard() {
           )}
         </TabsContent>
 
-        {/* Faculty Management Tab with sub-tabs */}
+        {/* Faculty Management Tab */}
         <TabsContent value="faculty" className="mt-3 sm:mt-4">
           <Tabs defaultValue="profiles" className="w-full">
-            <TabsList className="w-full flex flex-wrap h-auto gap-1 p-1 mb-3 sm:mb-4">
-              <TabsTrigger value="profiles" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5">
+            <TabsList className="w-full flex flex-wrap h-auto gap-1 p-1 bg-white border rounded-xl shadow-sm mb-3 sm:mb-4">
+              <TabsTrigger value="profiles" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 rounded-lg">
                 <UserCheck className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
                 <span className="truncate">الملفات الأكاديمية</span>
               </TabsTrigger>
-              <TabsTrigger value="schedule" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5">
+              <TabsTrigger value="schedule" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 rounded-lg">
                 <Calendar className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
                 <span className="truncate">الجداول التدريسية</span>
               </TabsTrigger>
-              <TabsTrigger value="evaluations" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5">
+              <TabsTrigger value="evaluations" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 rounded-lg">
                 <BarChart3 className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
                 <span className="truncate">تقييم الأداء</span>
               </TabsTrigger>
-              <TabsTrigger value="development" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5">
+              <TabsTrigger value="development" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 rounded-lg">
                 <TrendingUp className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
                 <span className="truncate">التطوير المهني</span>
               </TabsTrigger>
@@ -388,19 +464,19 @@ export default function HODDashboard() {
           </Tabs>
         </TabsContent>
 
-        {/* Student Affairs Tab with sub-tabs */}
+        {/* Student Affairs Tab */}
         <TabsContent value="student-affairs" className="mt-3 sm:mt-4">
           <Tabs defaultValue="student-data" className="w-full">
-            <TabsList className="w-full flex flex-wrap h-auto gap-1 p-1 mb-3 sm:mb-4">
-              <TabsTrigger value="student-data" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5">
+            <TabsList className="w-full flex flex-wrap h-auto gap-1 p-1 bg-white border rounded-xl shadow-sm mb-3 sm:mb-4">
+              <TabsTrigger value="student-data" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 rounded-lg">
                 <UsersRound className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
                 <span className="truncate">بيانات الطلاب</span>
               </TabsTrigger>
-              <TabsTrigger value="advising" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5">
+              <TabsTrigger value="advising" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 rounded-lg">
                 <GraduationCap className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
                 <span className="truncate">الإرشاد الأكاديمي</span>
               </TabsTrigger>
-              <TabsTrigger value="training" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5">
+              <TabsTrigger value="training" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 rounded-lg">
                 <ClipboardList className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
                 <span className="truncate">التدريب والمشاريع</span>
               </TabsTrigger>
@@ -417,19 +493,19 @@ export default function HODDashboard() {
           </Tabs>
         </TabsContent>
 
-        {/* Courses & Curriculum Tab with sub-tabs */}
+        {/* Courses & Curriculum Tab */}
         <TabsContent value="curriculum" className="mt-3 sm:mt-4">
           <Tabs defaultValue="study-plans" className="w-full">
-            <TabsList className="w-full flex flex-wrap h-auto gap-1 p-1 mb-3 sm:mb-4">
-              <TabsTrigger value="study-plans" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5">
+            <TabsList className="w-full flex flex-wrap h-auto gap-1 p-1 bg-white border rounded-xl shadow-sm mb-3 sm:mb-4">
+              <TabsTrigger value="study-plans" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 rounded-lg">
                 <LayoutList className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
                 <span className="truncate">الخطط الدراسية</span>
               </TabsTrigger>
-              <TabsTrigger value="descriptions" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5">
+              <TabsTrigger value="descriptions" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 rounded-lg">
                 <BookOpen className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
                 <span className="truncate">توصيف المقررات</span>
               </TabsTrigger>
-              <TabsTrigger value="sections" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5">
+              <TabsTrigger value="sections" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 rounded-lg">
                 <UserCheck className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
                 <span className="truncate">الشعب الدراسية</span>
               </TabsTrigger>
@@ -446,15 +522,15 @@ export default function HODDashboard() {
           </Tabs>
         </TabsContent>
 
-        {/* Scheduling & Rooms Tab with sub-tabs */}
+        {/* Scheduling & Rooms Tab */}
         <TabsContent value="scheduling" className="mt-3 sm:mt-4">
           <Tabs defaultValue="rooms" className="w-full">
-            <TabsList className="w-full flex flex-wrap h-auto gap-1 p-1 mb-3 sm:mb-4">
-              <TabsTrigger value="rooms" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5">
+            <TabsList className="w-full flex flex-wrap h-auto gap-1 p-1 bg-white border rounded-xl shadow-sm mb-3 sm:mb-4">
+              <TabsTrigger value="rooms" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 rounded-lg">
                 <Building2 className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
                 <span className="truncate">إدارة القاعات</span>
               </TabsTrigger>
-              <TabsTrigger value="schedule-view" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5">
+              <TabsTrigger value="schedule-view" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 rounded-lg">
                 <CalendarDays className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
                 <span className="truncate">الجدول الدراسي</span>
               </TabsTrigger>

@@ -18,6 +18,8 @@ import {
   LayoutList,
   GraduationCap,
   ClipboardCheck,
+  BookMarked,
+  GraduationCap as UserGraduateIcon,
 } from "lucide-react";
 import {
   useAnnouncements,
@@ -47,6 +49,22 @@ export default function StudentDashboard() {
 
   return (
     <div className="space-y-4 sm:space-y-6">
+      {/* Gradient Header */}
+      <div className="bg-gradient-to-l from-orange-500 to-orange-700 rounded-2xl p-4 sm:p-6 text-white relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSA2MCAwIEwgMCAwIDAgNjAiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSgyNTUsMjU1LDI1NSwwLjAzKSIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-50" />
+        <div className="relative z-10">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <div className="w-9 h-9 sm:w-11 sm:h-11 bg-white/15 backdrop-blur-sm rounded-xl flex items-center justify-center">
+              <UserGraduateIcon className="w-4.5 h-4.5 sm:w-6 sm:h-6" />
+            </div>
+            <div>
+              <h2 className="text-base sm:text-xl md:text-2xl font-bold">بوابة الطالب</h2>
+              <p className="text-orange-200 text-[10px] sm:text-xs">الإعلانات والمقررات الأكاديمية والطلبات</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Urgent Announcements */}
       {urgentAnnouncements.length > 0 && (
         <div className="bg-red-50 border border-red-200 rounded-xl p-3 sm:p-4">
@@ -78,40 +96,40 @@ export default function StudentDashboard() {
 
       {/* Tabs */}
       <Tabs defaultValue="announcements" className="w-full">
-        <TabsList className="w-full flex flex-wrap h-auto gap-1 p-1">
-          <TabsTrigger value="announcements" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+        <TabsList className="w-full flex flex-wrap h-auto gap-1 p-1 bg-white border rounded-xl shadow-sm">
+          <TabsTrigger value="announcements" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
             <Bell className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             <span className="truncate">الإعلانات</span>
           </TabsTrigger>
-          <TabsTrigger value="courses" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+          <TabsTrigger value="courses" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
             <BookOpen className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
-            <span className="truncate">المقررات الدراسية</span>
+            <span className="truncate">المقررات</span>
           </TabsTrigger>
-          <TabsTrigger value="records" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+          <TabsTrigger value="records" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
             <FileBarChart className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             <span className="truncate">السجل الأكاديمي</span>
           </TabsTrigger>
-          <TabsTrigger value="registration" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+          <TabsTrigger value="registration" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
             <PenLine className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             <span className="truncate">التسجيل</span>
           </TabsTrigger>
-          <TabsTrigger value="study-plans" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+          <TabsTrigger value="study-plans" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
             <LayoutList className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             <span className="truncate">الخطط الدراسية</span>
           </TabsTrigger>
-          <TabsTrigger value="descriptions" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+          <TabsTrigger value="descriptions" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
             <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             <span className="truncate">توصيف المقررات</span>
           </TabsTrigger>
-          <TabsTrigger value="advising" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+          <TabsTrigger value="advising" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
             <GraduationCap className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             <span className="truncate">الإرشاد الأكاديمي</span>
           </TabsTrigger>
-          <TabsTrigger value="training" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+          <TabsTrigger value="training" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
             <ClipboardCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             <span className="truncate">التدريب والمشاريع</span>
           </TabsTrigger>
-          <TabsTrigger value="requests" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+          <TabsTrigger value="requests" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
             <ClipboardList className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             <span className="truncate">الطلبات</span>
           </TabsTrigger>
@@ -127,7 +145,7 @@ export default function StudentDashboard() {
           ) : (
             <div className="space-y-3">
               {studentAnnouncements.map((ann) => (
-                <Card key={ann.id}>
+                <Card key={ann.id} className="hover:shadow-md transition-shadow">
                   <CardContent className="p-3 sm:p-4">
                     <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
                       <div className="flex-1 min-w-0">

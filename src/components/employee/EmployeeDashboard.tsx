@@ -21,6 +21,8 @@ import {
   ClipboardList,
   UserCheck,
   Building2,
+  UserCog,
+  ListChecks,
 } from "lucide-react";
 import {
   useAnnouncements,
@@ -42,7 +44,6 @@ export default function EmployeeDashboard() {
     [announcements]
   );
 
-  // Note: Tasks are mock data. In production, connect to a tasks API/table.
   const tasks = [
     { id: 1, title: "تحديث سجلات الطلاب", status: "completed", dueDate: "2025-01-15" },
     { id: 2, title: "إعداد تقرير الفصل الدراسي", status: "pending", dueDate: "2025-01-20" },
@@ -74,12 +75,28 @@ export default function EmployeeDashboard() {
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      {/* Stat Cards - 2 cols mobile, 4 desktop */}
+      {/* Gradient Header */}
+      <div className="bg-gradient-to-l from-cyan-600 to-cyan-800 rounded-2xl p-4 sm:p-6 text-white relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSA2MCAwIEwgMCAwIDAgNjAiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSgyNTUsMjU1LDI1NSwwLjAzKSIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-50" />
+        <div className="relative z-10">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <div className="w-9 h-9 sm:w-11 sm:h-11 bg-white/15 backdrop-blur-sm rounded-xl flex items-center justify-center">
+              <UserCog className="w-4.5 h-4.5 sm:w-6 sm:h-6" />
+            </div>
+            <div>
+              <h2 className="text-base sm:text-xl md:text-2xl font-bold">لوحة تحكم الموظف الإداري</h2>
+              <p className="text-cyan-200 text-[10px] sm:text-xs">إدارة المهام والعمليات الإدارية</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Stat Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
         {statCards.map((card) => {
           const Icon = card.icon;
           return (
-            <Card key={card.label}>
+            <Card key={card.label} className="hover:shadow-md transition-shadow">
               <CardContent className="p-2.5 sm:p-3 md:p-4">
                 <div className="flex items-center gap-2 sm:gap-3 flex-row-reverse">
                   <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center shrink-0 ${card.color}`}>
@@ -98,32 +115,32 @@ export default function EmployeeDashboard() {
 
       {/* Tabs */}
       <Tabs defaultValue="announcements" className="w-full">
-        <TabsList className="w-full flex flex-wrap h-auto gap-1 p-1">
-          <TabsTrigger value="announcements" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+        <TabsList className="w-full flex flex-wrap h-auto gap-1 p-1 bg-white border rounded-xl shadow-sm">
+          <TabsTrigger value="announcements" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
             <Bell className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             <span className="truncate">الإعلانات</span>
           </TabsTrigger>
-          <TabsTrigger value="tasks" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
-            <ClipboardCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+          <TabsTrigger value="tasks" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
+            <ListChecks className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             <span className="truncate">المهام</span>
           </TabsTrigger>
-          <TabsTrigger value="student-data" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+          <TabsTrigger value="student-data" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
             <UsersRound className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             <span className="truncate">بيانات الطلاب</span>
           </TabsTrigger>
-          <TabsTrigger value="advising" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+          <TabsTrigger value="advising" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
             <GraduationCap className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             <span className="truncate">الإرشاد الأكاديمي</span>
           </TabsTrigger>
-          <TabsTrigger value="training" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+          <TabsTrigger value="training" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
             <ClipboardList className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             <span className="truncate">التدريب والمشاريع</span>
           </TabsTrigger>
-          <TabsTrigger value="sections" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+          <TabsTrigger value="sections" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
             <UserCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             <span className="truncate">الشعب الدراسية</span>
           </TabsTrigger>
-          <TabsTrigger value="rooms" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2">
+          <TabsTrigger value="rooms" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
             <Building2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             <span className="truncate">إدارة القاعات</span>
           </TabsTrigger>
@@ -168,16 +185,19 @@ export default function EmployeeDashboard() {
         </TabsContent>
 
         <TabsContent value="tasks" className="mt-3 sm:mt-4">
-          <Card>
-            <CardHeader className="p-3 sm:p-4 sm:pb-2">
-              <CardTitle className="text-sm sm:text-base md:text-lg">قائمة المهام</CardTitle>
+          <Card className="overflow-hidden">
+            <CardHeader className="p-3 sm:p-4 sm:pb-2 bg-gradient-to-l from-slate-50 to-white">
+              <CardTitle className="text-sm sm:text-base md:text-lg flex items-center gap-2">
+                <ListChecks className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-600" />
+                قائمة المهام
+              </CardTitle>
             </CardHeader>
             <CardContent className="p-3 sm:p-4 sm:pt-0">
               <div className="space-y-2 sm:space-y-3">
                 {tasks.map((task) => (
                   <div
                     key={task.id}
-                    className={`flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 rounded-lg border transition-colors flex-row-reverse ${
+                    className={`flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 rounded-xl border transition-colors flex-row-reverse ${
                       task.status === "completed"
                         ? "bg-emerald-50/50 border-emerald-100"
                         : "bg-white border-slate-200 hover:border-slate-300"
@@ -211,27 +231,22 @@ export default function EmployeeDashboard() {
           </Card>
         </TabsContent>
 
-        {/* Student Data Management Tab */}
         <TabsContent value="student-data" className="mt-3 sm:mt-4">
           <StudentDataManagement />
         </TabsContent>
 
-        {/* Academic Advising Tab */}
         <TabsContent value="advising" className="mt-3 sm:mt-4">
           <AcademicAdvising />
         </TabsContent>
 
-        {/* Training & Projects Tab */}
         <TabsContent value="training" className="mt-3 sm:mt-4">
           <TrainingAndProjects />
         </TabsContent>
 
-        {/* Course Sections Tab */}
         <TabsContent value="sections" className="mt-3 sm:mt-4">
           <CourseSections />
         </TabsContent>
 
-        {/* Room Management Tab */}
         <TabsContent value="rooms" className="mt-3 sm:mt-4">
           <RoomManagement />
         </TabsContent>
