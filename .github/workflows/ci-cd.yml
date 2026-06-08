@@ -1,10 +1,4 @@
-# ============================================
-# CI/CD Pipeline — نظام إدارة القسم الأكاديمي
-# ============================================
-# يتم التشغيل تلقائياً عند كل push على main أو pull request
-# يبني المشروع ويختبره ويحضر Docker Image للنشر
-
-name: Build & Deploy
+name: Build and Deploy
 
 on:
   push:
@@ -12,7 +6,6 @@ on:
   pull_request:
     branches: [main]
 
-# إيقاف العمليات المتوازية على نفس الفرع
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -27,155 +20,50 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  # ──────────────────────────────────────────
-  # الوظيفة 1: فحص الكود (Lint)
-  # ──────────────────────────────────────────
-  lint:
-    name: 🔍 فحص الكود
-    runs-on: ubuntu-latest
-    steps:
-      - name: 📥 استنساخ المستودع
-        uses: actions/checkout@v4
-
-      - name: 🟢 إعداد Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: "npm"
-
-      - name: 📦 تثبيت الحزم
-        run: npm ci
-
-      - name: 🔍 فحص ESLint
-        run: npm run lint
-
-  # ──────────────────────────────────────────
-  # الوظيفة 2: توليد Prisma Client
-  # ──────────────────────────────────────────
-  prisma-generate:
-    name: 🗄️ توليد Prisma
-    runs-on: ubuntu-latest
-    steps:
-      - name: 📥 استنساخ المستودع
-        uses: actions/checkout@v4
-
-      - name: 🟢 إعداد Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: "npm"
-
-      - name: 📦 تثبيت الحزم
-        run: npm ci
-
-      - name: 🗄️ توليد Prisma Client
-        run: npx prisma generate
-
-  # ──────────────────────────────────────────
-  # الوظيفة 3: بناء التطبيق (Build)
-  # ──────────────────────────────────────────
   build:
-    name: 🏗️ بناء التطبيق
+    name: Build
     runs-on: ubuntu-latest
-    needs: [lint, prisma-generate]
     steps:
-      - name: 📥 استنساخ المستودع
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: 🟢 إعداد Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: "npm"
 
-      - name: 📦 تثبيت الحزم
-        run: npm ci
+      - run: npm ci
 
-      - name: 🗄️ توليد Prisma Client
-        run: npx prisma generate
-
-      - name: 🏗️ بناء Next.js (Standalone)
+      - name: Build Next.js
         run: npm run build
         env:
           NODE_ENV: production
+          NEXT_PUBLIC_SUPABASE_URL: https://dkgxduabjctcuundkcrh.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: sb_publishable_fjPAsSTJ-BekuOJ3naTOBA_5a-8oLCP
 
-      - name: 📤 رفع ملفات البناء كArtifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: nextjs-build
-          path: |
-            .next/standalone/
-            .next/static/
-            public/
-          retention-days: 7
-
-  # ──────────────────────────────────────────
-  # الوظيفة 4: بناء صورة Docker
-  # ──────────────────────────────────────────
-  docker-build:
-    name: 🐳 بناء صورة Docker
+  docker:
+    name: Docker
     runs-on: ubuntu-latest
     needs: [build]
-    # فقط عند الدفع على فرع main
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
-      - name: 📥 استنساخ المستودع
-        uses: actions/checkout@v4
-
-      - name: 🔐 تسجيل الدخول إلى GitHub Container Registry
-        uses: docker/login-action@v3
+      - uses: actions/checkout@v4
+      - uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: 📝 إعداد Metadata لـ Docker
+      - uses: docker/metadata-action@v5
         id: meta
-        uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
             type=sha,prefix=
-            type=raw,value=latest,enable={{is_default_branch}}
-            type=raw,value={{date 'YYYY-MM-DD'}},enable={{is_default_branch}}
-
-      - name: 🐳 بناء ونشر صورة Docker
-        uses: docker/build-push-action@v5
+            type=raw,value=latest
+      - uses: docker/build-push-action@v5
         with:
           context: .
           file: ./Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-
-  # ──────────────────────────────────────────
-  # الوظيفة 5: ملخص النتائج
-  # ──────────────────────────────────────────
-  summary:
-    name: 📊 ملخص النتائج
-    runs-on: ubuntu-latest
-    needs: [lint, build, docker-build]
-    if: always()
-    steps:
-      - name: 📊 عرض حالة الوظائف
-        run: |
-          echo "============================================"
-          echo "  📊 ملخص CI/CD — نظام إدارة القسم الأكاديمي"
-          echo "============================================"
-          echo ""
-          echo "🔍 فحص الكود:       ${{ needs.lint.result }}"
-          echo "🏗️ بناء التطبيق:     ${{ needs.build.result }}"
-          echo "🐳 بناء Docker:      ${{ needs.docker-build.result }}"
-          echo ""
-          echo "📌 الفرع: ${{ github.ref_name }}"
-          echo "📌 الإصدار: ${{ github.sha }}"
-          echo "📌 بواسطة: ${{ github.actor }}"
-          echo "📌 التاريخ: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
-          echo ""
-          if [ "${{ needs.lint.result }}" == "success" ] && [ "${{ needs.build.result }}" == "success" ]; then
-            echo "✅ البناء ناجح!"
-          else
-            echo "❌ فشل البناء — يرجى مراجعة الأخطاء"
-          fi
