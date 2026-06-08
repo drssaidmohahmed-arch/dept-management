@@ -350,7 +350,19 @@ CREATE INDEX idx_room_bookings_status ON room_bookings(status);
 CREATE INDEX idx_room_bookings_booked_by ON room_bookings(booked_by);
 
 -- =============================================================================
--- 4. UPDATED_AT TRIGGERS
+-- 4. UPDATED_AT TRIGGER FUNCTION (ensure it exists)
+-- =============================================================================
+
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+-- =============================================================================
+-- 5. UPDATED_AT TRIGGERS
 -- =============================================================================
 
 -- Students
