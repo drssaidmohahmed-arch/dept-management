@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { teachingAssignmentsStore } from '@/lib/local-data';
 
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error) return error.message;
@@ -7,17 +8,28 @@ function getErrorMessage(error: unknown): string {
   return 'حدث خطأ غير متوقع';
 }
 
-export async function GET() {
+// Helper: try to get Supabase client, returns null if connection fails
+async function getSupabaseOrFallback() {
   try {
-    const supabase = await createClient();
-    const { data, error } = await supabase
-      .from('teaching_assignments')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (error) throw error;
-    return NextResponse.json(data || []);
-  } catch (error: unknown) {
-    return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
+    return await createClient();
+  } catch {
+    return null;
   }
+}
+
+export async function GET() {
+  const supabase = await getSupabaseOrFallback();
+
+  if (supabase) {
+    try {
+      const { data, error } = await supabase.from('teaching_assignments').select('*').order('created_at', { ascending: false });
+      if (error) throw error;
+      return NextResponse.json(data || []);
+    } catch (error: unknown) {
+      return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
+    }
+  }
+
+  // Fallback to local data when Supabase is unavailable
+  return NextResponse.json(teachingAssignmentsStore.getAll());
 }

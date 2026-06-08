@@ -712,3 +712,72 @@ INSERT INTO employee_transfers (id, employee_id, employee_name, current_position
 -- =============================================================================
 -- END OF MIGRATION 003
 -- =============================================================================
+
+-- =============================================================================
+-- MIGRATION 004: Fix RLS policies for original tables
+-- The original tables (announcements, student_requests, members, professor_requests,
+-- enrolled_students, courses, professor_courses) may have RLS enabled but no
+-- policies, preventing UPDATE and DELETE operations.
+-- =============================================================================
+
+DO $$ BEGIN
+  -- Enable RLS on original tables (idempotent)
+  BEGIN
+    ALTER TABLE announcements ENABLE ROW LEVEL SECURITY;
+  EXCEPTION WHEN OTHERS THEN NULL;
+  END;
+
+  BEGIN
+    ALTER TABLE student_requests ENABLE ROW LEVEL SECURITY;
+  EXCEPTION WHEN OTHERS THEN NULL;
+  END;
+
+  BEGIN
+    ALTER TABLE members ENABLE ROW LEVEL SECURITY;
+  EXCEPTION WHEN OTHERS THEN NULL;
+  END;
+
+  BEGIN
+    ALTER TABLE professor_requests ENABLE ROW LEVEL SECURITY;
+  EXCEPTION WHEN OTHERS THEN NULL;
+  END;
+
+  BEGIN
+    ALTER TABLE enrolled_students ENABLE ROW LEVEL SECURITY;
+  EXCEPTION WHEN OTHERS THEN NULL;
+  END;
+
+  BEGIN
+    ALTER TABLE courses ENABLE ROW LEVEL SECURITY;
+  EXCEPTION WHEN OTHERS THEN NULL;
+  END;
+
+  BEGIN
+    ALTER TABLE professor_courses ENABLE ROW LEVEL SECURITY;
+  EXCEPTION WHEN OTHERS THEN NULL;
+  END;
+END $$;
+
+-- Drop existing policies if they exist (for safe re-creation)
+DO $$ BEGIN
+  DROP POLICY IF EXISTS "Announcements full access" ON announcements;
+  DROP POLICY IF EXISTS "Student requests full access" ON student_requests;
+  DROP POLICY IF EXISTS "Members full access" ON members;
+  DROP POLICY IF EXISTS "Professor requests full access" ON professor_requests;
+  DROP POLICY IF EXISTS "Enrolled students full access" ON enrolled_students;
+  DROP POLICY IF EXISTS "Courses full access" ON courses;
+  DROP POLICY IF EXISTS "Professor courses full access" ON professor_courses;
+END $$;
+
+-- Create full access policies for anon (public) role on original tables
+CREATE POLICY "Announcements full access" ON announcements FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Student requests full access" ON student_requests FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Members full access" ON members FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Professor requests full access" ON professor_requests FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Enrolled students full access" ON enrolled_students FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Courses full access" ON courses FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Professor courses full access" ON professor_courses FOR ALL USING (true) WITH CHECK (true);
+
+-- =============================================================================
+-- END OF MIGRATION 004
+-- =============================================================================

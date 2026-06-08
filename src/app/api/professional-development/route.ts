@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { professionalDevelopmentStore, genId } from '@/lib/local-data';
 
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error) return error.message;
@@ -7,137 +8,128 @@ function getErrorMessage(error: unknown): string {
   return 'حدث خطأ غير متوقع';
 }
 
-export async function GET(request: NextRequest) {
-  try {
-    const supabase = await createClient();
-    const { searchParams } = new URL(request.url);
-
-    let query = supabase.from('professional_development').select('*');
-
-    // Filter by faculty_id
-    const facultyId = searchParams.get('faculty_id');
-    if (facultyId) {
-      query = query.eq('faculty_id', facultyId);
-    }
-
-    // Filter by activity_type
-    const activityType = searchParams.get('activity_type');
-    if (activityType) {
-      query = query.eq('activity_type', activityType);
-    }
-
-    // Filter by status
-    const status = searchParams.get('status');
-    if (status) {
-      query = query.eq('status', status);
-    }
-
-    const { data, error } = await query.order('start_date', { ascending: false });
-
-    if (error) throw error;
-    return NextResponse.json(data);
-  } catch (error: unknown) {
-    return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
+function isConnectionError(error: unknown): boolean {
+  if (error instanceof Error) {
+    const msg = error.message.toLowerCase();
+    return (
+      msg.includes('fetch failed') ||
+      msg.includes('enotfound') ||
+      msg.includes('econnrefused') ||
+      msg.includes('etimedout') ||
+      msg.includes('invalid url') ||
+      msg.includes('missing') ||
+      msg.includes('supabase') ||
+      msg.includes('network')
+    );
   }
+  return false;
+}
+
+// Helper: try to get Supabase client, returns null if connection fails
+async function getSupabaseOrFallback() {
+  try {
+    return await createClient();
+  } catch {
+    return null;
+  }
+}
+
+export async function GET(request: NextRequest) {
+  const supabase = await getSupabaseOrFallback();
+  const { searchParams } = new URL(request.url);
+
+  if (supabase) {
+    try {
+      let query = supabase.from('professional_development').select('*');
+      const facultyName = searchParams.get('facultyName');
+      if (facultyName) query = query.eq('faculty_name', facultyName);
+      const { data, error } = await query.order('created_at', { ascending: false });
+      if (error) throw error;
+      return NextResponse.json(data || []);
+    } catch (error: unknown) {
+      return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
+    }
+  }
+
+  // Fallback to local data when Supabase is unavailable
+  let items = professionalDevelopmentStore.getAll();
+  const facultyName = searchParams.get('facultyName');
+  if (facultyName) items = items.filter((d) => d.facultyName === facultyName);
+  return NextResponse.json(items);
 }
 
 export async function POST(request: NextRequest) {
-  try {
-    const supabase = await createClient();
-    const body = await request.json();
+  const body = await request.json().catch(() => ({}));
+  const supabase = await getSupabaseOrFallback();
 
-    const {
-      faculty_id,
-      faculty_name,
-      activity_type,
-      title,
-      provider,
-      location,
-      start_date,
-      end_date,
-      status,
-      hours,
-    } = body;
-
-    if (!faculty_id || !faculty_name || !activity_type || !title) {
-      return NextResponse.json(
-        { error: 'البيانات المطلوبة غير مكتملة' },
-        { status: 400 }
-      );
+  if (supabase) {
+    try {
+      const { data, error } = await supabase.from('professional_development').insert({
+        faculty_id: body.faculty_id || null, faculty_name: body.faculty_name,
+        title: body.title, activity_type: body.activity_type, provider: body.provider || '',
+        location: body.location || '', start_date: body.start_date || null, end_date: body.end_date || null,
+        hours: body.hours || 0, status: body.status || 'planned',
+      }).select().single();
+      if (error) throw error;
+      return NextResponse.json(data, { status: 201 });
+    } catch (error: unknown) {
+      return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
     }
-
-    const { data, error } = await supabase
-      .from('professional_development')
-      .insert({
-        faculty_id,
-        faculty_name,
-        activity_type,
-        title,
-        provider: provider || '',
-        location: location || '',
-        start_date: start_date || null,
-        end_date: end_date || null,
-        status: status || 'planned',
-        hours: hours ?? 0,
-      })
-      .select()
-      .single();
-
-    if (error) throw error;
-
-    return NextResponse.json(data, { status: 201 });
-  } catch (error: unknown) {
-    return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
   }
+
+  // Fallback to local data
+  const item = professionalDevelopmentStore.add({
+    id: genId('pd'), facultyId: body.faculty_id, facultyName: body.faculty_name || '',
+    title: body.title || '', activityType: body.activity_type, provider: body.provider || '',
+    location: body.location || '', startDate: body.start_date, endDate: body.end_date,
+    hours: body.hours || 0, status: body.status || 'planned', createdAt: new Date().toISOString(),
+  });
+  return NextResponse.json(item, { status: 201 });
 }
 
 export async function PUT(request: NextRequest) {
-  try {
-    const supabase = await createClient();
-    const body = await request.json();
-    const { id, ...updateFields } = body;
+  const body = await request.json().catch(() => ({}));
+  const { id, ...updateFields } = body;
+  if (!id) return NextResponse.json({ error: 'المعرف مطلوب' }, { status: 400 });
 
-    if (!id) {
-      return NextResponse.json(
-        { error: 'معرف النشاط مطلوب' },
-        { status: 400 }
-      );
+  const supabase = await getSupabaseOrFallback();
+
+  if (supabase) {
+    try {
+      const { data, error } = await supabase.from('professional_development').update(updateFields).eq('id', id).select().single();
+      if (error) throw error;
+      return NextResponse.json(data);
+    } catch (error: unknown) {
+      return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
     }
-
-    const { data, error } = await supabase
-      .from('professional_development')
-      .update(updateFields)
-      .eq('id', id)
-      .select()
-      .single();
-
-    if (error) throw error;
-    return NextResponse.json(data);
-  } catch (error: unknown) {
-    return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
   }
+
+  // Fallback to local data
+  const updates: Record<string, unknown> = { updatedAt: new Date().toISOString() };
+  Object.keys(updateFields).forEach((k) => { updates[k] = updateFields[k]; });
+  const updated = professionalDevelopmentStore.update(id, updates);
+  if (!updated) return NextResponse.json({ error: 'السجل غير موجود' }, { status: 404 });
+  return NextResponse.json(updated);
 }
 
 export async function DELETE(request: NextRequest) {
-  try {
-    const supabase = await createClient();
-    const { id } = await request.json();
+  const body = await request.json().catch(() => ({ id: '' }));
+  const { id } = body;
+  if (!id) return NextResponse.json({ error: 'المعرف مطلوب' }, { status: 400 });
 
-    if (!id) {
-      return NextResponse.json(
-        { error: 'معرف النشاط مطلوب' },
-        { status: 400 }
-      );
+  const supabase = await getSupabaseOrFallback();
+
+  if (supabase) {
+    try {
+      const { error } = await supabase.from('professional_development').delete().eq('id', id);
+      if (error) throw error;
+      return NextResponse.json({ success: true });
+    } catch (error: unknown) {
+      return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
     }
-
-    const { error } = await supabase
-      .from('professional_development')
-      .delete()
-      .eq('id', id);
-
-    if (error) throw error;
-    return NextResponse.json({ success: true });
-  } catch (error: unknown) {
-    return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
   }
+
+  // Fallback to local data
+  professionalDevelopmentStore.delete(id);
+  return NextResponse.json({ success: true });
 }

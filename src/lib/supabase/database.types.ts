@@ -767,6 +767,62 @@ export interface Database {
           updated_at?: string | null
         }
       }
+      employee_transfers: {
+        Row: {
+          id: string
+          employee_id: string
+          employee_name: string
+          current_position: string
+          requested_rank: string
+          requested_specialization: string
+          requested_qualification: string
+          courses_to_teach: string[]
+          reason: string
+          supporting_docs: string[]
+          status: 'pending' | 'under_review' | 'approved' | 'rejected' | 'cancelled'
+          reviewed_by: string | null
+          reviewed_by_name: string | null
+          review_notes: string | null
+          created_at: string
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          employee_id: string
+          employee_name: string
+          current_position: string
+          requested_rank: string
+          requested_specialization: string
+          requested_qualification: string
+          courses_to_teach?: string[]
+          reason: string
+          supporting_docs?: string[]
+          status?: 'pending' | 'under_review' | 'approved' | 'rejected' | 'cancelled'
+          reviewed_by?: string | null
+          reviewed_by_name?: string | null
+          review_notes?: string | null
+          created_at?: string
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          employee_id?: string
+          employee_name?: string
+          current_position?: string
+          requested_rank?: string
+          requested_specialization?: string
+          requested_qualification?: string
+          courses_to_teach?: string[]
+          reason?: string
+          supporting_docs?: string[]
+          status?: 'pending' | 'under_review' | 'approved' | 'rejected' | 'cancelled'
+          reviewed_by?: string | null
+          reviewed_by_name?: string | null
+          review_notes?: string | null
+          created_at?: string
+          updated_at?: string | null
+        }
+      }
       course_sections: {
         Row: {
           id: string
@@ -888,6 +944,7 @@ export interface Database {
       description_status: 'draft' | 'approved' | 'archived'
       section_status: 'open' | 'closed' | 'full'
       booking_status: 'pending' | 'approved' | 'rejected' | 'cancelled'
+      transfer_status: 'pending' | 'under_review' | 'approved' | 'rejected' | 'cancelled'
     }
   }
 }

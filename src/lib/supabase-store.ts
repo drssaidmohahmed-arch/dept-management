@@ -3,6 +3,16 @@
 import { useSyncExternalStore, useCallback, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import {
+  announcementsStore,
+  studentRequestsStore,
+  membersStore,
+  professorRequestsStore,
+  professorCoursesStore,
+  enrolledStudentsStore,
+  coursesStore,
+  employeeTransfersStore,
+} from '@/lib/local-data';
 
 // ============ Re-export ALL types, constants, labels, colors from the original store ============
 
@@ -96,16 +106,28 @@ const EMPTY_STATS = {
   activeMembers: 0,
 };
 
-// Module-level caches: table name → mapped data array (pre-initialized for all tables)
+// Module-level caches: table name → mapped data array (pre-initialized with local data)
+// When Supabase is null/unavailable, we fall back to local mock data.
+const localDataMap: Record<string, unknown[]> = {
+  announcements: announcementsStore.getAll(),
+  student_requests: studentRequestsStore.getAll(),
+  members: membersStore.getAll(),
+  professor_requests: professorRequestsStore.getAll(),
+  professor_courses: professorCoursesStore.getAll(),
+  enrolled_students: enrolledStudentsStore.getAll(),
+  courses: coursesStore.getAll(),
+  employee_transfers: employeeTransfersStore.getAll(),
+};
+
 const tableCache: Record<string, unknown[]> = {
-  announcements: EMPTY_ARRAY,
-  student_requests: EMPTY_ARRAY,
-  members: EMPTY_ARRAY,
-  professor_requests: EMPTY_ARRAY,
-  professor_courses: EMPTY_ARRAY,
-  enrolled_students: EMPTY_ARRAY,
-  courses: EMPTY_ARRAY,
-  employee_transfers: EMPTY_ARRAY,
+  announcements: localDataMap.announcements,
+  student_requests: localDataMap.student_requests,
+  members: localDataMap.members,
+  professor_requests: localDataMap.professor_requests,
+  professor_courses: localDataMap.professor_courses,
+  enrolled_students: localDataMap.enrolled_students,
+  courses: localDataMap.courses,
+  employee_transfers: localDataMap.employee_transfers,
 };
 
 // Module-level listener sets: table name → set of callbacks
@@ -165,7 +187,10 @@ function getTableSnapshot<T>(tableName: string): T[] {
 
 async function fetchTableData(tableName: string) {
   const sb = getSupabase();
-  if (!sb) return;
+  if (!sb) {
+    // Supabase not available — keep the local mock data already set in tableCache
+    return;
+  }
   try {
     const { data, error } = await sb.from(tableName).select('*');
 
@@ -177,7 +202,8 @@ async function fetchTableData(tableName: string) {
     emitTableChange(tableName);
   } catch (err) {
     console.error(`Error fetching ${tableName}:`, err);
-    tableCache[tableName] = EMPTY_ARRAY;
+    // On error, fall back to local mock data instead of empty array
+    tableCache[tableName] = localDataMap[tableName] ?? EMPTY_ARRAY;
     emitTableChange(tableName);
   }
 }
@@ -449,7 +475,32 @@ export function useTransfers(): import('./store').EmployeeTransfer[] {
 export async function getStats() {
   const sb = getSupabase();
   if (!sb) {
-    return { ...EMPTY_STATS };
+    // Return stats from local mock data
+    const allMembers = membersStore.getAll();
+    const allEnrolled = enrolledStudentsStore.getAll();
+    const allRequests = studentRequestsStore.getAll();
+    const activeProfessors = allMembers.filter((m: any) => m.role === 'professor' && m.isActive === true).length;
+    const activeEmployees = allMembers.filter((m: any) => m.role === 'employee' && m.isActive === true).length;
+    const uniqueStudents = new Set(allEnrolled.map((e: any) => e.studentId));
+    const gradeToPoints: Record<string, number> = {
+      'أ+': 4.0, 'أ': 4.0, 'أ-': 3.7,
+      'ب+': 3.3, 'ب': 3.0, 'ب-': 2.7,
+      'ج+': 2.3, 'ج': 2.0, 'ج-': 1.7,
+      'د+': 1.3, 'د': 1.0, 'د-': 0.7, 'ر': 0.0,
+    };
+    const graded = allEnrolled.filter((e: any) => e.grade);
+    const totalPoints = graded.reduce((sum: number, e: any) => sum + (gradeToPoints[e.grade] || 0), 0);
+    const averageGPA = graded.length > 0 ? Math.round((totalPoints / graded.length) * 100) / 100 : 0;
+    return {
+      totalAnnouncements: announcementsStore.getAll().length,
+      professors: activeProfessors,
+      employees: activeEmployees,
+      students: uniqueStudents.size,
+      totalRequests: allRequests.length,
+      averageGPA,
+      totalMembers: allMembers.length,
+      activeMembers: allMembers.filter((m: any) => m.isActive === true).length,
+    };
   }
   try {
     const [announcementsRes, membersRes, requestsRes] = await Promise.all([
