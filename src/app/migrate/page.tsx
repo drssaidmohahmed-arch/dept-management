@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   CheckCircle2,
@@ -21,6 +22,12 @@ import {
   Loader2,
   ChevronDown,
   ChevronUp,
+  Play,
+  Eye,
+  EyeOff,
+  ShieldCheck,
+  Zap,
+  XCircle,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -31,6 +38,14 @@ interface MigrationStatus {
   tables: string[];
 }
 
+type MigrationResult = {
+  success: boolean;
+  warning?: boolean;
+  message?: string;
+  error?: string;
+  detail?: string;
+};
+
 export default function MigratePage() {
   const [status, setStatus] = useState<MigrationStatus | null>(null);
   const [loading, setLoading] = useState(true);
@@ -39,6 +54,12 @@ export default function MigratePage() {
   const [sqlExpanded, setSqlExpanded] = useState(false);
   const [sqlContent, setSqlContent] = useState('');
   const [sqlLoading, setSqlLoading] = useState(true);
+
+  // Auto migration state
+  const [dbPassword, setDbPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [executing, setExecuting] = useState(false);
+  const [migrationResult, setMigrationResult] = useState<MigrationResult | null>(null);
 
   const checkMigration = async () => {
     setVerifying(true);
@@ -100,6 +121,36 @@ export default function MigratePage() {
       document.body.removeChild(ta);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  const handleAutoMigration = async () => {
+    if (!dbPassword.trim()) return;
+
+    setExecuting(true);
+    setMigrationResult(null);
+
+    try {
+      const res = await fetch('/api/run-migration', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: dbPassword.trim() }),
+      });
+
+      const data = await res.json();
+      setMigrationResult(data);
+
+      // If successful, re-check migration status
+      if (data.success) {
+        setTimeout(() => checkMigration(), 1500);
+      }
+    } catch {
+      setMigrationResult({
+        success: false,
+        error: 'تعذر الاتصال بالخادم. يرجى المحاولة مرة أخرى.',
+      });
+    } finally {
+      setExecuting(false);
     }
   };
 
@@ -232,11 +283,195 @@ export default function MigratePage() {
           </CardContent>
         </Card>
 
+        {/* Auto Execute Migration Card */}
+        {!status?.migrated && (
+          <Card className="mb-6 border-2 border-dashed border-emerald-300 bg-gradient-to-bl from-emerald-50/50 to-transparent">
+            <CardHeader className="p-4 sm:p-5 pb-3">
+              <CardTitle className="text-base sm:text-lg flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center">
+                  <Zap className="w-5 h-5 text-emerald-600" />
+                </div>
+                تنفيذ تلقائي للـ Migration
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-4 sm:p-5 pt-0 space-y-4">
+              <p className="text-sm text-muted-foreground">
+                يمكنك تنفيذ الـ Migration تلقائياً مباشرةً من هنا باستخدام كلمة مرور قاعدة البيانات في Supabase.
+                اذهب إلى{' '}
+                <span className="font-semibold text-slate-700">Database → Settings → Database password</span>{' '}
+                في لوحة تحكم Supabase.
+              </p>
+
+              {/* Password Input */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-700 flex items-center gap-1.5">
+                  <ShieldCheck className="w-4 h-4 text-slate-500" />
+                  كلمة مرور قاعدة البيانات
+                </label>
+                <div className="relative">
+                  <Input
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="أدخل كلمة مرور قاعدة بيانات Supabase..."
+                    value={dbPassword}
+                    onChange={(e) => {
+                      setDbPassword(e.target.value);
+                      // Clear previous result when user starts typing again
+                      if (migrationResult) setMigrationResult(null);
+                    }}
+                    disabled={executing}
+                    className="pl-10 text-left font-mono"
+                    dir="ltr"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute left-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
+                    onClick={() => setShowPassword(!showPassword)}
+                    tabIndex={-1}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-4 h-4" />
+                    ) : (
+                      <Eye className="w-4 h-4" />
+                    )}
+                  </Button>
+                </div>
+              </div>
+
+              {/* Execute Button */}
+              <Button
+                onClick={handleAutoMigration}
+                disabled={executing || !dbPassword.trim()}
+                className="w-full sm:w-auto flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white h-11 px-6"
+              >
+                {executing ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    جاري تنفيذ الـ Migration...
+                  </>
+                ) : (
+                  <>
+                    <Play className="w-5 h-5" />
+                    تنفيذ الـ Migration تلقائياً
+                  </>
+                )}
+              </Button>
+
+              {/* Progress while executing */}
+              {executing && (
+                <div className="flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-xl p-4 animate-pulse">
+                  <Loader2 className="w-5 h-5 text-emerald-600 animate-spin shrink-0" />
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-slate-700">
+                      جاري إنشاء الجداول والبيانات الأولية...
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      قد تستغرق العملية بضع ثوانٍ. يرجى عدم إغلاق الصفحة.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Result */}
+              {migrationResult && !executing && (
+                <div
+                  className={`rounded-xl p-4 ${
+                    migrationResult.success
+                      ? migrationResult.warning
+                        ? 'bg-amber-50 border border-amber-200'
+                        : 'bg-emerald-50 border border-emerald-200'
+                      : 'bg-red-50 border border-red-200'
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    {migrationResult.success ? (
+                      migrationResult.warning ? (
+                        <AlertTriangle className="w-6 h-6 text-amber-600 shrink-0 mt-0.5" />
+                      ) : (
+                        <CheckCircle2 className="w-6 h-6 text-emerald-600 shrink-0 mt-0.5" />
+                      )
+                    ) : (
+                      <XCircle className="w-6 h-6 text-red-600 shrink-0 mt-0.5" />
+                    )}
+                    <div className="space-y-1 min-w-0">
+                      <h4
+                        className={`font-bold text-sm sm:text-base ${
+                          migrationResult.success
+                            ? migrationResult.warning
+                              ? 'text-amber-800'
+                              : 'text-emerald-800'
+                            : 'text-red-800'
+                        }`}
+                      >
+                        {migrationResult.success
+                          ? migrationResult.warning
+                            ? 'تم التنفيذ مع تحذيرات ⚠'
+                            : 'تم التنفيذ بنجاح! ✓'
+                          : 'فشل في تنفيذ الـ Migration ✗'}
+                      </h4>
+                      <p
+                        className={`text-xs sm:text-sm ${
+                          migrationResult.success
+                            ? migrationResult.warning
+                              ? 'text-amber-700'
+                              : 'text-emerald-700'
+                            : 'text-red-700'
+                        }`}
+                      >
+                        {migrationResult.success
+                          ? migrationResult.message
+                          : migrationResult.error}
+                      </p>
+                      {migrationResult.warning && migrationResult.detail && (
+                        <p className="text-[10px] sm:text-xs text-amber-600 mt-1 font-mono break-all" dir="ltr">
+                          {migrationResult.detail}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Re-check button after success */}
+                  {migrationResult.success && (
+                    <div className="mt-3 flex justify-end">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={checkMigration}
+                        className="flex items-center gap-1.5 text-xs"
+                      >
+                        <RefreshCw className="w-3.5 h-3.5" />
+                        التحقق من حالة قاعدة البيانات
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Supabase SQL Editor Link */}
+              <div className="flex items-center justify-between bg-white border border-slate-200 rounded-xl p-3">
+                <div className="text-xs sm:text-sm text-muted-foreground">
+                  أو افتح محرر SQL في Supabase مباشرةً
+                </div>
+                <a
+                  href="https://supabase.com/dashboard/project/dkgxduabjctcuundkcrh/sql"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium text-emerald-600 hover:text-emerald-700 transition-colors"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  محرر SQL في Supabase
+                </a>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Instructions Card - only show if not migrated */}
         {!status?.migrated && (
           <Card className="mb-6">
             <CardHeader className="p-4 sm:p-5 pb-3">
-              <CardTitle className="text-base sm:text-lg">خطوات التثبيت</CardTitle>
+              <CardTitle className="text-base sm:text-lg">خطوات التثبيت اليدوي</CardTitle>
             </CardHeader>
             <CardContent className="p-4 sm:p-5 pt-0">
               <div className="space-y-4">
