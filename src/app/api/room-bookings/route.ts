@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { roomBookingsStore, genId } from '@/lib/local-data';
+import { serverLogActivity } from '@/lib/activity-logger';
 
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error) return error.message;
@@ -71,6 +72,7 @@ export async function POST(request: NextRequest) {
         purpose: body.purpose || '', status: body.status || 'pending',
       }).select().single();
       if (error) throw error;
+      serverLogActivity({ action: 'room_booking', entityType: 'room_booking', entityId: data.id, entityName: `${data.room_name} - ${data.purpose}`, details: { roomName: data.room_name, date: data.booking_date } });
       return NextResponse.json(data, { status: 201 });
     } catch (error: unknown) {
       return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });

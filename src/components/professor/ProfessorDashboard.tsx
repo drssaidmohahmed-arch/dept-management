@@ -35,6 +35,7 @@ import FacultyProfiles from "@/components/faculty/FacultyProfiles";
 import TeachingSchedule from "@/components/faculty/TeachingSchedule";
 import ProfessionalDevelopment from "@/components/faculty/ProfessionalDevelopment";
 import PerformanceEvaluations from "@/components/faculty/PerformanceEvaluations";
+import FacultyPerformanceDashboard from "@/components/professor/FacultyPerformanceDashboard";
 
 export default function ProfessorDashboard() {
   const announcements = useAnnouncements();
@@ -161,6 +162,10 @@ export default function ProfessorDashboard() {
             <BarChart3 className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             <span className="truncate">تقييم الأداء</span>
           </TabsTrigger>
+          <TabsTrigger value="performance" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
+            <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+            <span className="truncate">لوحة الأداء</span>
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="announcements" className="mt-3 sm:mt-4">
@@ -223,6 +228,10 @@ export default function ProfessorDashboard() {
 
         <TabsContent value="evaluations" className="mt-3 sm:mt-4">
           <PerformanceEvaluations />
+        </TabsContent>
+
+        <TabsContent value="performance" className="mt-3 sm:mt-4">
+          <FacultyPerformanceDashboard />
         </TabsContent>
       </Tabs>
     </div>

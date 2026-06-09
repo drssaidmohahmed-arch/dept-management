@@ -49,6 +49,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { toast } from "sonner";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import type { Room, RoomType, RoomBooking, BookingStatus } from "@/lib/store";
 import {
   ROOM_TYPE_LABELS,
@@ -129,6 +130,10 @@ export default function RoomManagement() {
   const [filterBookingDate, setFilterBookingDate] = useState<string>("");
   const [filterBookingStatus, setFilterBookingStatus] = useState<string>("all");
   const [filterBookedBy, setFilterBookedBy] = useState<string>("all");
+
+  // Conflict state
+  const [bookingConflicts, setBookingConflicts] = useState<string[]>([]);
+  const [checkingConflicts, setCheckingConflicts] = useState(false);
 
   // Dialogs
   const [roomDialogOpen, setRoomDialogOpen] = useState(false);
@@ -268,18 +273,54 @@ export default function RoomManagement() {
   const handleSaveBooking = async () => {
     if (!bookingForm.roomId || !bookingForm.bookingDate || !bookingForm.startTime) return;
 
-    // Conflict detection
-    const conflict = bookings.find((b) => {
-      if (b.id === editingBooking?.id) return false;
-      if (b.roomId !== bookingForm.roomId || b.bookingDate !== bookingForm.bookingDate) return false;
-      if (b.status === "rejected" || b.status === "cancelled") return false;
-      return b.startTime < bookingForm.endTime && b.endTime > bookingForm.startTime;
-    });
-
-    if (conflict) {
-      toast.error(`تعارض في الحجز! يوجد حجز آخر في نفس الوقت: ${conflict.purpose}`);
-      return;
+    // Server-side conflict detection
+    setCheckingConflicts(true);
+    setBookingConflicts([]);
+    try {
+      const conflictRes = await fetch("/api/check-conflicts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          newEntry: {
+            roomId: bookingForm.roomId,
+            roomName: bookingForm.roomName,
+            startTime: bookingForm.startTime,
+            endTime: bookingForm.endTime,
+            day: new Date(bookingForm.bookingDate).toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase(),
+          },
+          existingEntries: bookings
+            .filter((b) => b.id !== editingBooking?.id && b.status !== "rejected" && b.status !== "cancelled")
+            .map((b) => ({
+              roomId: b.roomId,
+              roomName: b.roomName,
+              startTime: b.startTime,
+              endTime: b.endTime,
+              day: new Date(b.bookingDate).toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase(),
+              courseName: b.purpose,
+            })),
+        }),
+      });
+      const conflictData = await conflictRes.json();
+      if (conflictData.hasConflicts && conflictData.conflicts.length > 0) {
+        setBookingConflicts(conflictData.conflicts.map((c: { message: string }) => c.message));
+        setCheckingConflicts(false);
+        return;
+      }
+    } catch {
+      // Fallback to local conflict detection
+      const conflict = bookings.find((b) => {
+        if (b.id === editingBooking?.id) return false;
+        if (b.roomId !== bookingForm.roomId || b.bookingDate !== bookingForm.bookingDate) return false;
+        if (b.status === "rejected" || b.status === "cancelled") return false;
+        return b.startTime < bookingForm.endTime && b.endTime > bookingForm.startTime;
+      });
+      if (conflict) {
+        setBookingConflicts([`تعارض في الحجز! يوجد حجز آخر في نفس الوقت: ${conflict.purpose}`]);
+        setCheckingConflicts(false);
+        return;
+      }
     }
+    setCheckingConflicts(false);
 
     try {
       const method = editingBooking ? "PUT" : "POST";
@@ -289,6 +330,7 @@ export default function RoomManagement() {
         toast.success(editingBooking ? "تم تحديث الحجز بنجاح" : "تم إنشاء الحجز بنجاح");
         setBookingDialogOpen(false);
         setEditingBooking(null);
+        setBookingConflicts([]);
         resetBookingForm();
         fetchData();
       } else {
@@ -315,6 +357,7 @@ export default function RoomManagement() {
 
   const resetBookingForm = () => {
     setBookingForm({ roomId: "", roomName: "", bookedBy: "", bookingDate: "", startTime: "", endTime: "", purpose: "", status: "pending" });
+    setBookingConflicts([]);
   };
 
   // ========== Render ==========
@@ -602,8 +645,28 @@ export default function RoomManagement() {
                     </Select>
                   </div>
                 </div>
+                {bookingConflicts.length > 0 && (
+                  <div className="space-y-2">
+                    <Alert variant="destructive">
+                      <AlertTriangle className="w-4 h-4" />
+                      <AlertTitle>يوجد تعارضات!</AlertTitle>
+                      <AlertDescription>
+                        <div className="space-y-1 mt-1">
+                          {bookingConflicts.map((msg, idx) => (
+                            <p key={idx} className="text-xs">⚠️ {msg}</p>
+                          ))}
+                        </div>
+                      </AlertDescription>
+                    </Alert>
+                    <p className="text-xs text-muted-foreground">يرجى تعديل وقت أو القاعة أو إلغاء التعارض قبل المتابعة.</p>
+                  </div>
+                )}
                 <DialogFooter className="gap-2">
-                  <Button onClick={handleSaveBooking} disabled={!bookingForm.roomId || !bookingForm.bookingDate} className="bg-emerald-600 hover:bg-emerald-700 text-sm">حفظ</Button>
+                  <Button onClick={handleSaveBooking} disabled={!bookingForm.roomId || !bookingForm.bookingDate || checkingConflicts} className="bg-emerald-600 hover:bg-emerald-700 text-sm">
+                    {checkingConflicts ? (
+                      <span className="flex items-center gap-1"><span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />جارٍ الفحص...</span>
+                    ) : "حفظ"}
+                  </Button>
                   <DialogClose asChild><Button variant="outline" size="sm">إلغاء</Button></DialogClose>
                 </DialogFooter>
               </DialogContent>

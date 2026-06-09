@@ -3,6 +3,7 @@
 import { useSyncExternalStore, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { addNotification } from '@/lib/notification-store';
 import {
   announcementsStore,
   studentRequestsStore,
@@ -665,6 +666,14 @@ export async function addAnnouncement(
     showNotification('حدث خطأ أثناء إضافة الإعلان', true);
   } else {
     showNotification('تم نشر الإعلان بنجاح');
+    // Add notification about new announcement
+    addNotification({
+      type: 'info',
+      title: 'إعلان جديد تم نشره',
+      message: `تم نشر إعلان "${announcement.title}" بنجاح.`,
+      link: '#announcements',
+      entityType: 'announcement',
+    });
   }
 }
 
@@ -728,6 +737,26 @@ export async function updateStudentRequestStatus(
   } else {
     const statusMsg = status === 'approved' ? 'تم قبول طلب الطالب' : status === 'rejected' ? 'تم رفض طلب الطالب' : 'تم تحديث حالة الطلب';
     showNotification(statusMsg);
+    // Add notification to notification center
+    if (status === 'approved') {
+      addNotification({
+        type: 'success',
+        title: 'تم قبول طلب طالب',
+        message: 'تمت الموافقة على طلب طالب وإبلاغه بالنتيجة.',
+        link: '#requests',
+        entityType: 'request',
+        entityId: requestId,
+      });
+    } else if (status === 'rejected') {
+      addNotification({
+        type: 'warning',
+        title: 'تم رفض طلب طالب',
+        message: 'تم رفض طلب طالب وسيتم إبلاغه بالسبب.',
+        link: '#requests',
+        entityType: 'request',
+        entityId: requestId,
+      });
+    }
   }
   return result;
 }
@@ -950,6 +979,18 @@ export async function addEnrollment(enrollment: {
     showNotification('حدث خطأ أثناء التسجيل في المقرر', true);
   } else {
     showNotification('تم التسجيل في المقرر بنجاح');
+    // Check for capacity and send warning if needed
+    const currentCount = tableCache['enrolled_students']?.length || 0;
+    if (currentCount >= 35) {
+      addNotification({
+        type: 'error',
+        title: 'تسجيل وصل للحد الأقصى',
+        message: `وصل عدد المسجلين في مقرر ${enrollment.courseCode} إلى ${currentCount} طالب، قريب من السعة القصوى.`,
+        link: '#curriculum',
+        entityType: 'course',
+        entityId: enrollment.courseCode,
+      });
+    }
   }
   return result;
 }
@@ -1048,6 +1089,26 @@ export async function updateTransferStatus(
   } else {
     const statusMsg = status === 'approved' ? 'تم قبول طلب التحويل وتحديث بيانات العضو' : status === 'rejected' ? 'تم رفض طلب التحويل' : 'تم تحديث حالة الطلب';
     showNotification(statusMsg);
+    // Add notification to notification center
+    if (status === 'approved') {
+      addNotification({
+        type: 'success',
+        title: 'تم قبول طلب تحويل',
+        message: 'تمت الموافقة على طلب التحويل وتحديث البيانات.',
+        link: '#transfers',
+        entityType: 'transfer',
+        entityId: transferId,
+      });
+    } else if (status === 'rejected') {
+      addNotification({
+        type: 'warning',
+        title: 'تم رفض طلب تحويل',
+        message: 'تم رفض طلب التحويل وسيتم إبلاغ المعني.',
+        link: '#transfers',
+        entityType: 'transfer',
+        entityId: transferId,
+      });
+    }
   }
   return result;
 }

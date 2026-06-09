@@ -19,6 +19,7 @@ import {
   GraduationCap,
   ClipboardCheck,
   GraduationCap as UserGraduateIcon,
+  User,
 } from "lucide-react";
 import {
   useAnnouncements,
@@ -27,6 +28,7 @@ import {
   TARGET_ROLE_LABELS,
 } from "@/lib/supabase-store";
 import StudentRecords from "@/components/student/StudentRecords";
+import StudentProfileCard from "@/components/student/StudentProfileCard";
 import CourseRegistration from "@/components/student/CourseRegistration";
 import AcademicCourses from "@/components/student/AcademicCourses";
 import StudentRequests from "@/components/student/StudentRequests";
@@ -99,6 +101,10 @@ export default function StudentDashboard() {
           <TabsTrigger value="announcements" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
             <Bell className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             <span className="truncate">الإعلانات</span>
+          </TabsTrigger>
+          <TabsTrigger value="profile" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
+            <User className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+            <span className="truncate">البطاقة</span>
           </TabsTrigger>
           <TabsTrigger value="courses" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
             <BookOpen className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
@@ -184,6 +190,11 @@ export default function StudentDashboard() {
         {/* Academic Courses Tab */}
         <TabsContent value="courses" className="mt-3 sm:mt-4">
           <AcademicCourses />
+        </TabsContent>
+
+        {/* Student Profile Card Tab */}
+        <TabsContent value="profile" className="mt-3 sm:mt-4">
+          <StudentProfileCard />
         </TabsContent>
 
         {/* Academic Records Tab */}

@@ -401,6 +401,19 @@ html[dir="rtl"] [data-vaul-drawer-content] {
   background: #a1a1a1;
 }
 
+/* Dark mode scrollbar */
+.dark .custom-scrollbar::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #475569;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
 /* Card hover transition */
 .role-card {
   transition: all 0.3s ease;

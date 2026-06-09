@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   Card,
   CardContent,
@@ -19,6 +19,8 @@ import {
   Megaphone,
   UserCheck,
   GraduationCap,
+  Printer,
+  CalendarDays,
 } from 'lucide-react';
 import {
   Select,
@@ -27,6 +29,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 interface LogEntry {
   id: string;
@@ -51,11 +55,20 @@ const ACTION_LABELS: Record<string, string> = {
   student_approved: 'قبول طلب طالب',
   student_rejected: 'رفض طلب طالب',
   announcement: 'إعلان',
+  announcement_deleted: 'حذف إعلان',
   member_added: 'إضافة عضو',
   member_removed: 'حذف عضو',
   permission_change: 'تغيير صلاحيات',
   enrollment: 'تسجيل مقرر',
+  enrollment_deleted: 'إلغاء تسجيل',
   grade_update: 'تحديث درجات',
+  course_added: 'إضافة مقرر',
+  course_deleted: 'حذف مقرر',
+  room_added: 'إضافة قاعة',
+  room_deleted: 'حذف قاعة',
+  room_booking: 'حجز قاعة',
+  professor_request_deleted: 'حذف طلب أستاذ',
+  student_request_deleted: 'حذف طلب طالب',
 };
 
 const ENTITY_TYPE_LABELS: Record<string, string> = {
@@ -65,6 +78,9 @@ const ENTITY_TYPE_LABELS: Record<string, string> = {
   announcement: 'إعلان',
   member: 'عضو',
   enrolled_student: 'تسجيل',
+  course: 'مقرر',
+  room: 'قاعة',
+  room_booking: 'حجز قاعة',
 };
 
 const ENTITY_TYPE_COLORS: Record<string, string> = {
@@ -74,14 +90,15 @@ const ENTITY_TYPE_COLORS: Record<string, string> = {
   announcement: 'bg-emerald-100 text-emerald-800',
   member: 'bg-cyan-100 text-cyan-800',
   enrolled_student: 'bg-amber-100 text-amber-800',
+  course: 'bg-blue-100 text-blue-800',
+  room: 'bg-teal-100 text-teal-800',
+  room_booking: 'bg-pink-100 text-pink-800',
 };
 
 const ACTION_COLORS: Record<string, string> = {
   transfer_request: 'bg-blue-100 text-blue-800',
   transfer_approved: 'bg-emerald-100 text-emerald-800',
   transfer_rejected: 'bg-red-100 text-red-800',
-  transfer_review: 'bg-amber-100 text-amber-800',
-  transfer_cancelled: 'bg-slate-100 text-slate-800',
   professor_request: 'bg-sky-100 text-sky-800',
   professor_approved: 'bg-emerald-100 text-emerald-800',
   professor_rejected: 'bg-red-100 text-red-800',
@@ -91,9 +108,12 @@ const ACTION_COLORS: Record<string, string> = {
   announcement: 'bg-purple-100 text-purple-800',
   member_added: 'bg-emerald-100 text-emerald-800',
   member_removed: 'bg-red-100 text-red-800',
-  permission_change: 'bg-amber-100 text-amber-800',
   enrollment: 'bg-indigo-100 text-indigo-800',
-  grade_update: 'bg-teal-100 text-teal-800',
+  course_added: 'bg-blue-100 text-blue-800',
+  course_deleted: 'bg-red-100 text-red-800',
+  room_added: 'bg-teal-100 text-teal-800',
+  room_deleted: 'bg-red-100 text-red-800',
+  room_booking: 'bg-pink-100 text-pink-800',
 };
 
 function getActionIcon(action: string) {
@@ -105,12 +125,14 @@ function getActionIcon(action: string) {
   if (action.includes('announcement')) return Megaphone;
   if (action.includes('member')) return UserCheck;
   if (action.includes('enrollment')) return ClipboardList;
+  if (action.includes('course')) return GraduationCap;
+  if (action.includes('room')) return GraduationCap;
   return Activity;
 }
 
 function getActionIconColor(action: string) {
   if (action.includes('approved')) return 'text-emerald-600';
-  if (action.includes('rejected')) return 'text-red-600';
+  if (action.includes('rejected') || action.includes('deleted') || action.includes('removed')) return 'text-red-600';
   if (action.includes('transfer')) return 'text-violet-600';
   return 'text-slate-600';
 }
@@ -125,16 +147,38 @@ function formatDate(dateStr: string) {
   });
 }
 
+function getDateRangeFilter(range: string) {
+  const now = new Date();
+  let start: Date;
+  switch (range) {
+    case 'today':
+      start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      break;
+    case 'week':
+      start = new Date(now);
+      start.setDate(now.getDate() - 7);
+      break;
+    case 'month':
+      start = new Date(now);
+      start.setMonth(now.getMonth() - 1);
+      break;
+    default:
+      return null;
+  }
+  return start.toISOString();
+}
+
 export default function ActivityLog() {
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterType, setFilterType] = useState<string>('all');
+  const [dateRange, setDateRange] = useState<string>('all');
 
   const fetchLogs = async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
-      params.set('limit', '50');
+      params.set('limit', '100');
       if (filterType !== 'all') {
         params.set('entityType', filterType);
       }
@@ -152,26 +196,44 @@ export default function ActivityLog() {
     fetchLogs();
   }, [filterType]);
 
-  const filteredLogs = logs;
+  const filteredLogs = useMemo(() => {
+    if (dateRange === 'all') return logs;
+    const startISO = getDateRangeFilter(dateRange);
+    if (!startISO) return logs;
+    return logs.filter((l) => new Date(l.created_at) >= new Date(startISO));
+  }, [logs, dateRange]);
 
-  const stats = {
-    total: logs.length,
-    transfers: logs.filter((l) => l.entity_type === 'employee_transfer').length,
-    professorReqs: logs.filter((l) => l.entity_type === 'professor_request').length,
-    studentReqs: logs.filter((l) => l.entity_type === 'student_request').length,
-    announcements: logs.filter((l) => l.entity_type === 'announcement').length,
+  const stats = useMemo(() => {
+    const now = new Date();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+    const weekStart = new Date(now);
+    weekStart.setDate(now.getDate() - 7);
+    const weekStartISO = weekStart.toISOString();
+    const monthStart = new Date(now);
+    monthStart.setMonth(now.getMonth() - 1);
+    const monthStartISO = monthStart.toISOString();
+
+    return {
+      total: filteredLogs.length,
+      today: filteredLogs.filter((l) => l.created_at >= todayStart).length,
+      thisWeek: filteredLogs.filter((l) => l.created_at >= weekStartISO).length,
+      thisMonth: filteredLogs.filter((l) => l.created_at >= monthStartISO).length,
+    };
+  }, [filteredLogs]);
+
+  const handleExport = () => {
+    window.print();
   };
 
   return (
     <div className="space-y-4" dir="rtl">
-      {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-3">
+      {/* Stats Summary */}
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-3 no-print">
         {[
           { label: 'الإجمالي', value: stats.total, icon: Activity, color: 'bg-slate-50 text-slate-700' },
-          { label: 'التحويلات', value: stats.transfers, icon: ArrowRightLeft, color: 'bg-violet-50 text-violet-700' },
-          { label: 'طلبات الأساتذة', value: stats.professorReqs, icon: UserCheck, color: 'bg-sky-50 text-sky-700' },
-          { label: 'طلبات الطلاب', value: stats.studentReqs, icon: GraduationCap, color: 'bg-orange-50 text-orange-700' },
-          { label: 'الإعلانات', value: stats.announcements, icon: Megaphone, color: 'bg-emerald-50 text-emerald-700' },
+          { label: 'اليوم', value: stats.today, icon: CalendarDays, color: 'bg-blue-50 text-blue-700' },
+          { label: 'هذا الأسبوع', value: stats.thisWeek, icon: Clock, color: 'bg-amber-50 text-amber-700' },
+          { label: 'هذا الشهر', value: stats.thisMonth, icon: ClipboardList, color: 'bg-emerald-50 text-emerald-700' },
         ].map((card) => {
           const Icon = card.icon;
           return (
@@ -192,10 +254,10 @@ export default function ActivityLog() {
         })}
       </div>
 
-      {/* Filter & Refresh */}
-      <Card>
+      {/* Filter & Refresh & Export */}
+      <Card className="no-print">
         <CardContent className="p-3 sm:p-4">
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             <div className="flex items-center gap-1.5 flex-row-reverse">
               <Filter className="w-4 h-4 text-muted-foreground" />
               <Select value={filterType} onValueChange={setFilterType}>
@@ -209,18 +271,32 @@ export default function ActivityLog() {
                   <SelectItem value="student_request">طلبات الطلاب</SelectItem>
                   <SelectItem value="announcement">الإعلانات</SelectItem>
                   <SelectItem value="member">الأعضاء</SelectItem>
+                  <SelectItem value="course">المقررات</SelectItem>
+                  <SelectItem value="room">القاعات</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={fetchLogs}
-              disabled={loading}
-              className="text-xs sm:text-sm"
-            >
+            <div className="flex items-center gap-1.5 flex-row-reverse">
+              <Label className="text-xs text-muted-foreground shrink-0">الفترة:</Label>
+              <Select value={dateRange} onValueChange={setDateRange}>
+                <SelectTrigger className="w-full sm:w-32 text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">الكل</SelectItem>
+                  <SelectItem value="today">اليوم</SelectItem>
+                  <SelectItem value="week">هذا الأسبوع</SelectItem>
+                  <SelectItem value="month">هذا الشهر</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <Button variant="outline" size="sm" onClick={fetchLogs} disabled={loading} className="text-xs sm:text-sm">
               <RefreshCw className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ml-1 ${loading ? 'animate-spin' : ''}`} />
               تحديث
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleExport} className="text-xs sm:text-sm gap-1.5">
+              <Printer className="w-3.5 h-3.5" />
+              تصدير
             </Button>
             <Badge variant="outline" className="text-[10px] sm:text-xs shrink-0">
               {filteredLogs.length} سجل
@@ -236,7 +312,7 @@ export default function ActivityLog() {
           <p className="text-sm">لا توجد سجلات حالياً</p>
         </div>
       ) : (
-        <div className="space-y-2 sm:space-y-3">
+        <div className="space-y-2 sm:space-y-3 max-h-[600px] overflow-y-auto custom-scrollbar">
           {filteredLogs.map((log) => {
             const ActionIcon = getActionIcon(log.action);
             const iconColor = getActionIconColor(log.action);
@@ -245,12 +321,9 @@ export default function ActivityLog() {
               <Card key={log.id} className="hover:shadow-md transition-shadow overflow-hidden">
                 <CardContent className="p-3 sm:p-4">
                   <div className="flex items-start gap-2.5 sm:gap-3 flex-row-reverse">
-                    {/* Icon */}
                     <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-slate-50 flex items-center justify-center shrink-0">
                       <ActionIcon className={`w-4 h-4 sm:w-5 sm:h-5 ${iconColor}`} />
                     </div>
-
-                    {/* Content */}
                     <div className="flex-1 min-w-0">
                       <div className="flex flex-wrap items-center gap-1 sm:gap-1.5 mb-1">
                         <Badge className={`text-[10px] sm:text-xs ${ACTION_COLORS[log.action] || 'bg-slate-100 text-slate-800'}`}>
@@ -269,7 +342,7 @@ export default function ActivityLog() {
 
                       {log.details && (
                         <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed line-clamp-2">
-                          {log.details}
+                          {typeof log.details === 'string' ? log.details : ''}
                         </p>
                       )}
 

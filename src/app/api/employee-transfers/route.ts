@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { employeeTransfersStore, membersStore, genId } from '@/lib/local-data';
+import { serverLogActivity } from '@/lib/activity-logger';
 
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error) return error.message;
@@ -87,6 +88,7 @@ export async function POST(request: NextRequest) {
         .single();
 
       if (error) throw error;
+      serverLogActivity({ action: 'transfer_request', entityType: 'employee_transfer', entityId: data.id, entityName: data.employee_name, details: { requestedRank: data.requested_rank } });
       return NextResponse.json(data, { status: 201 });
     } catch (error: unknown) {
       return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
@@ -175,23 +177,9 @@ export async function PUT(request: NextRequest) {
         await supabase.from('members').update(memberUpdate).eq('id', updatedRecord.employee_id);
 
         // 2. Log the transfer approval to activity_log
-        await supabase.from('activity_log').insert({
-          action: 'employee_transfer_approved',
-          entity_type: 'employee_transfer',
-          entity_id: updatedRecord.id,
-          entity_name: updatedRecord.employee_name,
-          performed_by: updatedRecord.reviewed_by,
-          performed_by_name: updatedRecord.reviewed_by_name,
-          details: {
-            transfer_id: updatedRecord.id,
-            employee_name: updatedRecord.employee_name,
-            employee_id: updatedRecord.employee_id,
-            requested_rank: updatedRecord.requested_rank,
-            new_department: updatedRecord.new_department || null,
-          },
-        });
+        serverLogActivity({ action: 'transfer_approved', entityType: 'employee_transfer', entityId: updatedRecord.id, entityName: updatedRecord.employee_name, details: { newStatus: 'approved' } });
 
-        // 3. Create/update faculty_profile only if the new role is teaching-related
+        // 3. Create/update faculty profile only if the new role is teaching-related
         const teachingRoles = new Set([
           'professor', 'associate_professor', 'assistant_professor',
           'lecturer', 'ta', 'teaching_assistant',

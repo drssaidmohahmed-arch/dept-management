@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { membersStore, genId } from '@/lib/local-data';
+import { serverLogActivity } from '@/lib/activity-logger';
 
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error) return error.message;
@@ -130,6 +131,7 @@ export async function POST(request: NextRequest) {
         .single();
 
       if (error) throw error;
+      serverLogActivity({ action: 'member_added', entityType: 'member', entityId: data.id, entityName: data.name, details: { role: data.role, position: data.position } });
       return NextResponse.json(data, { status: 201 });
     } catch (error: unknown) {
       return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
@@ -148,6 +150,7 @@ export async function POST(request: NextRequest) {
     permissions: body.permissions || [],
     joinedAt: new Date().toISOString(),
   });
+  serverLogActivity({ action: 'member_added', entityType: 'member', entityId: item.id, entityName: item.name, details: { role: item.role } });
   return NextResponse.json(item, { status: 201 });
 }
 
@@ -212,6 +215,7 @@ export async function DELETE(request: NextRequest) {
         .eq('id', id);
 
       if (error) throw error;
+      serverLogActivity({ action: 'member_removed', entityType: 'member', entityId: id, entityName: 'عضو محذوف' });
       return NextResponse.json({ success: true });
     } catch (error: unknown) {
       return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
@@ -220,5 +224,6 @@ export async function DELETE(request: NextRequest) {
 
   // Fallback to local data
   membersStore.delete(id);
+  serverLogActivity({ action: 'member_removed', entityType: 'member', entityId: id, entityName: 'عضو محذوف' });
   return NextResponse.json({ success: true });
 }

@@ -56,6 +56,8 @@ import {
   Crown,
   ArrowRightLeft,
   Activity,
+  FileBarChart,
+  CalendarCheck,
 } from "lucide-react";
 import DepartmentRequestManager from "@/components/shared/DepartmentRequestManager";
 import TeachingSchedule from "@/components/faculty/TeachingSchedule";
@@ -74,6 +76,13 @@ import PermissionsManager from "@/components/hod/PermissionsManager";
 import StudentManagement from "@/components/hod/StudentManagement";
 import FacultyProfiles from "@/components/faculty/FacultyProfiles";
 import ActivityLog from "@/components/shared/ActivityLog";
+import ReportsDashboard from "@/components/shared/ReportsDashboard";
+import KPIDashboard from "@/components/hod/KPIDashboard";
+import ExamSchedule from "@/components/schedules/ExamSchedule";
+import {
+  NotificationBell,
+  NotificationHistory,
+} from "@/components/shared/NotificationCenter";
 import {
   useAnnouncements,
   useCourses,
@@ -112,6 +121,7 @@ export default function HODDashboard() {
   const [content, setContent] = useState("");
   const [priority, setPriority] = useState<"urgent" | "important" | "normal">("normal");
   const [targetRole, setTargetRole] = useState<"all" | "professors" | "employees" | "students">("all");
+  const [showNotificationHistory, setShowNotificationHistory] = useState(false);
 
   const announcements = useAnnouncements();
   const stats = useStats();
@@ -155,11 +165,13 @@ export default function HODDashboard() {
                 <p className="text-blue-200 text-[10px] sm:text-xs">نظرة شاملة على القسم الأكاديمي</p>
               </div>
             </div>
-            {/* System Status Badge */}
-            <Badge
-              className={`text-[9px] sm:text-[10px] px-2 py-1 shrink-0 ${
-                migrated === true
-                  ? "bg-emerald-500/20 text-emerald-100 border border-emerald-400/30"
+            {/* System Status Badge + Notification Bell */}
+            <div className="flex items-center gap-2">
+              <NotificationBell onViewAll={() => setShowNotificationHistory(true)} />
+              <Badge
+                className={`text-[9px] sm:text-[10px] px-2 py-1 shrink-0 ${
+                  migrated === true
+                    ? "bg-emerald-500/20 text-emerald-100 border border-emerald-400/30"
                   : migrated === false
                   ? "bg-amber-500/20 text-amber-100 border border-amber-400/30"
                   : "bg-white/10 text-blue-200 border border-white/20"
@@ -182,9 +194,19 @@ export default function HODDashboard() {
                 </span>
               )}
             </Badge>
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Notification History Modal */}
+      {showNotificationHistory && (
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-start justify-center pt-4 sm:pt-8 overflow-y-auto">
+          <div className="w-full max-w-3xl mx-4 mb-8">
+            <NotificationHistory onBack={() => setShowNotificationHistory(false)} />
+          </div>
+        </div>
+      )}
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3 md:gap-4">
@@ -216,6 +238,10 @@ export default function HODDashboard() {
           <TabsTrigger value="home" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
             <BarChart3 className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             <span className="truncate">الرئيسية</span>
+          </TabsTrigger>
+          <TabsTrigger value="kpi" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
+            <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+            <span className="truncate">لوحة المؤشرات</span>
           </TabsTrigger>
           <TabsTrigger value="announcements" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
             <Bell className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
@@ -256,6 +282,10 @@ export default function HODDashboard() {
           <TabsTrigger value="activity-log" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
             <Activity className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             <span className="truncate">سجل العمليات</span>
+          </TabsTrigger>
+          <TabsTrigger value="reports" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
+            <FileBarChart className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+            <span className="truncate">التقارير والإحصائيات</span>
           </TabsTrigger>
         </TabsList>
 
@@ -312,6 +342,11 @@ export default function HODDashboard() {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* KPI Dashboard Tab */}
+        <TabsContent value="kpi" className="mt-3 sm:mt-4">
+          <KPIDashboard />
         </TabsContent>
 
         {/* Announcements Tab */}
@@ -554,12 +589,19 @@ export default function HODDashboard() {
                 <CalendarDays className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
                 <span className="truncate">الجدول الدراسي</span>
               </TabsTrigger>
+              <TabsTrigger value="exams" className="flex-1 min-w-0 flex items-center gap-0.5 sm:gap-1 flex-row-reverse text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 rounded-lg">
+                <CalendarCheck className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
+                <span className="truncate">جدول الامتحانات</span>
+              </TabsTrigger>
             </TabsList>
             <TabsContent value="rooms">
               <RoomManagement />
             </TabsContent>
             <TabsContent value="schedule-view">
               <ScheduleView />
+            </TabsContent>
+            <TabsContent value="exams">
+              <ExamSchedule />
             </TabsContent>
           </Tabs>
         </TabsContent>
@@ -587,6 +629,11 @@ export default function HODDashboard() {
         {/* Activity Log Tab */}
         <TabsContent value="activity-log" className="mt-3 sm:mt-4">
           <ActivityLog />
+        </TabsContent>
+
+        {/* Reports Tab */}
+        <TabsContent value="reports" className="mt-3 sm:mt-4">
+          <ReportsDashboard />
         </TabsContent>
       </Tabs>
     </div>

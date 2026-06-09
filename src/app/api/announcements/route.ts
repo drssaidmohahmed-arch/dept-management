@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { announcementsStore, genId } from '@/lib/local-data';
+import { serverLogActivity } from '@/lib/activity-logger';
 
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error) return error.message;
@@ -79,6 +80,7 @@ export async function POST(request: NextRequest) {
         .single();
 
       if (error) throw error;
+      serverLogActivity({ action: 'announcement', entityType: 'announcement', entityId: data.id, entityName: data.title, details: { priority: data.priority, targetRole: data.target_role } });
       return NextResponse.json(data, { status: 201 });
     } catch (error: unknown) {
       return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
@@ -94,6 +96,7 @@ export async function POST(request: NextRequest) {
     targetRole: body.targetRole || 'all',
     createdAt: new Date().toISOString(),
   });
+  serverLogActivity({ action: 'announcement', entityType: 'announcement', entityId: item.id, entityName: item.title, details: { priority: item.priority } });
   return NextResponse.json(item, { status: 201 });
 }
 
@@ -115,6 +118,7 @@ export async function DELETE(request: NextRequest) {
         .eq('id', id);
 
       if (error) throw error;
+      serverLogActivity({ action: 'announcement_deleted', entityType: 'announcement', entityId: id, entityName: 'إعلان محذوف' });
       return NextResponse.json({ success: true });
     } catch (error: unknown) {
       return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
@@ -123,5 +127,6 @@ export async function DELETE(request: NextRequest) {
 
   // Fallback to local data
   announcementsStore.delete(id);
+  serverLogActivity({ action: 'announcement_deleted', entityType: 'announcement', entityId: id, entityName: 'إعلان محذوف' });
   return NextResponse.json({ success: true });
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { studentRequestsStore, genId } from '@/lib/local-data';
+import { serverLogActivity } from '@/lib/activity-logger';
 
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error) return error.message;
@@ -110,6 +111,7 @@ export async function POST(request: NextRequest) {
         .single();
 
       if (error) throw error;
+      serverLogActivity({ action: 'student_request', entityType: 'student_request', entityId: data.id, entityName: data.type, details: { description: data.description } });
       return NextResponse.json(data, { status: 201 });
     } catch (error: unknown) {
       return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
@@ -162,6 +164,9 @@ export async function PUT(request: NextRequest) {
     if (error) throw error;
 
     if (data && data.length > 0) {
+      if (status === 'approved' || status === 'rejected') {
+        serverLogActivity({ action: status === 'approved' ? 'student_approved' : 'student_rejected', entityType: 'student_request', entityId: id, entityName: 'طلب طالب', details: { newStatus: status, response } });
+      }
       return NextResponse.json(data[0]);
     }
 
@@ -190,6 +195,7 @@ export async function DELETE(request: NextRequest) {
         .eq('id', id);
 
       if (error) throw error;
+      serverLogActivity({ action: 'student_request_deleted', entityType: 'student_request', entityId: id, entityName: 'طلب طالب محذوف' });
       return NextResponse.json({ success: true });
     } catch (error: unknown) {
       return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
@@ -198,5 +204,6 @@ export async function DELETE(request: NextRequest) {
 
   // Fallback to local data
   studentRequestsStore.delete(id);
+  serverLogActivity({ action: 'student_request_deleted', entityType: 'student_request', entityId: id, entityName: 'طلب طالب محذوف' });
   return NextResponse.json({ success: true });
 }

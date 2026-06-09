@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { enrolledStudentsStore, genId } from '@/lib/local-data';
+import { serverLogActivity } from '@/lib/activity-logger';
 
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error) return error.message;
@@ -100,6 +101,7 @@ export async function POST(request: NextRequest) {
         throw error;
       }
 
+      serverLogActivity({ action: 'enrollment', entityType: 'enrolled_student', entityId: data.id, entityName: `${data.student_name} - ${data.course_code}`, details: { courseCode: data.course_code, studentId: data.student_id } });
       return NextResponse.json(data, { status: 201 });
     } catch (error: unknown) {
       return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
@@ -180,6 +182,7 @@ export async function DELETE(request: NextRequest) {
     try {
       const { error } = await supabase.from('enrolled_students').delete().eq('id', id);
       if (error) throw error;
+      serverLogActivity({ action: 'enrollment_deleted', entityType: 'enrolled_student', entityId: id, entityName: 'تسجيل محذوف' });
       return NextResponse.json({ success: true });
     } catch (error: unknown) {
       return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
@@ -188,5 +191,6 @@ export async function DELETE(request: NextRequest) {
 
   // Fallback to local data
   enrolledStudentsStore.delete(id);
+  serverLogActivity({ action: 'enrollment_deleted', entityType: 'enrolled_student', entityId: id, entityName: 'تسجيل محذوف' });
   return NextResponse.json({ success: true });
 }

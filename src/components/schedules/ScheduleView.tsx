@@ -23,7 +23,10 @@ import {
   Filter,
   AlertTriangle,
   Clock,
+  ShieldCheck,
 } from "lucide-react";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import type { ScheduleConflict } from "@/lib/conflict-detector";
 import type { TeachingAssignment, CourseSection, DayOfWeek, SessionType } from "@/lib/store";
 import {
   DAY_OF_WEEK_LABELS,
@@ -120,6 +123,9 @@ export default function ScheduleView() {
   const [filterProfessor, setFilterProfessor] = useState<string>("all");
   const [filterRoom, setFilterRoom] = useState<string>("all");
   const [filterSemester, setFilterSemester] = useState<string>("all");
+  const [serverConflicts, setServerConflicts] = useState<ScheduleConflict[]>([]);
+  const [isCheckingServerConflicts, setIsCheckingServerConflicts] = useState(false);
+  const [showServerConflictAlert, setShowServerConflictAlert] = useState(false);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -158,6 +164,38 @@ export default function ScheduleView() {
     return true;
   });
 
+  const handleCheckServerConflicts = async () => {
+    setIsCheckingServerConflicts(true);
+    try {
+      const res = await fetch("/api/check-conflicts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          newEntry: { startTime: "00:00", endTime: "00:01" }, // dummy entry to trigger all-conflicts mode
+          existingEntries: filteredAssignments.map((a) => ({
+            roomId: a.roomId,
+            roomName: a.roomName,
+            instructorName: a.professorName,
+            startTime: a.startTime,
+            endTime: a.endTime,
+            day: a.day,
+            courseName: a.courseName,
+            courseCode: a.courseCode,
+            section: a.section,
+            enrolledCount: undefined,
+            capacity: undefined,
+          })),
+        }),
+      });
+      const data = await res.json();
+      setServerConflicts(data.conflicts || []);
+      setShowServerConflictAlert(true);
+    } catch {
+      setServerConflicts([]);
+    }
+    setIsCheckingServerConflicts(false);
+  };
+
   const conflicts = findConflicts(filteredAssignments);
   const conflictingIds = new Set(conflicts.flatMap((c) => c.assignments.map((a) => a.id)));
 
@@ -174,16 +212,28 @@ export default function ScheduleView() {
     <div dir="rtl" className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between gap-2 flex-wrap">
-        <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2 flex-row-reverse">
-          <Calendar className="w-5 h-5 text-emerald-600" />
-          الجدول الأسبوعي الرئيسي
-        </h2>
-        {conflicts.length > 0 && (
-          <Badge variant="destructive" className="flex items-center gap-1 text-[10px]">
-            <AlertTriangle className="w-3 h-3" />
-            {conflicts.length} تعارض
-          </Badge>
-        )}
+        <div className="flex items-center gap-2 flex-row-reverse">
+          <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+            <Calendar className="w-5 h-5 text-emerald-600" />
+            الجدول الأسبوعي الرئيسي
+          </h2>
+          {conflicts.length > 0 && (
+            <Badge variant="destructive" className="flex items-center gap-1 text-[10px]">
+              <AlertTriangle className="w-3 h-3" />
+              {conflicts.length} تعارض
+            </Badge>
+          )}
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleCheckServerConflicts}
+          disabled={isCheckingServerConflicts}
+          className="flex items-center gap-1.5 text-xs"
+        >
+          <ShieldCheck className="w-3.5 h-3.5" />
+          {isCheckingServerConflicts ? "جارٍ الفحص..." : "كشف التعارضات"}
+        </Button>
       </div>
 
       {/* Filters */}
@@ -359,6 +409,59 @@ export default function ScheduleView() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Server Conflict Alert Dialog */}
+      {showServerConflictAlert && (
+        <Card className="border-red-200">
+          <CardHeader className="p-3 pb-2">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-sm text-red-700 flex items-center gap-2 flex-row-reverse">
+                <ShieldCheck className="w-4 h-4" />
+                تقرير كشف التعارضات
+              </CardTitle>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowServerConflictAlert(false)}
+                className="text-xs"
+              >
+                إغلاق
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="p-3 pt-0">
+            {serverConflicts.length === 0 ? (
+              <Alert>
+                <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                <AlertTitle className="text-emerald-700">لا توجد تعارضات</AlertTitle>
+                <AlertDescription className="text-emerald-600">
+                  الجدول الأسبوعي خالٍ من أي تعارضات في القاعات أو جداول المحاضرين.
+                </AlertDescription>
+              </Alert>
+            ) : (
+              <div className="space-y-2">
+                <Alert variant="destructive">
+                  <AlertTriangle className="w-4 h-4" />
+                  <AlertTitle>تم اكتشاف {serverConflicts.length} تعارض</AlertTitle>
+                  <AlertDescription>
+                    يرجى مراجعة التعارضات التالية وإصلاحها قبل بدء الفصل الدراسي.
+                  </AlertDescription>
+                </Alert>
+                {serverConflicts.map((c, idx) => (
+                  <div key={idx} className="bg-red-50 rounded-lg p-2.5 border border-red-100">
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <Badge className={`text-[9px] ${c.type === 'room_overlap' ? 'bg-orange-100 text-orange-800' : c.type === 'instructor_overlap' ? 'bg-violet-100 text-violet-800' : 'bg-red-100 text-red-800'}`}>
+                        {c.type === 'room_overlap' ? 'تعارض قاعة' : c.type === 'instructor_overlap' ? 'تعارض محاضر' : 'تجاوز سعة'}
+                      </Badge>
+                    </div>
+                    <p className="text-xs text-red-800">{c.message}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       {/* Conflict Warnings */}
       {conflicts.length > 0 && (

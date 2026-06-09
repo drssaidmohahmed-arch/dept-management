@@ -17,6 +17,7 @@ import {
   GRADE_TO_POINTS,
   GRADE_COLORS,
 } from '@/lib/supabase-store';
+import { calculateGPA, getAcademicStatus } from '@/lib/gpa-calculator';
 
 // Current student (hardcoded since no auth)
 const CURRENT_STUDENT_ID = 'ST-2024-001';
@@ -55,34 +56,20 @@ export default function StudentRecords() {
     return myEnrollments.filter((e) => e.semester === activeSem);
   }, [myEnrollments, activeSem]);
 
-  // Calculate GPA for a set of enrollments
-  const calculateGPA = (enrollments: typeof myEnrollments) => {
-    let totalPoints = 0;
-    let totalHours = 0;
-    enrollments.forEach((e) => {
-      if (e.grade && e.status === 'active') {
-        const hours = courseMap[e.courseCode]?.hours || 0;
-        const points = GRADE_TO_POINTS[e.grade] ?? 0;
-        totalPoints += points * hours;
-        totalHours += hours;
-      }
-    });
-    return totalHours > 0 ? totalPoints / totalHours : 0;
-  };
+  // Auto-calculated GPA from GPA calculator library
+  const gpaResult = useMemo(() => {
+    const courseHoursMap: Record<string, number> = {};
+    courses.forEach((c) => { courseHoursMap[c.code] = c.hours; });
+    return calculateGPA(myEnrollments, courseHoursMap);
+  }, [myEnrollments, courses]);
 
-  // Calculate total hours earned (courses with passing grades)
-  const totalHoursEarned = useMemo(() => {
-    let hours = 0;
-    myEnrollments.forEach((e) => {
-      if (e.grade && e.status === 'active' && GRADE_TO_POINTS[e.grade] > 0) {
-        hours += courseMap[e.courseCode]?.hours || 0;
-      }
-    });
-    return hours;
-  }, [myEnrollments, courseMap]);
+  // Calculate total hours earned from auto-calculated result
+  const totalHoursEarned = gpaResult.totalCredits;
 
-  const currentSemesterGPA = calculateGPA(semesterEnrollments);
-  const cumulativeGPA = calculateGPA(myEnrollments);
+  const currentSemesterGPA = gpaResult.semesterGPAs.length > 0
+    ? gpaResult.semesterGPAs[gpaResult.semesterGPAs.length - 1].gpa
+    : 0;
+  const cumulativeGPA = gpaResult.cumulativeGPA;
 
   const gpaColor = (gpa: number) => {
     if (gpa >= 3.5) return 'text-emerald-600';
@@ -91,15 +78,17 @@ export default function StudentRecords() {
     return 'text-red-600';
   };
 
+  const academicStatus = getAcademicStatus(cumulativeGPA);
+
   // Calculate hours for active semester
   const semesterHours = semesterEnrollments.reduce((sum, e) => {
     return sum + (courseMap[e.courseCode]?.hours || 0);
   }, 0);
 
-  // Per-semester GPA for display
+  // Per-semester GPA for display from auto-calculated result
   const semesterGPA = (sem: number) => {
-    const semEnrollments = myEnrollments.filter((e) => e.semester === sem);
-    return calculateGPA(semEnrollments);
+    const found = gpaResult.semesterGPAs.find((s) => s.semester === sem);
+    return found ? found.gpa : 0;
   };
 
   return (
@@ -118,6 +107,9 @@ export default function StudentRecords() {
             <div className="mr-auto">
               <Badge className="bg-emerald-500/20 text-emerald-300 text-[10px] sm:text-xs border-0">
                 {studentSemesters.length} فصل
+              </Badge>
+              <Badge className={`${academicStatus.bgColor} ${academicStatus.textColor} text-[10px] sm:text-xs border-0 mr-1`}>
+                معدل {cumulativeGPA.toFixed(2)} - {academicStatus.label}
               </Badge>
             </div>
           </div>

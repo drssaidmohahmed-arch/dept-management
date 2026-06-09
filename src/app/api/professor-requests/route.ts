@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { professorRequestsStore, genId } from '@/lib/local-data';
+import { serverLogActivity } from '@/lib/activity-logger';
 
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error) return error.message;
@@ -133,6 +134,7 @@ export async function POST(request: NextRequest) {
         .single();
 
       if (error) throw error;
+      serverLogActivity({ action: 'professor_request', entityType: 'professor_request', entityId: data.id, entityName: data.subject, details: { category: data.category, target: data.target } });
       return NextResponse.json(data, { status: 201 });
     } catch (error: unknown) {
       return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
@@ -186,6 +188,9 @@ export async function PUT(request: NextRequest) {
         .single();
 
       if (error) throw error;
+      if (updateFields.status === 'approved' || updateFields.status === 'rejected') {
+        serverLogActivity({ action: updateFields.status === 'approved' ? 'professor_approved' : 'professor_rejected', entityType: 'professor_request', entityId: id, entityName: 'طلب أستاذ', details: { newStatus: updateFields.status } });
+      }
       return NextResponse.json(data);
     } catch (error: unknown) {
       return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
@@ -222,6 +227,8 @@ export async function DELETE(request: NextRequest) {
         .eq('id', id);
 
       if (error) throw error;
+
+      serverLogActivity({ action: 'professor_request_deleted', entityType: 'professor_request', entityId: id, entityName: 'طلب أستاذ محذوف' });
       return NextResponse.json({ success: true });
     } catch (error: unknown) {
       return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
@@ -230,5 +237,6 @@ export async function DELETE(request: NextRequest) {
 
   // Fallback to local data
   professorRequestsStore.delete(id);
+  serverLogActivity({ action: 'professor_request_deleted', entityType: 'professor_request', entityId: id, entityName: 'طلب أستاذ محذوف' });
   return NextResponse.json({ success: true });
 }

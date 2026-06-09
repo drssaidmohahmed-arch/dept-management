@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { roomsStore, genId } from '@/lib/local-data';
+import { serverLogActivity } from '@/lib/activity-logger';
 
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error) return error.message;
@@ -63,6 +64,7 @@ export async function POST(request: NextRequest) {
         is_available: body.isAvailable ?? true,
       }).select().single();
       if (error) throw error;
+      serverLogActivity({ action: 'room_added', entityType: 'room', entityId: data.id, entityName: data.name, details: { code: data.code, type: data.type } });
       return NextResponse.json(data, { status: 201 });
     } catch (error: unknown) {
       return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
@@ -75,6 +77,7 @@ export async function POST(request: NextRequest) {
     floor: body.floor || 0, capacity: body.capacity || 40, type: body.type || 'lecture_hall',
     equipment: body.equipment || [], isAvailable: body.isAvailable ?? true, createdAt: new Date().toISOString(),
   });
+  serverLogActivity({ action: 'room_added', entityType: 'room', entityId: item.id, entityName: item.name, details: { code: item.code } });
   return NextResponse.json(item, { status: 201 });
 }
 
@@ -125,6 +128,7 @@ export async function DELETE(request: NextRequest) {
     try {
       const { error } = await supabase.from('rooms').delete().eq('id', id);
       if (error) throw error;
+      serverLogActivity({ action: 'room_deleted', entityType: 'room', entityId: id, entityName: 'قاعة محذوفة' });
       return NextResponse.json({ success: true });
     } catch (error: unknown) {
       return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
@@ -133,5 +137,6 @@ export async function DELETE(request: NextRequest) {
 
   // Fallback to local data
   roomsStore.delete(id);
+  serverLogActivity({ action: 'room_deleted', entityType: 'room', entityId: id, entityName: 'قاعة محذوفة' });
   return NextResponse.json({ success: true });
 }

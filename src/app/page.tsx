@@ -22,6 +22,8 @@ import HODDashboard from "@/components/hod/HODDashboard";
 import ProfessorDashboard from "@/components/professor/ProfessorDashboard";
 import EmployeeDashboard from "@/components/employee/EmployeeDashboard";
 import StudentDashboard from "@/components/student/StudentDashboard";
+import { useAuth } from "@/lib/auth-context";
+import type { UserRole } from "@/lib/mock-users";
 
 type Role = "landing" | "hod" | "professor" | "employee" | "student";
 
@@ -135,7 +137,11 @@ function LandingPage({ onSelectRole }: { onSelectRole: (role: Role) => void }) {
 // ============ Main Page ============
 
 export default function Home() {
-  const [currentRole, setCurrentRole] = useState<Role>("landing");
+  const { isAuthenticated, user, role } = useAuth();
+  // selectedRole tracks manual user selection; null = auto-select from auth role
+  const [selectedRole, setSelectedRole] = useState<Role | null>(null);
+  // Derive effective role: manual selection takes precedence, otherwise use auth role
+  const currentRole: Role = selectedRole ?? (role as Role) ?? "landing";
 
   const roleTitles: Record<string, string> = {
     hod: "رئيس القسم",
@@ -144,27 +150,44 @@ export default function Home() {
     student: "الطالب",
   };
 
+  // Not authenticated - show loading while redirect happens
+  if (!isAuthenticated || !user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+          <p className="text-sm text-muted-foreground">جاري التحقق من الهوية...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (currentRole === "landing") {
-    return <LandingPage onSelectRole={setCurrentRole} />;
+    return <LandingPage onSelectRole={setSelectedRole} />;
   }
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 relative">
       {/* Header - compact on mobile */}
-      <header className="bg-white border-b sticky top-0 z-10">
+      <header className="bg-white border-b sticky top-14 z-10">
         <div className="max-w-6xl mx-auto px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between">
           <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             <div className="w-8 h-8 sm:w-9 sm:h-9 bg-slate-800 rounded-lg flex items-center justify-center shrink-0">
               <GraduationCap className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
             </div>
-            <h1 className="text-sm sm:text-lg font-bold text-slate-800 truncate">
-              {roleTitles[currentRole]}
-            </h1>
+            <div className="flex flex-col min-w-0">
+              <h1 className="text-sm sm:text-lg font-bold text-slate-800 truncate">
+                {roleTitles[currentRole]}
+              </h1>
+              <span className="text-[10px] sm:text-xs text-muted-foreground truncate">
+                {user.name}
+              </span>
+            </div>
           </div>
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setCurrentRole("landing")}
+            onClick={() => setSelectedRole(null)}
             className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm shrink-0"
           >
             <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
